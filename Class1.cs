@@ -9,7 +9,6 @@ using GTA;
 using GTA.Native;
 using GTA.Math;
 using GTA.NaturalMotion;
-using NativeUI;
 using LemonUI;
 using System.Media;
 using System.IO;
@@ -22,6 +21,7 @@ using LemonUI.Extensions;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 using System.Collections;
 using GTA.UI;
+using System.Runtime.CompilerServices;
 
 //uses lemon and SHVDN version 2, also added windows forms
 
@@ -36,6 +36,14 @@ namespace LemonUI.Menu1
         public static bool CanPlayerSuperJump { get; set; }
         public static bool canPlayerFastRun { get; set; }
 
+        //MoneyDrop Story Mode
+        bool moneyDrop40kOn;
+        bool moneyDrop1MilOn;
+        bool moneyDrop10MilOn;
+        bool moneyDrop15MilOn;
+        bool moneyDrop20MilOn;
+        bool moneyDrop100MilOn;
+
         private static readonly ObjectPool DemoPool = new ObjectPool();
         private static readonly NativeMenu DemoMenu = new NativeMenu(bqnnerText: "Essential Menu", name: "Made ~b~By Anonik v1.30", description: "Made ~b~By Anonik v1.30");
 
@@ -45,9 +53,12 @@ namespace LemonUI.Menu1
         //start of Top Level Items, at top of menu, not part of submenu
         private static readonly NativeMenu SelfMenu = new NativeMenu("Self Options", "Self Options", "");  //The first submenu
         private static readonly NativeMenu VehicleMenu = new NativeMenu("Vehicle Options", "Vehicle Options", "");  //The first submenu
+        private static readonly NativeMenu TeleportMenu = new NativeMenu("Teleport Options", "Teleporting Options");
 
         private static readonly NativeItem ClearWeather = new NativeItem("Clear Weather", "");
         private static readonly NativeItem CarGuy = new NativeItem("Change to Car Guy Model", "");
+
+
 
         //start of Submenu
         private static readonly NativeMenu DemoSubMenuPed = new NativeMenu("Peds", "Ped Gangs", "");  //The first submenu
@@ -57,8 +68,10 @@ namespace LemonUI.Menu1
         private static readonly NativeMenu ModelMenuPed = new NativeMenu("Model Changer", "Model Changer","");
         private static readonly NativeItem Franklins = new NativeItem("Franklin Model", "");
 
+
         //Selfmenu
 
+        
         private static readonly NativeCheckboxItem godmode1 = new NativeCheckboxItem("~b~God Mode.", "Description", false); // Enabled by Default with a Description
         private static readonly NativeItem maxhealth = new NativeItem("Max Health");
         private static readonly NativeCheckboxItem neverwanted = new NativeCheckboxItem("~b~Never Wanted", false);
@@ -68,15 +81,38 @@ namespace LemonUI.Menu1
         private static readonly NativeCheckboxItem superjump = new NativeCheckboxItem("Super Jump", false);
         private static readonly NativeCheckboxItem invisible = new NativeCheckboxItem("Invisible", false);
         private static readonly NativeCheckboxItem fastrun = new NativeCheckboxItem("Fast Run", false);
+        private static readonly NativeMenu MoneyMenu = new NativeMenu("Money Drop", "Money Drop", "");
+        private static readonly NativeCheckboxItem money40k = new NativeCheckboxItem("Money Drop 40k", false);
+        private static readonly NativeCheckboxItem money1milion = new NativeCheckboxItem("Money Drop 1Mil", false);
+        private static readonly NativeCheckboxItem money10milion = new NativeCheckboxItem("Money Drop 10Mil", false);
+        private static readonly NativeCheckboxItem money15milion = new NativeCheckboxItem("Money Drop 15Mil", false);
+        private static readonly NativeCheckboxItem money20milion = new NativeCheckboxItem("Money Drop 20Mil", false);
+        private static readonly NativeCheckboxItem money100milion = new NativeCheckboxItem("Money Drop 100Mil", false);
 
         //VehicleMenu
 
         private static readonly NativeItem fixvehicle = new NativeItem("Fix Car Health");
         private static readonly NativeCheckboxItem cargodmod = new NativeCheckboxItem("Invincible Car", false);
         private static readonly NativeCheckboxItem cardrivein = new NativeCheckboxItem("Car Autopilot","Autopilot", false);
-        private static readonly NativeMenu Vehspw = new NativeMenu("Vehicle Spawn", "Vehicle spawner", "");  //The first submenu
+        private static readonly NativeItem vehiclespawn = new NativeItem("Spawn Vehicle","Type a input name vehicle");
+        private static readonly NativeItem vehiclepimp = new NativeItem("Max Car Stats");
 
-
+        //TeleportMenu
+        private static readonly NativeItem teltoway = new NativeItem("Teleport To Waypoint");
+        private static readonly NativeItem teltochiliad = new NativeItem("Teleport to Mont Chilliad");
+        private static readonly NativeItem teltopub1 = new NativeItem("Teleport to Tequilala");
+        private static readonly NativeItem teltopub2 = new NativeItem("Teleport to Bahama");
+        private static readonly NativeItem teltobank = new NativeItem("Teleport to Bank");
+        private static readonly NativeItem teltobell = new NativeItem("Teleport to Cluckin Bell");
+        private static readonly NativeItem teltofib = new NativeItem("Teleport to FIB");
+        private static readonly NativeItem teltofloyd = new NativeItem("Teleport to Floyd House");
+        private static readonly NativeItem teltolife = new NativeItem("Teleport to Life Invader");
+        private static readonly NativeItem teltolester = new NativeItem("Teleport to Lester House");
+        private static readonly NativeItem teltooneil = new NativeItem("Teleport to Oneil Farm");
+        private static readonly NativeItem teltosolomon = new NativeItem("Teleport to Solomon Office");
+        private static readonly NativeMenu Northmenu = new NativeMenu("North Yankton Loader", "North Yankton Loader");
+        private static readonly NativeItem loadnorth = new NativeItem("Load North Yankton");
+        private static readonly NativeItem unloadnorth = new NativeItem("Unload North Yankton");
 
 
 
@@ -102,6 +138,19 @@ namespace LemonUI.Menu1
             invisible.TitleFont = Font.Monospace;  
             fastrun.TitleFont = Font.Monospace;
 
+            //MONEY MENU
+            MoneyMenu.BannerText.Color = Color.Brown;
+            MoneyMenu.NameFont = Font.Monospace;
+            MoneyMenu.Banner.Color = Color.Black;
+            MoneyMenu.BannerText.Font = Font.Monospace;
+            MoneyMenu.DescriptionFont  = Font.Monospace;
+            money40k.TitleFont = Font.Monospace;
+            money1milion.TitleFont = Font.Monospace;
+            money10milion.TitleFont = Font.Monospace;
+            money15milion.TitleFont = Font.Monospace;
+            money20milion.TitleFont = Font.Monospace;
+            money100milion.TitleFont = Font.Monospace;
+
             //VEHICLE MENU
             VehicleMenu.BannerText.Color = Color.Brown;
             VehicleMenu.NameFont = Font.Monospace;
@@ -112,6 +161,38 @@ namespace LemonUI.Menu1
             cargodmod.TitleFont = Font.Monospace;
             cardrivein.TitleFont = Font.Monospace;
             cardrivein.AltTitleFont = Font.Monospace;   
+            vehiclespawn.TitleFont = Font.Monospace;
+            vehiclepimp.TitleFont = Font.Monospace;
+
+            //TELEPORT MENU
+            TeleportMenu.BannerText.Color = Color.Brown;
+            TeleportMenu.NameFont = Font.Monospace;
+            TeleportMenu.Banner.Color = Color.Black;
+            TeleportMenu.BannerText.Font = Font.Monospace;
+            TeleportMenu.DescriptionFont = Font.Monospace;
+            teltoway.TitleFont = Font.Monospace;
+            teltochiliad.TitleFont = Font.Monospace;
+            teltopub1.TitleFont = Font.Monospace;
+            teltofib.TitleFont = Font.Monospace;
+            teltobell.TitleFont = Font.Monospace; 
+            teltobank.TitleFont = Font.Monospace;
+            teltopub2.TitleFont = Font.Monospace;
+            teltosolomon.TitleFont = Font.Monospace;    
+            teltooneil.TitleFont = Font.Monospace;  
+            teltolife.TitleFont = Font.Monospace;
+            teltolester.TitleFont = Font.Monospace;
+            teltofloyd.TitleFont = Font.Monospace;
+
+          
+
+            //NORTH MENU
+            Northmenu.BannerText.Color = Color.Brown;
+            Northmenu.Banner.Color = Color.Black;
+            Northmenu.NameFont = Font.Monospace; 
+            Northmenu.BannerText.Font = Font.Monospace;
+            Northmenu.DescriptionFont = Font.Monospace;
+            loadnorth.TitleFont = Font.Monospace;
+            unloadnorth.TitleFont = Font.Monospace;
 
             //MAIN MENU
             DemoMenu.Banner.Color = Color.Black;
@@ -136,15 +217,26 @@ namespace LemonUI.Menu1
             DemoPool.Add(DemoMenu); // The pool is container for your menus, add the menu
             DemoPool.Add(SelfMenu);
             DemoPool.Add(VehicleMenu);
-            DemoPool.Add(Vehspw);
+            DemoPool.Add(TeleportMenu);
+  
             DemoPool.Add(DemoSubMenuPed); // add first submenu
              DemoPool.Add(ModelMenuPed);//Model Changer
+            DemoPool.Add(Northmenu);
+            DemoPool.Add(MoneyMenu);
             
 
             //Main Menu Categories
             DemoMenu.AddSubMenu(SelfMenu);//godmode
             DemoMenu.AddSubMenu(VehicleMenu);
-            DemoMenu.AddSubMenu(Vehspw);
+            DemoMenu.AddSubMenu(TeleportMenu);
+
+            //Submenu Categories
+
+            //Teleport SubMenu
+            TeleportMenu.AddSubMenu(Northmenu);
+            Northmenu.Add(loadnorth);
+            Northmenu.Add(unloadnorth);
+            
 
             //Self Menu
             SelfMenu.Add(godmode1);
@@ -156,11 +248,34 @@ namespace LemonUI.Menu1
             SelfMenu.Add(superjump);
             SelfMenu.Add(invisible);
             SelfMenu.Add(fastrun);
+            SelfMenu.AddSubMenu(MoneyMenu);
+            MoneyMenu.Add(money40k);
+            MoneyMenu.Add(money1milion);
+            MoneyMenu.Add(money10milion);
+            MoneyMenu.Add(money15milion);
+            MoneyMenu.Add(money20milion);
+            MoneyMenu.Add(money100milion);
 
             //Vehicle Menu
             VehicleMenu.Add(fixvehicle);
             VehicleMenu.Add(cargodmod);
             VehicleMenu.Add(cardrivein);
+            VehicleMenu.Add(vehiclespawn);
+            VehicleMenu.Add(vehiclepimp);
+
+            //Teleport Menu
+            TeleportMenu.Add(teltoway);
+            TeleportMenu.Add(teltochiliad);
+            TeleportMenu.Add(teltopub1);
+            TeleportMenu.Add(teltopub2);
+            TeleportMenu.Add(teltobank);
+            TeleportMenu.Add(teltobell);
+            TeleportMenu.Add(teltofib);
+            TeleportMenu.Add(teltofloyd);
+            TeleportMenu.Add(teltolife);
+            TeleportMenu.Add(teltolester);
+            TeleportMenu.Add(teltooneil);
+            TeleportMenu.Add(teltosolomon);
 
      
 
@@ -195,12 +310,39 @@ namespace LemonUI.Menu1
             invisible.Activated += SetInvisible;
             fastrun.Activated += SetFastrun;
 
+            //Item Att MoneyMenu SELFMENU
+            money40k.Activated += SetMoneyDrop40k;
+            money1milion.Activated += SetMoneyDrop1Mil;
+            money10milion.Activated += SetMoneyDrop10Mil;
+            money15milion.Activated += SetMoneyDrop15Mil;
+            money20milion.Activated += SetMoneyDrop20Mil;
+            money100milion.Activated += SetMoneyDrop100Mil;
+
             //Item Att Vehicle
             fixvehicle.Activated += SetFixCar;
             cargodmod.Activated += SetCarGodMod;
             cardrivein.Activated += SetCarDriveIn;
+            vehiclespawn.Activated += SetCarSpawn;
+            vehiclepimp.Activated += SetCarMax;
 
+            //Item Att Teleport
+            teltoway.Activated += SetTelWay;
+            teltochiliad.Activated += SetTelChilliad;
+            teltopub1.Activated += SetTequilala;
+            teltopub2.Activated += SetBahama;
+            teltobank.Activated += SetBank;
+            teltobell.Activated += SetBell;
+            teltofib.Activated += SetFib;
+            teltofloyd.Activated += SetFloydHouse;
+            teltolife.Activated += SetLifeInv;
+            teltolester.Activated += SetLester;
+            teltosolomon.Activated += SetSolomon;
+            teltooneil.Activated += SetOneil;
 
+            //Item North Menu - TELEPORTMENU
+            loadnorth.Activated += SetNorthLoad;
+            unloadnorth.Activated += SetNorthUnload;
+                
             //
 
             Tick += Basics_Tick;
@@ -326,6 +468,85 @@ namespace LemonUI.Menu1
             }
         }
 
+        private void SetMoneyDrop40k(object sender, EventArgs e)
+        {
+            if (money40k.Checked == true)
+            {
+                moneyDrop40kOn = !moneyDrop40kOn;
+            }
+
+            if (money40k.Checked == false)
+            {
+                moneyDrop40kOn = false;
+            }
+        }
+
+        private void SetMoneyDrop1Mil(object sender, EventArgs e)
+        {
+            if (money1milion.Checked == true)
+            {
+                moneyDrop1MilOn = !moneyDrop1MilOn;
+            }
+
+            if (money1milion.Checked == false)
+            {
+                moneyDrop1MilOn = false;
+            }
+        }
+
+        private void SetMoneyDrop10Mil(object sender, EventArgs e)
+        {
+            if (money10milion.Checked == true)
+            {
+                moneyDrop10MilOn = !moneyDrop10MilOn;
+            }
+
+            if (money10milion.Checked == false)
+            {
+                moneyDrop10MilOn = false;
+            }
+        }
+
+        private void SetMoneyDrop15Mil(object sender, EventArgs e)
+        {
+            if (money15milion.Checked == true)
+            {
+                moneyDrop15MilOn = !moneyDrop15MilOn;
+            }
+
+            if (money15milion.Checked == false)
+            {
+                moneyDrop15MilOn = false;
+            }
+        }
+
+        private void SetMoneyDrop20Mil(object sender, EventArgs e)
+        {
+            if (money20milion.Checked == true)
+            {
+                moneyDrop20MilOn = !moneyDrop20MilOn;
+            }
+
+            if (money20milion.Checked == false)
+            {
+                moneyDrop20MilOn = false;
+            }
+        }
+
+        private void SetMoneyDrop100Mil(object sender, EventArgs e)
+        {
+            if (money100milion.Checked == true)
+            {
+                moneyDrop100MilOn = !moneyDrop100MilOn;
+            }
+
+            if (money100milion.Checked == false)
+            {
+                moneyDrop100MilOn = false;
+            }
+        }
+
+
         private void SetFixCar(object sender, EventArgs e)
         {
             Function.Call(Hash.SET_VEHICLE_FIXED, Game.Player.Character.CurrentVehicle);
@@ -383,27 +604,454 @@ namespace LemonUI.Menu1
             }
         }
 
-        private void CreateVehicleSpawnerMenu()
+      
+        private void SetCarSpawn(object sender, EventArgs e)
         {
-            foreach (VehicleHash vehicleHash in Enum.GetValues(typeof(VehicleHash)))
+            Ped gamePed = Game.Player.Character;
+            string modelName = Game.GetUserInput();
+            Model model = new Model(modelName);
+            model.Request();
+
+            if (model.IsInCdImage && model.IsValid)
             {
-                NativeItem itemSpawnVehicle = new NativeItem(vehicleHash.ToString(), $"Spawns a {vehicleHash} right in front of you!");
-                itemSpawnVehicle.Activated += (sender, args) =>
-                {
-                    Ped character = Game.Player.Character;
-
-                    Model vehicleModel = new Model(vehicleHash);
-                    vehicleModel.Request();
-
-                    Vehicle vehicle = World.CreateVehicle(vehicleModel, character.Position + character.ForwardVector * 3.0f, character.Heading + 90.0f);
-
-                    vehicleModel.MarkAsNoLongerNeeded();
-
-                    Notification.Show($"Vehicle: {vehicleHash} has been spawned!");
-                };
-                Vehspw.Add(itemSpawnVehicle);
+                Vehicle v = World.CreateVehicle(model, gamePed.Position, gamePed.Heading);
+                v.PlaceOnGround();
+                gamePed.Task.WarpIntoVehicle(v, VehicleSeat.Driver);
             }
         }
+
+        private void SetCarMax(object sender, EventArgs e)
+        {
+
+            if(Game.Player.Character.CurrentVehicle == null || !Game.Player.Character.CurrentVehicle.Exists()) return;
+
+
+            Vehicle veh = Game.Player.Character.CurrentVehicle;
+            veh.IsPersistent = true;
+   
+            veh.CanTiresBurst = false;
+            veh.IsStolen = false;
+            veh.DirtLevel = 0f;
+
+            Game.Player.Character.CurrentVehicle.Mods.CustomPrimaryColor = Color.Gold;
+            
+            GTA.Native.Function.Call(Hash.SET_VEHICLE_MOD, veh, 1, 1, false);
+            Function.Call(Hash.SET_VEHICLE_MOD,veh, 0, 0, false);
+            Function.Call(Hash.SET_VEHICLE_MOD,veh, 11, 3, false);
+            Function.Call(Hash.SET_VEHICLE_MOD,veh, 22, false);
+            Function.Call(Hash.SET_VEHICLE_MAX_SPEED, veh, 200.0f);
+
+        }
+
+        private void SetTelWay(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+
+
+            var markerPosition = World.WaypointPosition;
+            var groundHeight = World.GetGroundHeight(markerPosition);
+
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = markerPosition + (Vector3.WorldDown * 200.5f);
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = markerPosition + (Vector3.WorldDown * 200.5f);
+            }
+
+
+
+            Vector3 ToGround(Vector3 position)
+            {
+                position.Z = World.GetGroundHeight(new Vector2(position.X, position.Y));
+                return new Vector3(position.X, position.Y, position.Z);
+            }
+
+            Vector3 GetWaypointCoords()
+            {
+                Vector3 pos = Function.Call<Vector3>(Hash.GET_BLIP_COORDS, Function.Call<Blip>(Hash.GET_FIRST_BLIP_INFO_ID, 8));
+
+                if (Function.Call<bool>(Hash.IS_WAYPOINT_ACTIVE) && pos != null || pos != new Vector3(0, 0, 0))
+                {
+                    Vector3 WayPos = ToGround(pos);
+                    if (WayPos.Z == 0 || WayPos.Z == 1)
+                    {
+                        WayPos = World.GetNextPositionOnStreet(WayPos);
+                    
+                    }
+                    return WayPos;
+                }
+                else
+                {
+                 
+                }
+                return Game.Player.Character.Position;
+            }
+
+            Game.Player.Character.Position = GetWaypointCoords();
+        }
+
+        private void SetTelChilliad (object  sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(451.2820f, 5572.9897f, 796.6793f);
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(451.2820f, 5572.9897f, 796.6793f);
+            }
+        }
+
+        private void SetBank(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(255.851f, 217.030f, 101.683f);
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(255.851f, 217.030f, 101.683f);
+            }
+        }
+
+        private void SetTequilala(object sender, EventArgs e)
+        {
+            //IAA Office X: 117.220 Y: -620.938 Z: 206.047
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                //player.Character.Position = new Vector3(117.220f,-620.938f,06.047f);
+                player.Character.Position = new Vector3(-556.5089111328125f, 286.318115234375f, 81.1763f);
+                Function.Call(Hash.DISABLE_INTERIOR, Function.Call<int>(Hash.GET_INTERIOR_AT_COORDS, -556.5089111328125, 286.318115234375, 81.1763), false);
+                Function.Call(Hash.CAP_INTERIOR, Function.Call<int>(Hash.GET_INTERIOR_AT_COORDS, -556.5089111328125, 286.318115234375, 81.1763), false);
+                Function.Call(Hash.REQUEST_IPL, "v_rockclub");
+                Function.Call(Hash.IS_DOOR_CLOSED,false, 993120320, -565.1712f, 276.6259f, 83.28626f, false, 0.0f, 0.0f, 0.0f);// front door not working
+                Function.Call(Hash.IS_DOOR_CLOSED, false, -561.2866f, 293.5044f, 87.77851f, false, 0.0f, 0.0f, 0.0f);// back door not working
+
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(255.851f, 217.030f, 101.683f);
+            }
+        }
+
+        private void SetBahama(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(-1388.0013427734375f, -618.419677734375f, 30.819599151611328f);
+                Function.Call(Hash.DISABLE_INTERIOR, Function.Call<int>(Hash.GET_INTERIOR_AT_COORDS, -1388.0013427734375, -618.419677734375, 30.819599151611328), false);
+                Function.Call(Hash.REQUEST_IPL, "v_bahama");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(-1388.0013427734375f, -618.419677734375f, 30.819599151611328f);
+
+            }
+        }
+
+        private void SetBell(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(-72.68752f, 6253.72656f, 31.08991f);
+                Function.Call(Hash.REQUEST_IPL, "CS1_02_cf_onmission1");
+                Function.Call(Hash.REQUEST_IPL, "CS1_02_cf_onmission2");
+                Function.Call(Hash.REQUEST_IPL, "CS1_02_cf_onmission3");
+                Function.Call(Hash.REQUEST_IPL, "CS1_02_cf_onmission4");
+                Function.Call(Hash.REMOVE_IPL, "CS1_02_cf_offmission");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(-72.68752f, 6253.72656f, 31.08991f);
+
+            }
+        }
+
+        private void SetFib(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(110.4f, -744.2f, 45.7f);
+                Function.Call(Hash.REQUEST_IPL, "FIBlobby");
+                Function.Call(Hash.REMOVE_IPL, "FIBlobbyfake");
+               // Function.Call(Hash._DOOR_CONTROL, -1517873911, 106.3793f, -742.6982f, 46.51962f, false, 0.0f, 0.0f, 0.0f);
+               // Function.Call(Hash._DOOR_CONTROL, -90456267, 105.7607f, -746.646f, 46.18266f, false, 0.0f, 0.0f, 0.0f);
+            }
+
+          
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(110.4f, -744.2f, 45.7f);
+
+            }
+        }
+
+        private void SetFloydHouse(object sender, EventArgs e)
+        {
+            
+                Player player = Game.Player;
+                if (!player.Character.IsInVehicle())
+                {
+                    player.Character.Position = new Vector3(-1149.709f, -1521.088f, 10.78267f);
+                    Function.Call(Hash.REMOVE_IPL, "vb_30_crimetape");
+                    //Function.Call(Hash._DOOR_CONTROL, -607040053, -1149.709f, -1521.088f, 10.78267f, false, 0.0f, 0.0f, 0.0f);
+                }
+                else
+                {
+                    Vehicle v = player.Character.CurrentVehicle;
+                    v.Position = new Vector3(-1149.709f, -1521.088f, 10.78267f);
+
+
+                }
+            
+        }
+
+        private void SetLifeInv(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(-1047.9f, -233.0f, 39.0f);
+                Function.Call(Hash.REQUEST_IPL, "facelobby");  // lifeinvader
+                Function.Call(Hash.REMOVE_IPL, "facelobbyfake");
+                //Function.Call(Hash._DOOR_CONTROL, -340230128, -1042.518, -240.6915, 38.11796, true, 0.0f, 0.0f, -1.0f);
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(-1047.9f, -233.0f, 39.0f);
+
+            }
+        }
+
+        private void SetLester(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(1274.933837890625f, -1714.7255859375f, 53.77149963378906f);
+                Function.Call(Hash.DISABLE_INTERIOR, Function.Call<int>(Hash.GET_INTERIOR_AT_COORDS, 1274.933837890625, -1714.7255859375, 53.77149963378906), false);
+                Function.Call(Hash.REQUEST_IPL, "v_lesters");
+                //Function.Call(Hash._DOOR_CONTROL, 1145337974, 1273.816f, -1720.697f, 54.92143f, false, 0.0f, 0.0f, 0.0f);
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(1274.933837890625f, -1714.7255859375f, 53.77149963378906f);
+
+            }
+        }
+
+        private void SetOneil(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(2441.2f, 4968.5f, 51.7f);
+                Function.Call(Hash.REMOVE_IPL, "farm_burnt");
+                Function.Call(Hash.REMOVE_IPL, "farm_burnt_lod");
+                Function.Call(Hash.REMOVE_IPL, "farm_burnt_props");
+                Function.Call(Hash.REMOVE_IPL, "farmint_cap");
+                Function.Call(Hash.REMOVE_IPL, "farmint_cap_lod");
+                Function.Call(Hash.REQUEST_IPL, "farm");
+                Function.Call(Hash.REQUEST_IPL, "farmint");
+                Function.Call(Hash.REQUEST_IPL, "farm_lod");
+                Function.Call(Hash.REQUEST_IPL, "farm_props");
+
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(2441.2f, 4968.5f, 51.7f);
+
+            }
+        }
+
+        private void SetSolomon(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(-1005.663208f, -478.3460998535156f, 49.0265f);
+                Function.Call(Hash.DISABLE_INTERIOR, Function.Call<int>(Hash.GET_INTERIOR_AT_COORDS, -1005.663208f, -478.3460998535156f, 49.0265f), false);
+                Function.Call(Hash.REQUEST_IPL, "v_58_sol_office");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(-1005.663208f, -478.3460998535156f, 49.0265f);
+
+            }
+        }
+
+        private void SetNorthLoad(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(3360.19f, -4849.67f, 111.8f);
+                Function.Call(Hash.REQUEST_IPL, "plg_01");
+                Function.Call(Hash.REQUEST_IPL, "prologue01");
+                Function.Call(Hash.REQUEST_IPL, "prologue01_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue01c");
+                Function.Call(Hash.REQUEST_IPL, "prologue01c_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue01d");
+                Function.Call(Hash.REQUEST_IPL, "prologue01d_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue01f");
+                Function.Call(Hash.REQUEST_IPL, "prologue01f_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue01g");
+                Function.Call(Hash.REQUEST_IPL, "prologue01h");
+                Function.Call(Hash.REQUEST_IPL, "prologue01h_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue01i");
+                Function.Call(Hash.REQUEST_IPL, "prologue01i_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue01j");
+                Function.Call(Hash.REQUEST_IPL, "prologue01j_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue01k");
+                Function.Call(Hash.REQUEST_IPL, "prologue01k_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue01z");
+                Function.Call(Hash.REQUEST_IPL, "prologue01z_lod");
+                Function.Call(Hash.REQUEST_IPL, "plg_02");
+                Function.Call(Hash.REQUEST_IPL, "prologue02");
+                Function.Call(Hash.REQUEST_IPL, "prologue02_lod");
+                Function.Call(Hash.REQUEST_IPL, "plg_03");
+                Function.Call(Hash.REQUEST_IPL, "prologue03");
+                Function.Call(Hash.REQUEST_IPL, "prologue03_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue03b");
+                Function.Call(Hash.REQUEST_IPL, "prologue03b_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue03_grv_dug");
+                Function.Call(Hash.REQUEST_IPL, "prologue03_grv_dug_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue03b");
+                Function.Call(Hash.REQUEST_IPL, "prologue0_grv_torch");
+                Function.Call(Hash.REQUEST_IPL, "plg_04");
+                Function.Call(Hash.REQUEST_IPL, "prologue04");
+                Function.Call(Hash.REQUEST_IPL, "prologue04_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue04b");
+                Function.Call(Hash.REQUEST_IPL, "prologue04b_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue04_cover");
+                Function.Call(Hash.REQUEST_IPL, "des_potree_end");
+                Function.Call(Hash.REQUEST_IPL, "des_potree_start");
+                Function.Call(Hash.REQUEST_IPL, "des_potree_start_lod");
+                Function.Call(Hash.REQUEST_IPL, "plg_05");
+                Function.Call(Hash.REQUEST_IPL, "prologue05");
+                Function.Call(Hash.REQUEST_IPL, "prologue05_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue05b");
+                Function.Call(Hash.REQUEST_IPL, "prologue05b_lod");
+                Function.Call(Hash.REQUEST_IPL, "plg_06");
+                Function.Call(Hash.REQUEST_IPL, "prologue06");
+                Function.Call(Hash.REQUEST_IPL, "prologue06_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue06b");
+                Function.Call(Hash.REQUEST_IPL, "prologue06b_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue06_int");
+                Function.Call(Hash.REQUEST_IPL, "prologue06_int_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue06_pannel");
+                Function.Call(Hash.REQUEST_IPL, "prologue06_pannel_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue_m2_door");
+                Function.Call(Hash.REQUEST_IPL, "prologue_m2_door_lod");
+                Function.Call(Hash.REQUEST_IPL, "plg_occl_00");
+                Function.Call(Hash.REQUEST_IPL, "prologue_occl");
+                Function.Call(Hash.REQUEST_IPL, "plg_rd");
+                Function.Call(Hash.REQUEST_IPL, "prologuerd");
+                Function.Call(Hash.REQUEST_IPL, "prologuerdb");
+                Function.Call(Hash.REQUEST_IPL, "prologuerd_lod");
+
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(3360.19f, -4849.67f, 111.8f);
+
+            }
+        }
+
+        private void SetNorthUnload(object sender, EventArgs e)
+        {
+            Function.Call(Hash.REMOVE_IPL, "plg_01");
+            Function.Call(Hash.REMOVE_IPL, "prologue01");
+            Function.Call(Hash.REMOVE_IPL, "prologue01_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue01c");
+            Function.Call(Hash.REMOVE_IPL, "prologue01c_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue01d");
+            Function.Call(Hash.REMOVE_IPL, "prologue01d_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue01f");
+            Function.Call(Hash.REMOVE_IPL, "prologue01f_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue01g");
+            Function.Call(Hash.REMOVE_IPL, "prologue01h");
+            Function.Call(Hash.REMOVE_IPL, "prologue01h_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue01i");
+            Function.Call(Hash.REMOVE_IPL, "prologue01i_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue01j");
+            Function.Call(Hash.REMOVE_IPL, "prologue01j_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue01k");
+            Function.Call(Hash.REMOVE_IPL, "prologue01k_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue01z");
+            Function.Call(Hash.REMOVE_IPL, "prologue01z_lod");
+            Function.Call(Hash.REMOVE_IPL, "plg_02");
+            Function.Call(Hash.REMOVE_IPL, "prologue02");
+            Function.Call(Hash.REMOVE_IPL, "prologue02_lod");
+            Function.Call(Hash.REMOVE_IPL, "plg_03");
+            Function.Call(Hash.REMOVE_IPL, "prologue03");
+            Function.Call(Hash.REMOVE_IPL, "prologue03_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue03b");
+            Function.Call(Hash.REMOVE_IPL, "prologue03b_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue03_grv_dug");
+            Function.Call(Hash.REMOVE_IPL, "prologue03_grv_dug_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue03b");
+            Function.Call(Hash.REMOVE_IPL, "prologue0_grv_torch");
+            Function.Call(Hash.REMOVE_IPL, "plg_04");
+            Function.Call(Hash.REMOVE_IPL, "prologue04");
+            Function.Call(Hash.REMOVE_IPL, "prologue04_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue04b");
+            Function.Call(Hash.REMOVE_IPL, "prologue04b_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue04_cover");
+            Function.Call(Hash.REMOVE_IPL, "des_potree_end");
+            Function.Call(Hash.REMOVE_IPL, "des_potree_start");
+            Function.Call(Hash.REMOVE_IPL, "des_potree_start_lod");
+            Function.Call(Hash.REMOVE_IPL, "plg_05");
+            Function.Call(Hash.REMOVE_IPL, "prologue05");
+            Function.Call(Hash.REMOVE_IPL, "prologue05_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue05b");
+            Function.Call(Hash.REMOVE_IPL, "prologue05b_lod");
+            Function.Call(Hash.REMOVE_IPL, "plg_06");
+            Function.Call(Hash.REMOVE_IPL, "prologue06");
+            Function.Call(Hash.REMOVE_IPL, "prologue06_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue06b");
+            Function.Call(Hash.REMOVE_IPL, "prologue06b_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue06_int");
+            Function.Call(Hash.REMOVE_IPL, "prologue06_int_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue06_pannel");
+            Function.Call(Hash.REMOVE_IPL, "prologue06_pannel_lod");
+            Function.Call(Hash.REMOVE_IPL, "prologue_m2_door");
+            Function.Call(Hash.REMOVE_IPL, "prologue_m2_door_lod");
+            Function.Call(Hash.REMOVE_IPL, "plg_occl_00");
+            Function.Call(Hash.REMOVE_IPL, "prologue_occl");
+            Function.Call(Hash.REMOVE_IPL, "plg_rd");
+            Function.Call(Hash.REMOVE_IPL, "prologuerd");
+            Function.Call(Hash.REMOVE_IPL, "prologuerdb");
+            Function.Call(Hash.REMOVE_IPL, "prologuerd_lod");
+        
+    }
+
+
+    
+   
+
+
+
 
 
 
@@ -454,6 +1102,68 @@ namespace LemonUI.Menu1
                 }
 
             }
+
+            if (moneyDrop40kOn)
+            {
+                Vector3 pos = Game.Player.Character.Position;
+                var hash = Function.Call<int>(Hash.GET_HASH_KEY, "PICKUP_MONEY_CASE");
+                var model = new Model(0x113FD533); // prop_money_bag_01
+                model.Request(1000);
+                Function.Call(Hash.CREATE_AMBIENT_PICKUP, hash, pos.X, pos.Y, pos.Z, 0, 40000, 0x113FD533, false, true);
+                model.MarkAsNoLongerNeeded();
+            }
+
+            if (moneyDrop1MilOn)
+            {
+                Vector3 pos = Game.Player.Character.Position;
+                var hash = Function.Call<int>(Hash.GET_HASH_KEY, "PICKUP_MONEY_CASE");
+                var model = new Model(0x113FD533); // prop_money_bag_01
+                model.Request(1000);
+                Function.Call(Hash.CREATE_AMBIENT_PICKUP, hash, pos.X, pos.Y, pos.Z, 0, 1000000, 0x113FD533, false, true);
+                model.MarkAsNoLongerNeeded();
+            }
+
+
+            if (moneyDrop10MilOn)
+            {
+                Vector3 pos = Game.Player.Character.Position;
+                var hash = Function.Call<int>(Hash.GET_HASH_KEY, "PICKUP_MONEY_CASE");
+                var model = new Model(0x113FD533); // prop_money_bag_01
+                model.Request(1000);
+                Function.Call(Hash.CREATE_AMBIENT_PICKUP, hash, pos.X, pos.Y, pos.Z, 0, 10000000, 0x113FD533, false, true);
+                model.MarkAsNoLongerNeeded();
+            }
+
+            if (moneyDrop15MilOn)
+            {
+                Vector3 pos = Game.Player.Character.Position;
+                var hash = Function.Call<int>(Hash.GET_HASH_KEY, "PICKUP_MONEY_CASE");
+                var model = new Model(0x113FD533); // prop_money_bag_01
+                model.Request(1000);
+                Function.Call(Hash.CREATE_AMBIENT_PICKUP, hash, pos.X, pos.Y, pos.Z, 0, 15000000, 0x113FD533, false, true);
+                model.MarkAsNoLongerNeeded();
+            }
+
+            if (moneyDrop20MilOn)
+            {
+                Vector3 pos = Game.Player.Character.Position;
+                var hash = Function.Call<int>(Hash.GET_HASH_KEY, "PICKUP_MONEY_CASE");
+                var model = new Model(0x113FD533); // prop_money_bag_01
+                model.Request(1000);
+                Function.Call(Hash.CREATE_AMBIENT_PICKUP, hash, pos.X, pos.Y, pos.Z, 0, 20000000, 0x113FD533, false, true);
+                model.MarkAsNoLongerNeeded();
+            }
+
+            if (moneyDrop100MilOn)
+            {
+                Vector3 pos = Game.Player.Character.Position;
+                var hash = Function.Call<int>(Hash.GET_HASH_KEY, "PICKUP_MONEY_CASE");
+                var model = new Model(0x113FD533); // prop_money_bag_01
+                model.Request(1000);
+                Function.Call(Hash.CREATE_AMBIENT_PICKUP, hash, pos.X, pos.Y, pos.Z, 0, 100000000, 0x113FD533, false, true);
+                model.MarkAsNoLongerNeeded();
+            }
+
         }
 
 
@@ -467,6 +1177,7 @@ namespace LemonUI.Menu1
                 DemoMenu.Visible = true;
                 //GTA.UI.Notification.Show("Welcome",true);
                 GTA.UI.Notification.Show(GTA.UI.NotificationIcon.Call911,"Anonik","Welcome","Essential Menu 1.30", true,true);
+               
 
  
             }
