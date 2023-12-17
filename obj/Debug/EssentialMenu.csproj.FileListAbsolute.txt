@@ -1,0 +1,9 @@
+C:\Users\impie\Desktop\Essential Menu NEW\ModMenu\bin\Debug\EssentialMenu.dll
+C:\Users\impie\Desktop\Essential Menu NEW\ModMenu\bin\Debug\EssentialMenu.pdb
+C:\Users\impie\Desktop\Essential Menu NEW\ModMenu\bin\Debug\NativeUI.dll
+C:\Users\impie\Desktop\Essential Menu NEW\ModMenu\obj\Debug\EssentialMenu.csproj.AssemblyReference.cache
+C:\Users\impie\Desktop\Essential Menu NEW\ModMenu\obj\Debug\EssentialMenu.csproj.CoreCompileInputs.cache
+C:\Users\impie\Desktop\Essential Menu NEW\ModMenu\obj\Debug\EssentialMenu.csproj.CopyComplete
+C:\Users\impie\Desktop\Essential Menu NEW\ModMenu\obj\Debug\EssentialMenu.dll
+C:\Users\impie\Desktop\Essential Menu NEW\ModMenu\obj\Debug\EssentialMenu.pdb
+C:\Users\impie\Desktop\Essential Menu NEW\ModMenu\bin\Debug\ScriptHookVDotNet3.dll
