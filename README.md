@@ -1,4 +1,4 @@
-# EssentialMenu-LEMON
+# EssentialMenu 🍋
 Essential Menu Is Back ! , Retwrited with the LemonUI Library
 
 Old version with NativeUI <a href="https://github.com/anonik9900/Essential-Menu">Here !</a>.<br>
