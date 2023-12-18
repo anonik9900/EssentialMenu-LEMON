@@ -22,6 +22,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 using System.Collections;
 using GTA.UI;
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 
 //uses lemon and SHVDN version 2, also added windows forms
 
@@ -43,6 +44,10 @@ namespace LemonUI.Menu1
         bool moneyDrop15MilOn;
         bool moneyDrop20MilOn;
         bool moneyDrop100MilOn;
+        
+     
+
+
 
         private static readonly ObjectPool DemoPool = new ObjectPool();
         private static readonly NativeMenu DemoMenu = new NativeMenu(bqnnerText: "Essential Menu", name: "Made ~b~By Anonik v1.30", description: "Made ~b~By Anonik v1.30");
@@ -54,8 +59,9 @@ namespace LemonUI.Menu1
         private static readonly NativeMenu SelfMenu = new NativeMenu("Self Options", "Self Options", "");  //The first submenu
         private static readonly NativeMenu VehicleMenu = new NativeMenu("Vehicle Options", "Vehicle Options", "");  //The first submenu
         private static readonly NativeMenu TeleportMenu = new NativeMenu("Teleport Options", "Teleporting Options");
+        private static readonly NativeMenu WeatherMenu = new NativeMenu("Weather Options", "Weather Options");//Weather Menu
 
-        private static readonly NativeItem ClearWeather = new NativeItem("Clear Weather", "");
+
         private static readonly NativeItem CarGuy = new NativeItem("Change to Car Guy Model", "");
 
 
@@ -67,6 +73,8 @@ namespace LemonUI.Menu1
 
         private static readonly NativeMenu ModelMenuPed = new NativeMenu("Model Changer", "Model Changer","");
         private static readonly NativeItem Franklins = new NativeItem("Franklin Model", "");
+
+        
 
 
         //Selfmenu
@@ -94,8 +102,9 @@ namespace LemonUI.Menu1
         private static readonly NativeItem fixvehicle = new NativeItem("Fix Car Health");
         private static readonly NativeCheckboxItem cargodmod = new NativeCheckboxItem("Invincible Car", false);
         private static readonly NativeCheckboxItem cardrivein = new NativeCheckboxItem("Car Autopilot","Autopilot", false);
-        private static readonly NativeItem vehiclespawn = new NativeItem("Spawn Vehicle","Type a input name vehicle");
+        private static readonly NativeItem vehiclespawn = new NativeItem("Spawn Input Vehicle","Type a input name vehicle");
         private static readonly NativeItem vehiclepimp = new NativeItem("Max Car Stats");
+        private static readonly NativeMenu SpwanCarListMenu = new NativeMenu("Spwan Car Listed", "Spawn Car listed");
 
         //TeleportMenu
         private static readonly NativeItem teltoway = new NativeItem("Teleport To Waypoint");
@@ -114,7 +123,22 @@ namespace LemonUI.Menu1
         private static readonly NativeItem loadnorth = new NativeItem("Load North Yankton");
         private static readonly NativeItem unloadnorth = new NativeItem("Unload North Yankton");
 
-
+        //WeatherMenu
+        private static readonly NativeItem ClearWeather = new NativeItem("Clear", "");
+        private static readonly NativeItem ClearingWeather = new NativeItem("Clearing", "");
+        private static readonly NativeItem SunnyWeather = new NativeItem("ExtraSunny", "");
+        private static readonly NativeItem CloudWeather = new NativeItem("Clouds", "");
+        private static readonly NativeItem SmogWeather = new NativeItem("Smog", "");
+        private static readonly NativeItem FoggyWeather = new NativeItem("Foggy", "");
+        private static readonly NativeItem NeutralWeather = new NativeItem("Neutral", "");
+        private static readonly NativeItem HalloweenWeather = new NativeItem("Halloween", "");
+        private static readonly NativeItem BlizzardWeather = new NativeItem("Blizzard", "");
+        private static readonly NativeItem RainingWeather = new NativeItem("Raining", "");
+        private static readonly NativeItem OvercastWeather = new NativeItem("Overcast", "");
+        private static readonly NativeItem ThunderWeather = new NativeItem("Thunderstorm", "");
+        private static readonly NativeItem ChristmasWeather = new NativeItem("Christmas", "");
+        private static readonly NativeItem SnowingWeather = new NativeItem("Snowing", "");
+        private static readonly NativeItem SnowlightWeather = new NativeItem("Snowligt", "");
 
         public Basics()
         {
@@ -142,7 +166,7 @@ namespace LemonUI.Menu1
             MoneyMenu.BannerText.Color = Color.Brown;
             MoneyMenu.NameFont = Font.Monospace;
             MoneyMenu.Banner.Color = Color.Black;
-            MoneyMenu.BannerText.Font = Font.Monospace;
+            MoneyMenu.BannerText.Font = Font.Pricedown;
             MoneyMenu.DescriptionFont  = Font.Monospace;
             money40k.TitleFont = Font.Monospace;
             money1milion.TitleFont = Font.Monospace;
@@ -168,7 +192,7 @@ namespace LemonUI.Menu1
             TeleportMenu.BannerText.Color = Color.Brown;
             TeleportMenu.NameFont = Font.Monospace;
             TeleportMenu.Banner.Color = Color.Black;
-            TeleportMenu.BannerText.Font = Font.Monospace;
+            TeleportMenu.BannerText.Font = Font.Pricedown;
             TeleportMenu.DescriptionFont = Font.Monospace;
             teltoway.TitleFont = Font.Monospace;
             teltochiliad.TitleFont = Font.Monospace;
@@ -183,13 +207,16 @@ namespace LemonUI.Menu1
             teltolester.TitleFont = Font.Monospace;
             teltofloyd.TitleFont = Font.Monospace;
 
+            //WEATHER MENU
+
+
           
 
             //NORTH MENU
             Northmenu.BannerText.Color = Color.Brown;
             Northmenu.Banner.Color = Color.Black;
             Northmenu.NameFont = Font.Monospace; 
-            Northmenu.BannerText.Font = Font.Monospace;
+            Northmenu.BannerText.Font = Font.Pricedown;
             Northmenu.DescriptionFont = Font.Monospace;
             loadnorth.TitleFont = Font.Monospace;
             unloadnorth.TitleFont = Font.Monospace;
@@ -210,6 +237,10 @@ namespace LemonUI.Menu1
 
 
             //========================================= END STYLE===============================================================
+           
+            
+           
+
 
 
 
@@ -218,17 +249,22 @@ namespace LemonUI.Menu1
             DemoPool.Add(SelfMenu);
             DemoPool.Add(VehicleMenu);
             DemoPool.Add(TeleportMenu);
-  
-            DemoPool.Add(DemoSubMenuPed); // add first submenu
+            DemoPool.Add(WeatherMenu);
+      
+
+
+
+            //DemoPool.Add(DemoSubMenuPed); // add first submenu
              DemoPool.Add(ModelMenuPed);//Model Changer
-            DemoPool.Add(Northmenu);
-            DemoPool.Add(MoneyMenu);
+            DemoPool.Add(Northmenu);//NorthMenu
+            DemoPool.Add(MoneyMenu);//MoneyDropMenu
             
 
             //Main Menu Categories
-            DemoMenu.AddSubMenu(SelfMenu);//godmode
+            DemoMenu.AddSubMenu(SelfMenu);
             DemoMenu.AddSubMenu(VehicleMenu);
             DemoMenu.AddSubMenu(TeleportMenu);
+            DemoMenu.AddSubMenu(WeatherMenu);
 
             //Submenu Categories
 
@@ -262,6 +298,8 @@ namespace LemonUI.Menu1
             VehicleMenu.Add(cardrivein);
             VehicleMenu.Add(vehiclespawn);
             VehicleMenu.Add(vehiclepimp);
+            //VehicleMenu.Add(itemSpawnVehicle);
+            
 
             //Teleport Menu
             TeleportMenu.Add(teltoway);
@@ -277,24 +315,39 @@ namespace LemonUI.Menu1
             TeleportMenu.Add(teltooneil);
             TeleportMenu.Add(teltosolomon);
 
-     
+            //WeatherMenu
+            WeatherMenu.Add(ClearWeather);
+            WeatherMenu.Add(ClearingWeather);
+            WeatherMenu.Add(SunnyWeather);
+            WeatherMenu.Add(CloudWeather);
+            WeatherMenu.Add(SmogWeather);
+            WeatherMenu.Add(FoggyWeather);
+            WeatherMenu.Add(NeutralWeather);
+            WeatherMenu.Add(HalloweenWeather);
+            WeatherMenu.Add(BlizzardWeather);
+            WeatherMenu.Add(RainingWeather);
+            WeatherMenu.Add(OvercastWeather);
+            WeatherMenu.Add(ThunderWeather);
+            WeatherMenu.Add(ChristmasWeather);
+            WeatherMenu.Add(SnowingWeather);
+            WeatherMenu.Add(SnowlightWeather);
 
 
             //standalone items to add to menu
-            DemoMenu.Add(ClearWeather);
-            DemoMenu.Add(CarGuy);
+
+            //DemoMenu.Add(CarGuy);
 
             //Items for SubMenu Ped
-            DemoMenu.AddSubMenu(DemoSubMenuPed); //the submenu
-            DemoSubMenuPed.Add(Ballas); // item 1
-            DemoSubMenuPed.Add(LostMCGang); // item 2
+            //DemoMenu.AddSubMenu(DemoSubMenuPed); //the submenu
+            //DemoSubMenuPed.Add(Ballas); // item 1
+            //DemoSubMenuPed.Add(LostMCGang); // item 2
 
             DemoMenu.AddSubMenu(ModelMenuPed);
             ModelMenuPed.Add(Franklins);
 
             //Misc Items, these are buttons/standalone (menu items without sub menus)
             CarGuy.Activated += SetModelCarGuy;
-            ClearWeather.Activated += SetWeatherClear;
+            
 
             //Item activation Self
             Ballas.Activated += SpawnBallas;
@@ -325,6 +378,8 @@ namespace LemonUI.Menu1
             vehiclespawn.Activated += SetCarSpawn;
             vehiclepimp.Activated += SetCarMax;
 
+
+
             //Item Att Teleport
             teltoway.Activated += SetTelWay;
             teltochiliad.Activated += SetTelChilliad;
@@ -338,6 +393,23 @@ namespace LemonUI.Menu1
             teltolester.Activated += SetLester;
             teltosolomon.Activated += SetSolomon;
             teltooneil.Activated += SetOneil;
+
+            //Item Att WEATHERMENU
+            ClearWeather.Activated += SetWeatherClear;
+            ClearingWeather.Activated += SetWeatherClearing;
+            SunnyWeather.Activated += SetWeatherSunny;
+            CloudWeather.Activated += SetWeatherClouds;
+            SmogWeather.Activated += SetWeatherSmog;
+            FoggyWeather.Activated += SetWeatherFoggy;
+            NeutralWeather.Activated += SetWeatherNeutral;
+            HalloweenWeather.Activated += SetWeatherHalloween;
+            BlizzardWeather.Activated += SetWeatherBlizzard;
+            RainingWeather.Activated += SetWeatherRaining;
+            OvercastWeather.Activated += SetWeatherOvercast;
+            ThunderWeather.Activated += SetWeatherThunder;
+            ChristmasWeather.Activated += SetWeatherChristmas;
+            SnowingWeather.Activated += SetWeatherSnowing;
+            SnowlightWeather.Activated += SetWeatherSnowlight;
 
             //Item North Menu - TELEPORTMENU
             loadnorth.Activated += SetNorthLoad;
@@ -618,6 +690,7 @@ namespace LemonUI.Menu1
                 v.PlaceOnGround();
                 gamePed.Task.WarpIntoVehicle(v, VehicleSeat.Driver);
             }
+
         }
 
         private void SetCarMax(object sender, EventArgs e)
@@ -663,6 +736,8 @@ namespace LemonUI.Menu1
 
 
 
+
+
             Vector3 ToGround(Vector3 position)
             {
                 position.Z = World.GetGroundHeight(new Vector2(position.X, position.Y));
@@ -692,6 +767,9 @@ namespace LemonUI.Menu1
 
             Game.Player.Character.Position = GetWaypointCoords();
         }
+
+
+        
 
         private void SetTelChilliad (object  sender, EventArgs e)
         {
@@ -1043,25 +1121,78 @@ namespace LemonUI.Menu1
             Function.Call(Hash.REMOVE_IPL, "prologuerd");
             Function.Call(Hash.REMOVE_IPL, "prologuerdb");
             Function.Call(Hash.REMOVE_IPL, "prologuerd_lod");
-        
-    }
 
+        }
 
-    
    
 
 
-
-
-
-
-
+ 
 
 
         private void SetWeatherClear(object sender, EventArgs e)
         { 
             World.Weather = Weather.Clear;
         }
+        private void SetWeatherClearing(object sender, EventArgs e)
+        {
+            World.Weather = Weather.Clearing;
+        }
+        private void SetWeatherSunny(object sender, EventArgs e)
+        {
+            World.Weather = Weather.ExtraSunny;
+        }
+        private void SetWeatherClouds(object sender, EventArgs e)
+        {
+            World.Weather = Weather.Clouds;
+        }
+        private void SetWeatherSmog(object sender, EventArgs e)
+        {
+            World.Weather = Weather.Smog;
+        }
+        private void SetWeatherFoggy(object sender, EventArgs e)
+        {
+            World.Weather = Weather.Foggy;
+        }
+        private void SetWeatherNeutral(object sender, EventArgs e)
+        {
+            World.Weather = Weather.Neutral;
+        }
+        private void SetWeatherHalloween(object sender, EventArgs e)
+        {
+            World.Weather = Weather.Halloween;
+        }
+        private void SetWeatherBlizzard(object sender, EventArgs e)
+        {
+            World.Weather = Weather.Blizzard;
+        }
+        private void SetWeatherRaining(object sender, EventArgs e)
+        {
+            World.Weather = Weather.Raining;
+        }
+        private void SetWeatherOvercast(object sender, EventArgs e)
+        {
+            World.Weather = Weather.Overcast;
+        }
+        private void SetWeatherThunder(object sender, EventArgs e)
+        {
+            World.Weather = Weather.ThunderStorm;
+        }
+        private void SetWeatherChristmas(object sender, EventArgs e)
+        {
+            World.Weather = Weather.Christmas;
+        }
+        private void SetWeatherSnowing(object sender, EventArgs e)
+        {
+            World.Weather = Weather.Snowing;
+        }
+        private void SetWeatherSnowlight(object sender, EventArgs e)
+        {
+            World.Weather = Weather.Snowlight;
+        }
+
+
+
 
         private void SetModelCarGuy(object sender, EventArgs e)
         { Game.Player.ChangeModel(PedHash.Car3Guy2); }
@@ -1102,6 +1233,7 @@ namespace LemonUI.Menu1
                 }
 
             }
+
 
             if (moneyDrop40kOn)
             {
@@ -1174,7 +1306,9 @@ namespace LemonUI.Menu1
 
             if (e.KeyCode == Keys.F6) //put whatever key binding you want here
             {
-                DemoMenu.Visible = true;
+                DemoMenu.Visible = !DemoMenu.Visible;
+                //DemoMenu.Visible = true;
+ 
                 //GTA.UI.Notification.Show("Welcome",true);
                 GTA.UI.Notification.Show(GTA.UI.NotificationIcon.Call911,"Anonik","Welcome","Essential Menu 1.30", true,true);
                
