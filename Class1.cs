@@ -23,6 +23,8 @@ using System.Collections;
 using GTA.UI;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
+using System.Runtime.ConstrainedExecution;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 //uses lemon and SHVDN version 2, also added windows forms
 
@@ -50,7 +52,7 @@ namespace LemonUI.Menu1
 
 
         private static readonly ObjectPool DemoPool = new ObjectPool();
-        private static readonly NativeMenu DemoMenu = new NativeMenu(bqnnerText: "Essential Menu", name: "Made ~b~By Anonik v1.30", description: "Made ~b~By Anonik v1.30");
+        private static readonly NativeMenu DemoMenu = new NativeMenu(bannerText: "Essential Menu", name: "Made By Anonik v1,30", description: "Made By Anonik v1,30");
 
 
 
@@ -60,6 +62,7 @@ namespace LemonUI.Menu1
         private static readonly NativeMenu VehicleMenu = new NativeMenu("Vehicle Options", "Vehicle Options", "");  //The first submenu
         private static readonly NativeMenu TeleportMenu = new NativeMenu("Teleport Options", "Teleporting Options");
         private static readonly NativeMenu WeatherMenu = new NativeMenu("Weather Options", "Weather Options");//Weather Menu
+        private static readonly NativeMenu BetaMenu = new NativeMenu("[Beta Menu ]", "Beta Options");//Weather Menu
 
 
         private static readonly NativeItem CarGuy = new NativeItem("Change to Car Guy Model", "");
@@ -74,13 +77,18 @@ namespace LemonUI.Menu1
         private static readonly NativeMenu ModelMenuPed = new NativeMenu("Model Changer", "Model Changer","");
         private static readonly NativeItem Franklins = new NativeItem("Franklin Model", "");
 
-        
+
+        //BetaMenu
+        private static readonly NativeCheckboxItem drunkmode = new NativeCheckboxItem("~b~Drunk Mode", "Description", false); // Enabled by Default with a Description
+        private static readonly NativeCheckboxItem nocollmode = new NativeCheckboxItem("~b~No Collision", "Description", false); // Enabled by Default with a Description
+        private static readonly NativeCheckboxItem chaosmode = new NativeCheckboxItem("~r~Chaos Mode", "Description", false); // Enabled by Default with a Description
+
 
 
         //Selfmenu
 
-        
-        private static readonly NativeCheckboxItem godmode1 = new NativeCheckboxItem("~b~God Mode.", "Description", false); // Enabled by Default with a Description
+
+        private static readonly NativeCheckboxItem godmode1 = new NativeCheckboxItem("~b~God Mode", "Description", false); // Enabled by Default with a Description
         private static readonly NativeItem maxhealth = new NativeItem("Max Health");
         private static readonly NativeCheckboxItem neverwanted = new NativeCheckboxItem("~b~Never Wanted", false);
         private static readonly NativeItem giveallwep = new NativeItem("Give All Weapons");
@@ -104,7 +112,7 @@ namespace LemonUI.Menu1
         private static readonly NativeCheckboxItem cardrivein = new NativeCheckboxItem("Car Autopilot","Autopilot", false);
         private static readonly NativeItem vehiclespawn = new NativeItem("Spawn Input Vehicle","Type a input name vehicle");
         private static readonly NativeItem vehiclepimp = new NativeItem("Max Car Stats");
-        private static readonly NativeMenu SpwanCarListMenu = new NativeMenu("Spwan Car Listed", "Spawn Car listed");
+
 
         //TeleportMenu
         private static readonly NativeItem teltoway = new NativeItem("Teleport To Waypoint");
@@ -119,7 +127,7 @@ namespace LemonUI.Menu1
         private static readonly NativeItem teltolester = new NativeItem("Teleport to Lester House");
         private static readonly NativeItem teltooneil = new NativeItem("Teleport to Oneil Farm");
         private static readonly NativeItem teltosolomon = new NativeItem("Teleport to Solomon Office");
-        private static readonly NativeMenu Northmenu = new NativeMenu("North Yankton Loader", "North Yankton Loader");
+        private static readonly NativeMenu Northmenu = new NativeMenu("N-Y Loader", "North Yankton Loader");
         private static readonly NativeItem loadnorth = new NativeItem("Load North Yankton");
         private static readonly NativeItem unloadnorth = new NativeItem("Unload North Yankton");
 
@@ -139,6 +147,7 @@ namespace LemonUI.Menu1
         private static readonly NativeItem ChristmasWeather = new NativeItem("Christmas", "");
         private static readonly NativeItem SnowingWeather = new NativeItem("Snowing", "");
         private static readonly NativeItem SnowlightWeather = new NativeItem("Snowligt", "");
+        private static readonly NativeCheckboxItem XmasWeather = new NativeCheckboxItem("Xmas Snow","Persistent Snow", false);
 
         public Basics()
         {
@@ -147,65 +156,66 @@ namespace LemonUI.Menu1
             //==============================================STYLE===============================================================
 
             //SELF MENU
+            //menu.BannerColor = System.Drawing.Color.FromArgb(180, 20, 20);
             SelfMenu.BannerText.Color = Color.Brown;
-            SelfMenu.NameFont = Font.Monospace;
-            SelfMenu.Banner.Color = Color.Black;
+            SelfMenu.NameFont = Font.RockstarTag;
+            SelfMenu.Banner.Color = Color.FromArgb(180, 20, 20);//Purple;
             SelfMenu.BannerText.Font = Font.Pricedown;
-            SelfMenu.DescriptionFont = Font.Monospace;
-            maxhealth.TitleFont = Font.Monospace;
-            godmode1.TitleFont = Font.Monospace;
-            neverwanted.TitleFont = Font.Monospace;
-            giveallwep.TitleFont = Font.Monospace;
-            givemaxammo.TitleFont = Font.Monospace;
-            infiniteammo.TitleFont = Font.Monospace;
-            superjump.TitleFont = Font.Monospace;
-            invisible.TitleFont = Font.Monospace;  
-            fastrun.TitleFont = Font.Monospace;
+            SelfMenu.DescriptionFont = Font.RockstarTag;
+            maxhealth.TitleFont = Font.RockstarTag;
+            godmode1.TitleFont = Font.RockstarTag;
+            neverwanted.TitleFont = Font.RockstarTag;
+            giveallwep.TitleFont = Font.RockstarTag;
+            givemaxammo.TitleFont = Font.RockstarTag;
+            infiniteammo.TitleFont = Font.RockstarTag;
+            superjump.TitleFont = Font.RockstarTag;
+            invisible.TitleFont = Font.RockstarTag;  
+            fastrun.TitleFont = Font.RockstarTag;
 
             //MONEY MENU
             MoneyMenu.BannerText.Color = Color.Brown;
-            MoneyMenu.NameFont = Font.Monospace;
+            MoneyMenu.NameFont = Font.RockstarTag;
             MoneyMenu.Banner.Color = Color.Black;
             MoneyMenu.BannerText.Font = Font.Pricedown;
-            MoneyMenu.DescriptionFont  = Font.Monospace;
-            money40k.TitleFont = Font.Monospace;
-            money1milion.TitleFont = Font.Monospace;
-            money10milion.TitleFont = Font.Monospace;
-            money15milion.TitleFont = Font.Monospace;
-            money20milion.TitleFont = Font.Monospace;
-            money100milion.TitleFont = Font.Monospace;
+            MoneyMenu.DescriptionFont  = Font.RockstarTag;
+            money40k.TitleFont = Font.RockstarTag;
+            money1milion.TitleFont = Font.RockstarTag;
+            money10milion.TitleFont = Font.RockstarTag;
+            money15milion.TitleFont = Font.RockstarTag;
+            money20milion.TitleFont = Font.RockstarTag;
+            money100milion.TitleFont = Font.RockstarTag;
 
             //VEHICLE MENU
             VehicleMenu.BannerText.Color = Color.Brown;
-            VehicleMenu.NameFont = Font.Monospace;
+            VehicleMenu.NameFont = Font.RockstarTag;
             VehicleMenu.Banner.Color = Color.Black;
             VehicleMenu.BannerText.Font = Font.Pricedown;
-            VehicleMenu.DescriptionFont = Font.Monospace;
-            fixvehicle.TitleFont = Font.Monospace;
-            cargodmod.TitleFont = Font.Monospace;
-            cardrivein.TitleFont = Font.Monospace;
-            cardrivein.AltTitleFont = Font.Monospace;   
-            vehiclespawn.TitleFont = Font.Monospace;
-            vehiclepimp.TitleFont = Font.Monospace;
+            VehicleMenu.DescriptionFont = Font.RockstarTag;
+            fixvehicle.TitleFont = Font.RockstarTag;
+            cargodmod.TitleFont = Font.RockstarTag;
+            cardrivein.TitleFont = Font.RockstarTag;
+            cardrivein.AltTitleFont = Font.RockstarTag;   
+            vehiclespawn.TitleFont = Font.RockstarTag;
+            vehiclepimp.TitleFont = Font.RockstarTag;
 
             //TELEPORT MENU
             TeleportMenu.BannerText.Color = Color.Brown;
-            TeleportMenu.NameFont = Font.Monospace;
+            TeleportMenu.NameFont = Font.RockstarTag;
             TeleportMenu.Banner.Color = Color.Black;
             TeleportMenu.BannerText.Font = Font.Pricedown;
-            TeleportMenu.DescriptionFont = Font.Monospace;
-            teltoway.TitleFont = Font.Monospace;
-            teltochiliad.TitleFont = Font.Monospace;
-            teltopub1.TitleFont = Font.Monospace;
-            teltofib.TitleFont = Font.Monospace;
-            teltobell.TitleFont = Font.Monospace; 
-            teltobank.TitleFont = Font.Monospace;
-            teltopub2.TitleFont = Font.Monospace;
-            teltosolomon.TitleFont = Font.Monospace;    
-            teltooneil.TitleFont = Font.Monospace;  
-            teltolife.TitleFont = Font.Monospace;
-            teltolester.TitleFont = Font.Monospace;
-            teltofloyd.TitleFont = Font.Monospace;
+            TeleportMenu.DescriptionFont = Font.RockstarTag;
+            teltoway.TitleFont = Font.RockstarTag;
+            teltochiliad.TitleFont = Font.RockstarTag;
+            teltopub1.TitleFont = Font.RockstarTag;
+            teltofib.TitleFont = Font.RockstarTag;
+            teltobell.TitleFont = Font.RockstarTag; 
+            teltobank.TitleFont = Font.RockstarTag;
+            teltopub2.TitleFont = Font.RockstarTag;
+            teltosolomon.TitleFont = Font.RockstarTag;    
+            teltooneil.TitleFont = Font.RockstarTag;  
+            teltolife.TitleFont = Font.RockstarTag;
+            teltolester.TitleFont = Font.RockstarTag;
+            teltofloyd.TitleFont = Font.RockstarTag;
 
             //WEATHER MENU
 
@@ -215,41 +225,43 @@ namespace LemonUI.Menu1
             //NORTH MENU
             Northmenu.BannerText.Color = Color.Brown;
             Northmenu.Banner.Color = Color.Black;
-            Northmenu.NameFont = Font.Monospace; 
+            Northmenu.NameFont = Font.RockstarTag; 
             Northmenu.BannerText.Font = Font.Pricedown;
-            Northmenu.DescriptionFont = Font.Monospace;
-            loadnorth.TitleFont = Font.Monospace;
-            unloadnorth.TitleFont = Font.Monospace;
+            Northmenu.DescriptionFont = Font.RockstarTag;
+            loadnorth.TitleFont = Font.RockstarTag;
+            unloadnorth.TitleFont = Font.RockstarTag;
 
             //MAIN MENU
-            DemoMenu.Banner.Color = Color.Black;
-            DemoMenu.NameFont = Font.Monospace;
-            DemoMenu.DescriptionFont = Font.Monospace;
+            DemoMenu.Banner.Color = Color.Purple;
+            DemoMenu.NameFont = Font.RockstarTag;
+            DemoMenu.DescriptionFont = Font.RockstarTag;
             DemoMenu.BannerText.Font = Font.Pricedown;
+            //DemoMenu.SetBanner("~HUD_COLOUR_GOLD~MOD MENU"); // Colore oro usando codici GTA
 
 
-            DemoSubMenuPed.Banner.Color = Color.Black;
+            DemoSubMenuPed.Banner.Color = Color.Purple;
             DemoSubMenuPed.BannerText.Color = Color.Brown;
             
             //MODEL CHANGER
-            Franklins.TitleFont = Font.Monospace;
+            Franklins.TitleFont = Font.RockstarTag;
 
 
 
             //========================================= END STYLE===============================================================
-           
-            
-           
 
 
 
 
-            //How you order items below doesn't matter
+
+
+
+        //How you order items below doesn't matter
             DemoPool.Add(DemoMenu); // The pool is container for your menus, add the menu
             DemoPool.Add(SelfMenu);
             DemoPool.Add(VehicleMenu);
             DemoPool.Add(TeleportMenu);
             DemoPool.Add(WeatherMenu);
+            DemoPool.Add(BetaMenu);
       
 
 
@@ -265,6 +277,7 @@ namespace LemonUI.Menu1
             DemoMenu.AddSubMenu(VehicleMenu);
             DemoMenu.AddSubMenu(TeleportMenu);
             DemoMenu.AddSubMenu(WeatherMenu);
+            DemoMenu.AddSubMenu(BetaMenu);
 
             //Submenu Categories
 
@@ -272,7 +285,13 @@ namespace LemonUI.Menu1
             TeleportMenu.AddSubMenu(Northmenu);
             Northmenu.Add(loadnorth);
             Northmenu.Add(unloadnorth);
-            
+
+
+            //Beta Menu
+            //BetaMenu.Add
+            BetaMenu.Add(drunkmode);
+            BetaMenu.Add(nocollmode);
+            BetaMenu.Add(chaosmode);
 
             //Self Menu
             SelfMenu.Add(godmode1);
@@ -299,6 +318,7 @@ namespace LemonUI.Menu1
             VehicleMenu.Add(vehiclespawn);
             VehicleMenu.Add(vehiclepimp);
             //VehicleMenu.Add(itemSpawnVehicle);
+
             
 
             //Teleport Menu
@@ -331,6 +351,7 @@ namespace LemonUI.Menu1
             WeatherMenu.Add(ChristmasWeather);
             WeatherMenu.Add(SnowingWeather);
             WeatherMenu.Add(SnowlightWeather);
+            WeatherMenu.Add(XmasWeather);
 
 
             //standalone items to add to menu
@@ -347,7 +368,11 @@ namespace LemonUI.Menu1
 
             //Misc Items, these are buttons/standalone (menu items without sub menus)
             CarGuy.Activated += SetModelCarGuy;
-            
+
+            //Item activation Beta
+            drunkmode.Activated += SetDrunk;
+            nocollmode.Activated += NoColl;
+            chaosmode.Activated += SetChaos;
 
             //Item activation Self
             Ballas.Activated += SpawnBallas;
@@ -410,6 +435,7 @@ namespace LemonUI.Menu1
             ChristmasWeather.Activated += SetWeatherChristmas;
             SnowingWeather.Activated += SetWeatherSnowing;
             SnowlightWeather.Activated += SetWeatherSnowlight;
+            XmasWeather.Activated += SetWeatherXmas;
 
             //Item North Menu - TELEPORTMENU
             loadnorth.Activated += SetNorthLoad;
@@ -421,8 +447,143 @@ namespace LemonUI.Menu1
             KeyDown += Basics_KeyDown; //line added to replace code in Basics_Tick
         }
 
-       
 
+
+  
+
+        private void SetDrunk(object sender, EventArgs e)
+        {
+            if (drunkmode.Checked == true)
+            {
+                //(Function.Call(Hash.SET_PED_IS_DRUNK));
+                Function.Call(Hash.REQUEST_ANIM_SET, "move_m@drunk@verydrunk");
+                Function.Call(Hash.SET_PED_MOVEMENT_CLIPSET, Game.Player.Character.Handle, "move_m@drunk@verydrunk", 0x3E800000);
+                
+                //Function.Call(Hash.SET_ENTITY_COMPLETELY_DISABLE_COLLISION, Game.Player.Character);
+            }
+
+            if (drunkmode.Checked == false)
+            {
+                Function.Call(Hash.RESET_PED_MOVEMENT_CLIPSET, Game.Player.Character);
+               // Function.Call(Hash.SET_ENTITY_COLLISION, Game.Player.Character);
+               
+            }
+
+        }
+
+
+        private void SetChaos(object sender, EventArgs e)
+        {
+            if (chaosmode.Checked == true)
+            {
+                Ped player = Game.Player.Character;
+
+                //foreach (Ped ped in World.GetAllPeds())
+                foreach (Ped ped in World.GetNearbyPeds(player, 500f)) // solo pedoni vicini
+                {
+                    if (ped == null || !ped.Exists() || ped.IsDead || ped == player)
+                        continue;
+
+                    // Salta i poliziotti o pedoni già in combattimento
+                    if (ped.RelationshipGroup == Game.GenerateHash("COP") || ped.IsInCombat)
+                        continue;
+
+                    // Imposta la relazione a ostile
+                    ped.RelationshipGroup = Game.GenerateHash("HATE_GROUP");
+                    Function.Call(Hash.SET_RELATIONSHIP_BETWEEN_GROUPS, 5, Game.GenerateHash("HATE_GROUP"), Game.Player.Character.RelationshipGroup);
+                    Function.Call(Hash.SET_RELATIONSHIP_BETWEEN_GROUPS, 5, Game.Player.Character.RelationshipGroup, Game.GenerateHash("HATE_GROUP"));
+
+                    if (ped.IsInVehicle() && ped == ped.CurrentVehicle.GetPedOnSeat(VehicleSeat.Driver))
+                    {
+                        // Il pedone è il guidatore di un veicolo
+                        Function.Call(Hash.TASK_VEHICLE_DRIVE_TO_COORD,
+                                ped,
+                                ped.CurrentVehicle,
+                                player.Position.X,
+                                player.Position.Y,
+                                player.Position.Z,
+                                60f,  // velocità
+                                1,    // driving mode
+                                ped.CurrentVehicle.Model.Hash,
+                                1074528293, //786603 driving style: aggressive //1074528293 follia
+                                10f,  // stopping range
+                                5f    // straight line distance tolerance 
+                          );
+                    }
+
+
+                    ped.Weapons.Give(WeaponHash.AssaultRifle, 9999, true, true);
+                    
+
+                    // Ordina al pedone di attaccare il giocatore
+                    ped.Task.FightAgainst(player);
+                }
+
+                /*Ped player = Game.Player.Character;
+                Vector3 playerPos = player.Position;
+
+                foreach (Ped ped in World.GetNearbyPeds(player, 100f)) // solo pedoni vicini
+                {
+                    if (ped == null || !ped.Exists() || ped.IsDead || ped == player || convertedPeds.Contains(ped))
+                        continue;
+
+                    // Evita poliziotti e pedoni già in combattimento
+                    if (ped.RelationshipGroup == Game.GenerateHash("COP") || ped.IsInCombat)
+                        continue;
+
+                    // Imposta relazione ostile
+                    ped.RelationshipGroup = hostileGroupHash;
+                    Function.Call(Hash.SET_RELATIONSHIP_BETWEEN_GROUPS, 5, hostileGroupHash, player.RelationshipGroup);
+                    Function.Call(Hash.SET_RELATIONSHIP_BETWEEN_GROUPS, 5, player.RelationshipGroup, hostileGroupHash);
+
+                    // Dai un'arma se non ne ha
+                    if (!ped.IsArmed())
+                    {
+                        ped.Weapons.Give(WeaponHash.Pistol, 100, true, true);
+                    }
+
+                    // Attacca il giocatore
+                    ped.Task.FightAgainst(player);
+                    convertedPeds.Add(ped);
+                }*/
+            }
+
+            if (chaosmode.Checked == false)
+            {
+                Ped player = Game.Player.Character;
+
+                foreach (Ped ped in World.GetAllPeds())
+                {
+                    if (ped == null || !ped.Exists() || ped.IsDead || ped == player)
+                        continue;
+
+                    // Ripristina il gruppo relazionale dei pedoni (puoi usare "CIVMALE" o "CIVFEMALE")
+                    ped.RelationshipGroup = Game.GenerateHash("CIVMALE");
+
+                    // Ferma eventuali task aggressivi
+                    ped.Task.ClearAll();
+                }
+
+                // Ripristina le relazioni tra i gruppi
+                Function.Call(Hash.SET_RELATIONSHIP_BETWEEN_GROUPS, 0, Game.GenerateHash("HATE_GROUP"), Game.Player.Character.RelationshipGroup);
+                Function.Call(Hash.SET_RELATIONSHIP_BETWEEN_GROUPS, 0, Game.Player.Character.RelationshipGroup, Game.GenerateHash("HATE_GROUP"));
+            }
+        }
+        
+
+        private void NoColl(object sender, EventArgs e)
+        {
+            if (nocollmode.Checked == true)
+            {
+                Game.Player.Character.IsCollisionEnabled = false;
+                
+            }
+
+            if (nocollmode.Checked == false)
+            {
+                Game.Player.Character.IsCollisionEnabled = true;
+            }
+        }
 
         //godmode
 
@@ -982,7 +1143,8 @@ namespace LemonUI.Menu1
             Player player = Game.Player;
             if (!player.Character.IsInVehicle())
             {
-                player.Character.Position = new Vector3(3360.19f, -4849.67f, 111.8f);
+                
+                                  
                 Function.Call(Hash.REQUEST_IPL, "plg_01");
                 Function.Call(Hash.REQUEST_IPL, "prologue01");
                 Function.Call(Hash.REQUEST_IPL, "prologue01_lod");
@@ -1046,8 +1208,35 @@ namespace LemonUI.Menu1
                 Function.Call(Hash.REQUEST_IPL, "prologuerd");
                 Function.Call(Hash.REQUEST_IPL, "prologuerdb");
                 Function.Call(Hash.REQUEST_IPL, "prologuerd_lod");
+        {
+            // Carica IPL di North Yankton
+            /*Function.Call(Hash.REQUEST_IPL, "prologue01");
+            Function.Call(Hash.REQUEST_IPL, "prologue01_lod");
+            Function.Call(Hash.REQUEST_IPL, "prologue01c");
+            Function.Call(Hash.REQUEST_IPL, "prologue01c_lod");
+            Function.Call(Hash.REQUEST_IPL, "prologue01d");
+            Function.Call(Hash.REQUEST_IPL, "prologue01d_lod");
+            Function.Call(Hash.REQUEST_IPL, "prologue01e");
+            Function.Call(Hash.REQUEST_IPL, "prologue01e_lod");
+            Function.Call(Hash.REQUEST_IPL, "prologue01f");
+            Function.Call(Hash.REQUEST_IPL, "prologue01f_lod");
+            Function.Call(Hash.REQUEST_IPL, "prologue01g");
+            Function.Call(Hash.REQUEST_IPL, "prologue01g_lod");
+            Function.Call(Hash.REQUEST_IPL, "prologue01h");
+            Function.Call(Hash.REQUEST_IPL, "prologue01h_lod");
+            Function.Call(Hash.REQUEST_IPL, "prologue01i");
+            Function.Call(Hash.REQUEST_IPL, "prologue01i_lod");
+            Function.Call(Hash.REQUEST_IPL, "prologue01j");
+            Function.Call(Hash.REQUEST_IPL, "prologue01j_lod");*/
 
-            }
+                    Vector3 yanktonCoords = new Vector3(3217.0f, -4834.0f, 111.0f); // posizione centrale
+                    Game.Player.Character.Position = yanktonCoords;
+                    //player.Character.Position = new Vector3(3360.19f, -4849.67f, 111.8f);
+
+                }
+
+
+    }
             else
             {
                 Vehicle v = player.Character.CurrentVehicle;
@@ -1191,6 +1380,43 @@ namespace LemonUI.Menu1
             World.Weather = Weather.Snowlight;
         }
 
+        private void SetWeatherXmas(object sender, EventArgs e)
+        {
+            if (XmasWeather.Checked == true)
+            {
+                Function.Call(Hash.REQUEST_IPL, "snow_maps");
+                Function.Call(Hash.REQUEST_IPL, "snow_grassmap");
+                Function.Call(Hash.REQUEST_IPL, "prologue01");
+                Function.Call(Hash.REQUEST_IPL, "prologue01_lod");
+                Function.Call(Hash.REQUEST_IPL, "prologue01c");
+                Function.Call(Hash.REQUEST_IPL, "prologue01c_lod");
+                Function.Call(Hash.SET_WEATHER_TYPE_OVERTIME_PERSIST, "XMAS");
+                Function.Call(Hash.SET_WEATHER_TYPE_NOW_PERSIST, "XMAS");
+                Function.Call(Hash.SET_WEATHER_TYPE_NOW, "XMAS");
+                Function.Call((Hash)0xAEEDAD1420C65CC0, true); // SET_FORCE_PED_FOOTSTEPS_TRACKS
+                Function.Call((Hash)0x4CC7F0FEA5283FE0, true); // SET_FORCE_VEHICLE_TRAILS
+
+            }
+
+            if (XmasWeather.Checked == false)
+            {
+                Function.Call(Hash.REMOVE_IPL, "snow_maps");
+                Function.Call(Hash.REMOVE_IPL, "snow_grassmap");
+                Function.Call(Hash.REMOVE_IPL, "prologue01");
+                Function.Call(Hash.REMOVE_IPL, "prologue01_lod");
+                Function.Call(Hash.REMOVE_IPL, "prologue01c");
+                Function.Call(Hash.REMOVE_IPL, "prologue01c_lod");
+                Function.Call(Hash.SET_WEATHER_TYPE_OVERTIME_PERSIST, "CLEAR");
+                Function.Call(Hash.SET_WEATHER_TYPE_NOW_PERSIST, "CLEAR");
+                Function.Call(Hash.SET_WEATHER_TYPE_NOW, "CLEAR");
+                Function.Call((Hash)0xAEEDAD1420C65CC0, false);
+                Function.Call((Hash)0x4CC7F0FEA5283FE0, false);
+
+            }
+        }
+
+
+
 
 
 
@@ -1298,8 +1524,10 @@ namespace LemonUI.Menu1
 
         }
 
+       
 
-        
+
+
 
         private void Basics_KeyDown(object sender, KeyEventArgs e)
         {
