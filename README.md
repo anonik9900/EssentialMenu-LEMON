@@ -33,7 +33,7 @@ Essential Menu is my biggest project when it comes to gta 5 mods. This is a work
  <h3> [Commands] </h3>
    <p>
     <ul>
-     <li>Press "F6" To Open the Menu </li>
+     <li>Press "F6" To Open the Menu Or Edit the esconfig.ini and choose your fav Key</li>
      <li>Use "Arrow_Up" to move Up.</li>
      <li>Use "Arrow_Down" to move Down.</li>
      <li>Use "Enter" to select an Option.</li>
