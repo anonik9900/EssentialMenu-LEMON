@@ -25,6 +25,7 @@ Essential Menu is my biggest project when it comes to gta 5 mods. This is a work
     <li>Weapon Options</li>
     <li>Teleport Options</li>
     <li>Weather Options</li>
+    <li>Vision Options</li>
     </ul
    </p>
 
