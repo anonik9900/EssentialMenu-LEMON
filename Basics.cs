@@ -25,6 +25,7 @@ using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using System.Runtime.ConstrainedExecution;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static LemonUI.Menu1.Basics;
 
 //uses lemon and SHVDN version 2, also added windows forms
 
@@ -51,9 +52,21 @@ namespace LemonUI.Menu1
 
 
 
-        private static readonly ObjectPool DemoPool = new ObjectPool();
-        private static readonly NativeMenu DemoMenu = new NativeMenu(bannerText: "Essential Menu", name: "Made By Anonik v1,30", description: "Made By Anonik v1,30");
 
+        private static readonly ObjectPool DemoPool = new ObjectPool();
+        private static readonly NativeMenu DemoMenu = new NativeMenu(bannerText: "Essential Menu", name: "Made By Anonik v1332 ~r~BETA", description: "Made By Anonik v1332 ~r~BETA");
+
+        // Aggiungi i menu per lo Skin Changer
+        private static readonly NativeMenu SkinChangerMenu = new NativeMenu("Skin Changer", "Change Player Model");
+        private static readonly NativeMenu ProtagonistMenu = new NativeMenu("Protagonists", "Main Characters");
+        private static readonly NativeMenu GangMenu = new NativeMenu("Gangs", "Gang Members");
+        private static readonly NativeMenu CivMaleMenu = new NativeMenu("Male Civilians", "Male Civilians");
+        private static readonly NativeMenu CivFemaleMenu = new NativeMenu("Female Civilians", "Female Civilians");
+        private static readonly NativeMenu CopMenu = new NativeMenu("Police", "Law Enforcement");
+        private static readonly NativeMenu EmergencyMenu = new NativeMenu("Emergency", "Medical/Fire");
+        private static readonly NativeMenu MiscMenu = new NativeMenu("Miscellaneous", "Other Models");
+        private static readonly NativeMenu AnimalMenu = new NativeMenu("Animals", "Animal Models");
+        private static readonly NativeMenu StoryMenu = new NativeMenu("Story Characters", "Story Mode Characters");
 
 
 
@@ -75,8 +88,8 @@ namespace LemonUI.Menu1
         private static readonly NativeItem Ballas = new NativeItem("Ballas and Family", "Description"); //Item 1 of submenu
         private static readonly NativeItem LostMCGang = new NativeItem("Import Export", "Description"); //Item 2 of submenu
 
-        private static readonly NativeMenu ModelMenuPed = new NativeMenu("Model Changer", "Model Changer","");
-        private static readonly NativeItem Franklins = new NativeItem("Franklin Model", "");
+       //private static readonly NativeMenu ModelMenuPed = new NativeMenu("Model Changer", "Model Changer","");
+        //private static readonly NativeItem Franklins = new NativeItem("Franklin Model", "");
 
 
         //BetaMenu
@@ -105,6 +118,8 @@ namespace LemonUI.Menu1
         private static readonly NativeCheckboxItem money15milion = new NativeCheckboxItem("Money Drop 15Mil", false);
         private static readonly NativeCheckboxItem money20milion = new NativeCheckboxItem("Money Drop 20Mil", false);
         private static readonly NativeCheckboxItem money100milion = new NativeCheckboxItem("Money Drop 100Mil", false);
+        // Skin Changer Menu
+
 
         //VehicleMenu
 
@@ -158,70 +173,104 @@ namespace LemonUI.Menu1
         public Basics()
         {
 
+            // Aggiungi i nuovi menu al pool
+            DemoPool.Add(SkinChangerMenu);
+            DemoPool.Add(ProtagonistMenu);
+            DemoPool.Add(GangMenu);
+            DemoPool.Add(CivMaleMenu);
+            DemoPool.Add(CivFemaleMenu);
+            DemoPool.Add(CopMenu);
+            DemoPool.Add(EmergencyMenu);
+            DemoPool.Add(MiscMenu);
+            DemoPool.Add(AnimalMenu);
+            DemoPool.Add(StoryMenu);
+
+            // Aggiungi SkinChangerMenu al menu principale
+            DemoMenu.AddSubMenu(SkinChangerMenu);
+
+            // Configura la gerarchia dei menu per lo Skin Changer
+            SkinChangerMenu.AddSubMenu(ProtagonistMenu);
+            SkinChangerMenu.AddSubMenu(GangMenu);
+            SkinChangerMenu.AddSubMenu(CivMaleMenu);
+            SkinChangerMenu.AddSubMenu(CivFemaleMenu);
+            SkinChangerMenu.AddSubMenu(CopMenu);
+            SkinChangerMenu.AddSubMenu(EmergencyMenu);
+            SkinChangerMenu.AddSubMenu(MiscMenu);
+            SkinChangerMenu.AddSubMenu(AnimalMenu);
+            SkinChangerMenu.AddSubMenu(StoryMenu);
+
+            // Configura lo stile per i nuovi menu
+            SkinChangerMenu.Banner.Color = Color.Purple;
+            SkinChangerMenu.BannerText.Font = Font.Pricedown;
+            SkinChangerMenu.NameFont = Font.Monospace;
+
+            // Popola i menu con i modelli
+            SetupSkinChanger();
+
 
             //==============================================STYLE===============================================================
 
             //SELF MENU
             //menu.BannerColor = System.Drawing.Color.FromArgb(180, 20, 20);
             SelfMenu.BannerText.Color = Color.Brown;
-            SelfMenu.NameFont = Font.RockstarTag;
+            SelfMenu.NameFont = Font.Monospace;
             SelfMenu.Banner.Color = Color.FromArgb(180, 20, 20);//Purple;
-            SelfMenu.BannerText.Font = Font.Pricedown;
-            SelfMenu.DescriptionFont = Font.RockstarTag;
-            maxhealth.TitleFont = Font.RockstarTag;
-            godmode1.TitleFont = Font.RockstarTag;
-            neverwanted.TitleFont = Font.RockstarTag;
-            giveallwep.TitleFont = Font.RockstarTag;
-            givemaxammo.TitleFont = Font.RockstarTag;
-            infiniteammo.TitleFont = Font.RockstarTag;
-            superjump.TitleFont = Font.RockstarTag;
-            invisible.TitleFont = Font.RockstarTag;  
-            fastrun.TitleFont = Font.RockstarTag;
+            SelfMenu.BannerText.Font = Font.Monospace;
+            SelfMenu.DescriptionFont = Font.Monospace;
+            maxhealth.TitleFont = Font.Monospace;
+            godmode1.TitleFont = Font.Monospace;
+            neverwanted.TitleFont = Font.Monospace;
+            giveallwep.TitleFont = Font.Monospace;
+            givemaxammo.TitleFont = Font.Monospace;
+            infiniteammo.TitleFont = Font.Monospace;
+            superjump.TitleFont = Font.Monospace;
+            invisible.TitleFont = Font.Monospace;  
+            fastrun.TitleFont = Font.Monospace;
 
             //MONEY MENU
             MoneyMenu.BannerText.Color = Color.Brown;
-            MoneyMenu.NameFont = Font.RockstarTag;
+            MoneyMenu.NameFont = Font.Monospace;
             MoneyMenu.Banner.Color = Color.Black;
             MoneyMenu.BannerText.Font = Font.Pricedown;
-            MoneyMenu.DescriptionFont  = Font.RockstarTag;
-            money40k.TitleFont = Font.RockstarTag;
-            money1milion.TitleFont = Font.RockstarTag;
-            money10milion.TitleFont = Font.RockstarTag;
-            money15milion.TitleFont = Font.RockstarTag;
-            money20milion.TitleFont = Font.RockstarTag;
-            money100milion.TitleFont = Font.RockstarTag;
+            MoneyMenu.DescriptionFont  = Font.Monospace;
+            money40k.TitleFont = Font.Monospace;
+            money1milion.TitleFont = Font.Monospace;
+            money10milion.TitleFont = Font.Monospace;
+            money15milion.TitleFont = Font.Monospace;
+            money20milion.TitleFont = Font.Monospace;
+            money100milion.TitleFont = Font.Monospace;
 
             //VEHICLE MENU
             VehicleMenu.BannerText.Color = Color.Brown;
-            VehicleMenu.NameFont = Font.RockstarTag;
+            VehicleMenu.NameFont = Font.Monospace;
             VehicleMenu.Banner.Color = Color.Black;
             VehicleMenu.BannerText.Font = Font.Pricedown;
-            VehicleMenu.DescriptionFont = Font.RockstarTag;
-            fixvehicle.TitleFont = Font.RockstarTag;
-            cargodmod.TitleFont = Font.RockstarTag;
-            cardrivein.TitleFont = Font.RockstarTag;
-            cardrivein.AltTitleFont = Font.RockstarTag;   
-            vehiclespawn.TitleFont = Font.RockstarTag;
-            vehiclepimp.TitleFont = Font.RockstarTag;
+            VehicleMenu.DescriptionFont = Font.Monospace;
+            fixvehicle.TitleFont = Font.Monospace;
+            cargodmod.TitleFont = Font.Monospace;
+            cardrivein.TitleFont = Font.Monospace;
+            cardrivein.AltTitleFont = Font.Monospace;   
+            vehiclespawn.TitleFont = Font.Monospace;
+            vehiclepimp.TitleFont = Font.Monospace;
 
             //TELEPORT MENU
             TeleportMenu.BannerText.Color = Color.Brown;
-            TeleportMenu.NameFont = Font.RockstarTag;
+            TeleportMenu.NameFont = Font.Monospace;
             TeleportMenu.Banner.Color = Color.Black;
             TeleportMenu.BannerText.Font = Font.Pricedown;
-            TeleportMenu.DescriptionFont = Font.RockstarTag;
-            teltoway.TitleFont = Font.RockstarTag;
-            teltochiliad.TitleFont = Font.RockstarTag;
-            teltopub1.TitleFont = Font.RockstarTag;
-            teltofib.TitleFont = Font.RockstarTag;
-            teltobell.TitleFont = Font.RockstarTag; 
-            teltobank.TitleFont = Font.RockstarTag;
-            teltopub2.TitleFont = Font.RockstarTag;
-            teltosolomon.TitleFont = Font.RockstarTag;    
-            teltooneil.TitleFont = Font.RockstarTag;  
-            teltolife.TitleFont = Font.RockstarTag;
-            teltolester.TitleFont = Font.RockstarTag;
-            teltofloyd.TitleFont = Font.RockstarTag;
+            TeleportMenu.DescriptionFont = Font.Monospace;
+            teltoway.TitleFont = Font.Monospace;
+            teltochiliad.TitleFont = Font.Monospace;
+            teltopub1.TitleFont = Font.Monospace;
+            teltofib.TitleFont = Font.Monospace;
+            teltobell.TitleFont = Font.Monospace; 
+            teltobank.TitleFont = Font.Monospace;
+            teltopub2.TitleFont = Font.Monospace;
+            teltosolomon.TitleFont = Font.Monospace;    
+            teltooneil.TitleFont = Font.Monospace;  
+            teltolife.TitleFont = Font.Monospace;
+            teltolester.TitleFont = Font.Monospace;
+            teltofloyd.TitleFont = Font.Monospace;
 
             //WEATHER MENU
 
@@ -231,16 +280,16 @@ namespace LemonUI.Menu1
             //NORTH MENU
             Northmenu.BannerText.Color = Color.Brown;
             Northmenu.Banner.Color = Color.Black;
-            Northmenu.NameFont = Font.RockstarTag; 
+            Northmenu.NameFont = Font.Monospace; 
             Northmenu.BannerText.Font = Font.Pricedown;
-            Northmenu.DescriptionFont = Font.RockstarTag;
-            loadnorth.TitleFont = Font.RockstarTag;
-            unloadnorth.TitleFont = Font.RockstarTag;
+            Northmenu.DescriptionFont = Font.Monospace;
+            loadnorth.TitleFont = Font.Monospace;
+            unloadnorth.TitleFont = Font.Monospace;
 
             //MAIN MENU
             DemoMenu.Banner.Color = Color.Purple;
-            DemoMenu.NameFont = Font.RockstarTag;
-            DemoMenu.DescriptionFont = Font.RockstarTag;
+            DemoMenu.NameFont = Font.Monospace;
+            DemoMenu.DescriptionFont = Font.Monospace;
             DemoMenu.BannerText.Font = Font.Pricedown;
             //DemoMenu.SetBanner("~HUD_COLOUR_GOLD~MOD MENU"); // Colore oro usando codici GTA
 
@@ -249,7 +298,7 @@ namespace LemonUI.Menu1
             DemoSubMenuPed.BannerText.Color = Color.Brown;
             
             //MODEL CHANGER
-            Franklins.TitleFont = Font.RockstarTag;
+            //Franklins.TitleFont = Font.Monospace;
 
 
 
@@ -269,12 +318,13 @@ namespace LemonUI.Menu1
             DemoPool.Add(WeatherMenu);
             DemoPool.Add(VisionMenu);
             DemoPool.Add(BetaMenu);
-      
+
+
 
 
 
             //DemoPool.Add(DemoSubMenuPed); // add first submenu
-             DemoPool.Add(ModelMenuPed);//Model Changer
+            //DemoPool.Add(ModelMenuPed);//Model Changer
             DemoPool.Add(Northmenu);//NorthMenu
             DemoPool.Add(MoneyMenu);//MoneyDropMenu
             
@@ -366,6 +416,11 @@ namespace LemonUI.Menu1
             VisionMenu.Add(NightVision);
             VisionMenu.Add(MatrixVision);
 
+         
+
+            // Aggiungi i menu al pool
+
+
 
             //standalone items to add to menu
 
@@ -376,8 +431,8 @@ namespace LemonUI.Menu1
             //DemoSubMenuPed.Add(Ballas); // item 1
             //DemoSubMenuPed.Add(LostMCGang); // item 2
 
-            DemoMenu.AddSubMenu(ModelMenuPed);
-            ModelMenuPed.Add(Franklins);
+            //DemoMenu.AddSubMenu(ModelMenuPed);
+            //ModelMenuPed.Add(Franklins);
 
             //Misc Items, these are buttons/standalone (menu items without sub menus)
             CarGuy.Activated += SetModelCarGuy;
@@ -390,7 +445,7 @@ namespace LemonUI.Menu1
             //Item activation Self
             Ballas.Activated += SpawnBallas;
             LostMCGang.Activated += SpawnLostMC;
-            Franklins.Activated += SpawnFrank;
+            //Franklins.Activated += SpawnFrank;
             godmode1.Activated += SetGodMode;
             maxhealth.Activated += SetMaxHealth;
             neverwanted.Activated += SetNeverWanted;
@@ -467,7 +522,116 @@ namespace LemonUI.Menu1
 
 
 
-  
+        private void SetupSkinChanger()
+        {
+            // Protagonisti
+            AddModelToMenu(ProtagonistMenu, "Michael", PedHash.Michael);
+            AddModelToMenu(ProtagonistMenu, "Franklin", PedHash.Franklin);
+            AddModelToMenu(ProtagonistMenu, "Trevor", PedHash.Trevor);
+            AddModelToMenu(ProtagonistMenu, "Lester", PedHash.LesterCrest2);
+            AddModelToMenu(ProtagonistMenu, "Lamar", PedHash.LamarDavis);
+            AddModelToMenu(ProtagonistMenu, "Jimmy", PedHash.JimmyBoston);
+            AddModelToMenu(ProtagonistMenu, "Amanda", PedHash.AmandaTownley);
+
+            // Gang
+            AddModelToMenu(GangMenu, "Ballas", PedHash.Ballas01GFY);
+            AddModelToMenu(GangMenu, "Families", PedHash.Families01GFY);
+            AddModelToMenu(GangMenu, "Vagos", PedHash.Vagos01GFY);
+            //AddModelToMenu(GangMenu, "Marabunta", PedHash.Marabunta01);
+            AddModelToMenu(GangMenu, "Lost MC", PedHash.Lost01GFY);
+            AddModelToMenu(GangMenu, "Armenian Boss", PedHash.ArmBoss01GMM);
+            AddModelToMenu(GangMenu, "Korean Boss", PedHash.KorBoss01GMM);
+
+            // Civili Uomini
+            AddModelToMenu(CivMaleMenu, "Businessman 1", PedHash.Business01AFY);
+            AddModelToMenu(CivMaleMenu, "Businessman 2", PedHash.Business02AFY);
+            AddModelToMenu(CivMaleMenu, "Cyclist", PedHash.Cyclist01);
+            //AddModelToMenu(CivMaleMenu, "Construction Worker", PedHash.Construct01);
+            //AddModelToMenu(CivMaleMenu, "Fisherman", PedHash.Fisherman01AMM);
+            AddModelToMenu(CivMaleMenu, "Golfer", PedHash.Golfer01AMY);
+            AddModelToMenu(CivMaleMenu, "Hiker", PedHash.Hiker01AMY);
+
+            // Civili Donne
+            AddModelToMenu(CivFemaleMenu, "Businesswoman", PedHash.Business02AFY);
+            AddModelToMenu(CivFemaleMenu, "Female Agent", PedHash.FemaleAgent);
+            //AddModelToMenu(CivFemaleMenu, "GenHot Girl", PedHash.GenHot01AFY);
+            AddModelToMenu(CivFemaleMenu, "Tourist", PedHash.Tourist01AFY);
+            AddModelToMenu(CivFemaleMenu, "Yoga Girl", PedHash.Yoga01AFY);
+            AddModelToMenu(CivFemaleMenu, "Beach Girl", PedHash.Beach01AFM);
+            AddModelToMenu(CivFemaleMenu, "Epsilon Girl", PedHash.Epsilon01AFY);
+
+            // Polizia
+            AddModelToMenu(CopMenu, "LSPD Officer", PedHash.Cop01SFY);
+            AddModelToMenu(CopMenu, "Sheriff", PedHash.Sheriff01SFY);
+            AddModelToMenu(CopMenu, "SWAT", PedHash.Swat01SMY);
+            AddModelToMenu(CopMenu, "FIB Agent", PedHash.FibSec01);
+            AddModelToMenu(CopMenu, "Army Soldier", PedHash.Marine01SMY);
+            AddModelToMenu(CopMenu, "Undercover Cop", PedHash.CiaSec01SMM);
+
+            // Emergenza
+            AddModelToMenu(EmergencyMenu, "Paramedic", PedHash.Paramedic01SMM);
+            AddModelToMenu(EmergencyMenu, "Fireman", PedHash.Fireman01SMY);
+            //AddModelToMenu(EmergencyMenu, "Doctor", PedHash.Medic01SMM);
+            AddModelToMenu(EmergencyMenu, "Nurse", PedHash.MrsPhillips);
+
+            // Varie
+            AddModelToMenu(MiscMenu, "Clown", PedHash.Clown01SMY);
+            AddModelToMenu(MiscMenu, "Zombie", PedHash.Zombie01);
+            //AddModelToMenu(MiscMenu, "Santa", PedHash.Christmas01);
+            //AddModelToMenu(MiscMenu, "Boxer", PedHash.Boxer01SMY);
+            //AddModelToMenu(MiscMenu, "DJ", PedHash.Djblamryon);
+            AddModelToMenu(MiscMenu, "Pilot", PedHash.Pilot01SMM);
+            AddModelToMenu(MiscMenu, "Car Guy", PedHash.Car3Guy2);
+
+            // Animali
+            AddModelToMenu(AnimalMenu, "Mountain Lion", PedHash.MountainLion);
+            //AddModelToMenu(AnimalMenu, "Cat", PedHash.Cat01);
+            AddModelToMenu(AnimalMenu, "Coyote", PedHash.Coyote);
+            AddModelToMenu(AnimalMenu, "Deer", PedHash.Deer);
+            AddModelToMenu(AnimalMenu, "Dog (Rottweiler)", PedHash.Rottweiler);
+            AddModelToMenu(AnimalMenu, "Dog (Retriever)", PedHash.Retriever);
+            AddModelToMenu(AnimalMenu, "Dog (Husky)", PedHash.Husky);
+
+            // Personaggi della storia
+            //AddModelToMenu(StoryMenu, "Devon Weston", PedHash.Devon);
+            AddModelToMenu(StoryMenu, "Solomon Richards", PedHash.Solomon);
+            AddModelToMenu(StoryMenu, "Tao Cheng", PedHash.TaoCheng);
+            AddModelToMenu(StoryMenu, "Steve Haines", PedHash.SteveHains);
+            AddModelToMenu(StoryMenu, "Dave Norton", PedHash.DaveNorton);
+            AddModelToMenu(StoryMenu, "Floyd Hebert", PedHash.Floyd);
+            AddModelToMenu(StoryMenu, "Jay Norris", PedHash.JayNorris);
+        }
+
+        private void AddModelToMenu(NativeMenu menu, string name, PedHash model)
+        {
+            var item = new NativeItem(name);
+            item.Activated += (sender, args) =>
+            
+            {
+                if (Game.Player.Character.IsInVehicle())
+                {
+                    Notification.Show("~r~Exit the vehicle before changing model");
+                    return;
+                }
+
+                try
+                {
+    
+
+                    // Then request the model
+                    Game.Player.ChangeModel(model);
+                    Function.Call(Hash.SET_PED_DEFAULT_COMPONENT_VARIATION, Game.Player.Character);
+                    Notification.Show($"~g~Changed to: ~w~{name}");
+                }
+                catch
+                {
+                    Notification.Show($"~r~Failed to load model: ~w~{name}");
+                }
+            };
+            menu.Add(item);
+        }
+
+
 
         private void SetDrunk(object sender, EventArgs e)
         {
@@ -1591,6 +1755,7 @@ namespace LemonUI.Menu1
 
 
 
+
         private void Basics_KeyDown(object sender, KeyEventArgs e)
         {
 
@@ -1600,7 +1765,7 @@ namespace LemonUI.Menu1
                 //DemoMenu.Visible = true;
  
                 //GTA.UI.Notification.Show("Welcome",true);
-                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.Call911,"Anonik","Welcome","Essential Menu 1.30", true,true);
+                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.Call911,"Anonik","Welcome","Essential Menu 1.3.32 BETA", true,true);
                
 
  
