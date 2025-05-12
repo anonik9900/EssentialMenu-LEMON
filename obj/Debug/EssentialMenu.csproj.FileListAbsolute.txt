@@ -8,3 +8,5 @@ C:\Users\impie\Desktop\EssentialMenu-LEMON-main\EssentialMenu-LEMON-main\obj\Deb
 C:\Users\impie\Desktop\EssentialMenu-LEMON-main\EssentialMenu-LEMON-main\obj\Debug\EssentialMenu.dll
 C:\Users\impie\Desktop\EssentialMenu-LEMON-main\EssentialMenu-LEMON-main\obj\Debug\EssentialMenu.pdb
 C:\Users\impie\Desktop\EssentialMenu-LEMON-main\EssentialMenu-LEMON-main\bin\Debug\LemonUI.SHVDN3.pdb
+C:\Users\impie\Desktop\EssentialMenu-LEMON-main\EssentialMenu-LEMON-main\bin\Debug\INIFileParser.dll
+C:\Users\impie\Desktop\EssentialMenu-LEMON-main\EssentialMenu-LEMON-main\bin\Debug\INIFileParser.xml

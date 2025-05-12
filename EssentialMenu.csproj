@@ -53,6 +53,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="INIFileParser, Version=2.5.3.0, Culture=neutral, PublicKeyToken=79af7b307b65cf3c, processorArchitecture=MSIL">
+      <HintPath>packages\ini-parser-netstandard.2.5.3\lib\net40\INIFileParser.dll</HintPath>
+    </Reference>
     <Reference Include="LemonUI.SHVDN3, Version=2.1.2.0, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>packages\LemonUI.SHVDN3.2.1.2\lib\net48\LemonUI.SHVDN3.dll</HintPath>
       <Private>True</Private>

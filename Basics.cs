@@ -28,6 +28,7 @@ using System.Runtime.ConstrainedExecution;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static LemonUI.Menu1.Basics;
 
+
 //uses lemon and SHVDN version 2, also added windows forms
 
 
@@ -38,8 +39,11 @@ namespace LemonUI.Menu1
     public class Basics : Script
     {
 
+
+
         bool expowpon;
         bool expoml;
+        bool moneygun;
 
         public static bool CanPlayerSuperJump { get; set; }
         public static bool canPlayerFastRun { get; set; }
@@ -52,10 +56,7 @@ namespace LemonUI.Menu1
         bool moneyDrop20MilOn;
         bool moneyDrop100MilOn;
 
-
-
-
-
+   
 
 
         private static readonly ObjectPool DemoPool = new ObjectPool();
@@ -73,7 +74,7 @@ namespace LemonUI.Menu1
         private static readonly NativeMenu AnimalMenu = new NativeMenu("Animals", "Animal Models");
         private static readonly NativeMenu StoryMenu = new NativeMenu("Story Characters", "Story Mode Characters");
 
-
+ 
 
         //start of Top Level Items, at top of menu, not part of submenu
         private static readonly NativeMenu SelfMenu = new NativeMenu("Self Options", "Self Options", "");  //The first submenu
@@ -129,6 +130,7 @@ namespace LemonUI.Menu1
         //WeaponMenu
         private static readonly NativeCheckboxItem expoweap = new NativeCheckboxItem("Explosive Ammo", "Description", false); // Enabled by Default with a Description
         private static readonly NativeCheckboxItem expomelee = new NativeCheckboxItem("Explosive Melee", "Description", false);
+        private static readonly NativeCheckboxItem moneygunop = new NativeCheckboxItem("Money Gun", "Description", false);
 
         //VehicleMenu
 
@@ -385,6 +387,7 @@ namespace LemonUI.Menu1
             //Weapon Menu
             WeaponMenu.Add(expoweap);
             WeaponMenu.Add(expomelee);
+            WeaponMenu.Add(moneygunop);
 
             //Vehicle Menu
             VehicleMenu.Add(fixvehicle);
@@ -491,6 +494,7 @@ namespace LemonUI.Menu1
             //Item Att WEAPONMENU
             expoweap.Activated += SetWeapExpo;
             expomelee.Activated += SetMeleeExpo;
+            moneygunop.Activated += SetMoneyGun;
 
 
             //Item Att Teleport
@@ -545,6 +549,7 @@ namespace LemonUI.Menu1
 
         private void SetupSkinChanger()
         {
+
             // Protagonisti
             AddModelToMenu(ProtagonistMenu, "Michael", PedHash.Michael);
             AddModelToMenu(ProtagonistMenu, "Franklin", PedHash.Franklin);
@@ -637,12 +642,33 @@ namespace LemonUI.Menu1
 
                 try
                 {
-    
 
+                    // Aggiungi effetto visivo prima del cambio modello
+                    // Esempio di effetto particellare
+
+                    // Effetto visivo pre-cambio
+                    /*
+                     * SwitchShortMichaelIn" / "SwitchShortMichaelOut" (effetto di transizione dei personaggi)
+
+                        "DeathFailOut" (effetto di dissolvenza)
+
+                        "CamPushInNeutral" (effetto zoom)
+
+                        "FocusIn" / "FocusOut" (effetto di messa a fuoco)
+                     */
+                    Function.Call((Hash)0x2206BF9A37B7F724, "CamPushInNeutral", 0, true); // _START_SCREEN_EFFECT
+                    Function.Call(Hash.PLAY_SOUND_FRONTEND, -1, "FocusIn", "HintCamSounds", true);
                     // Then request the model
                     Game.Player.ChangeModel(model);
                     Function.Call(Hash.SET_PED_DEFAULT_COMPONENT_VARIATION, Game.Player.Character);
+
+
                     Notification.Show($"~g~Changed to: ~w~{name}");
+
+                    // Pulizia dopo 1 secondo
+                    Script.Wait(1000);
+                    Function.Call((Hash)0x068E835A1D0DC0E3, "CamPushInNeutral"); // _STOP_SCREEN_EFFECT
+                    Function.Call((Hash)0x068E835A1D0DC0E3, "DeathFailOut"); // _STOP_SCREEN_EFFECT
                 }
                 catch
                 {
@@ -651,6 +677,8 @@ namespace LemonUI.Menu1
             };
             menu.Add(item);
         }
+
+
 
 
 
@@ -1008,15 +1036,24 @@ namespace LemonUI.Menu1
             if (expomelee.Checked == true)
             {
                 expoml = !expoml;
-                //Function.Call(Hash.SET_EXPLOSIVE_AMMO_THIS_FRAME, Game.Player.Character);
-                //WeaponHash weapon = Game.Player.Character.Weapons.Current.Hash;
-                //Function.Call(Hash.SET_EXPLOSIVE_AMMO_THIS_FRAME, weapon, true);
-                //Vector3 coords = Game.Player.Character.GetPositionOffset(new Vector3(0f, 5f, 0f));
-                //Function.Call(Hash.ADD_EXPLOSION, coords.X, coords.Y, coords.Z, 2, 1.0f, true, false, 0.0f);
             }
             if (expomelee.Checked == false)
             {
                 expoml = false;
+                //aggiungi codice per disabilitare munizioni esplosive
+            }
+        }
+
+        private void SetMoneyGun(object sender, EventArgs e)
+        {
+            if (moneygunop.Checked == true)
+            {
+                moneygun = !moneygun;
+
+            }
+            if (moneygunop.Checked == false)
+            {
+                moneygun = false;
                 //aggiungi codice per disabilitare munizioni esplosive
             }
         }
@@ -1092,6 +1129,7 @@ namespace LemonUI.Menu1
                 Vehicle v = World.CreateVehicle(model, gamePed.Position, gamePed.Heading);
                 v.PlaceOnGround();
                 gamePed.Task.WarpIntoVehicle(v, VehicleSeat.Driver);
+
             }
 
         }
@@ -1759,6 +1797,28 @@ namespace LemonUI.Menu1
                 Function.Call(Hash.SET_EXPLOSIVE_MELEE_THIS_FRAME, Game.Player, true);
             }
 
+            if (moneygun)
+            {
+                Game.Player.Character.Weapons.Current.InfiniteAmmo = true;
+                Game.Player.Character.Weapons.Current.InfiniteAmmoClip = true;
+                Ped ped = Game.Player.Character;
+                if (Function.Call<bool>(Hash.IS_PED_SHOOTING, ped.Handle))
+                {
+                    OutputArgument arg = new OutputArgument();
+                    Function.Call(Hash.GET_PED_LAST_WEAPON_IMPACT_COORD, ped.Handle, arg);
+                    GTA.Math.Vector3 result = arg.GetResult<GTA.Math.Vector3>();
+                    if (result != GTA.Math.Vector3.Zero)
+                    {
+                        Model model = new Model(0x113FD533);
+                        if (!model.IsLoaded)
+                            model.Request(1000);
+                        int hash = Function.Call<int>(Hash.GET_HASH_KEY, "PICKUP_MONEY_CASE");
+                        Function.Call(Hash.CREATE_AMBIENT_PICKUP, hash, result.X, result.Y, result.Z, 0, 1000000, model.Hash, 0, 1);
+                    }
+                }
+
+            }
+
 
             if (moneyDrop40kOn)
             {
@@ -1823,7 +1883,7 @@ namespace LemonUI.Menu1
 
         }
 
-       
+
 
 
 
