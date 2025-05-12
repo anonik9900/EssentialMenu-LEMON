@@ -10,6 +10,7 @@ using GTA.Native;
 using GTA.Math;
 using GTA.NaturalMotion;
 using LemonUI;
+using LemonUI.Tools;
 using System.Media;
 using System.IO;
 using System.Threading;
@@ -37,6 +38,9 @@ namespace LemonUI.Menu1
     public class Basics : Script
     {
 
+        bool expowpon;
+        bool expoml;
+
         public static bool CanPlayerSuperJump { get; set; }
         public static bool canPlayerFastRun { get; set; }
 
@@ -47,8 +51,9 @@ namespace LemonUI.Menu1
         bool moneyDrop15MilOn;
         bool moneyDrop20MilOn;
         bool moneyDrop100MilOn;
-        
-     
+
+
+
 
 
 
@@ -73,6 +78,7 @@ namespace LemonUI.Menu1
         //start of Top Level Items, at top of menu, not part of submenu
         private static readonly NativeMenu SelfMenu = new NativeMenu("Self Options", "Self Options", "");  //The first submenu
         private static readonly NativeMenu VehicleMenu = new NativeMenu("Vehicle Options", "Vehicle Options", "");  //The first submenu
+        private static readonly NativeMenu WeaponMenu = new NativeMenu("Weapon Options", "Weapon Options", "");  //The first submenu
         private static readonly NativeMenu TeleportMenu = new NativeMenu("Teleport Options", "Teleporting Options");
         private static readonly NativeMenu WeatherMenu = new NativeMenu("Weather Options", "Weather Options");//Weather Menu
         private static readonly NativeMenu VisionMenu = new NativeMenu("Vision Menu", "Vision Options");//Vision Menu
@@ -120,6 +126,9 @@ namespace LemonUI.Menu1
         private static readonly NativeCheckboxItem money100milion = new NativeCheckboxItem("Money Drop 100Mil", false);
         // Skin Changer Menu
 
+        //WeaponMenu
+        private static readonly NativeCheckboxItem expoweap = new NativeCheckboxItem("Explosive Ammo", "Description", false); // Enabled by Default with a Description
+        private static readonly NativeCheckboxItem expomelee = new NativeCheckboxItem("Explosive Melee", "Description", false);
 
         //VehicleMenu
 
@@ -210,6 +219,8 @@ namespace LemonUI.Menu1
 
             //==============================================STYLE===============================================================
 
+
+          
             //SELF MENU
             //menu.BannerColor = System.Drawing.Color.FromArgb(180, 20, 20);
             SelfMenu.BannerText.Color = Color.Brown;
@@ -313,6 +324,7 @@ namespace LemonUI.Menu1
         //How you order items below doesn't matter
             DemoPool.Add(DemoMenu); // The pool is container for your menus, add the menu
             DemoPool.Add(SelfMenu);
+            DemoPool.Add(WeaponMenu);
             DemoPool.Add(VehicleMenu);
             DemoPool.Add(TeleportMenu);
             DemoPool.Add(WeatherMenu);
@@ -331,6 +343,7 @@ namespace LemonUI.Menu1
 
             //Main Menu Categories
             DemoMenu.AddSubMenu(SelfMenu);
+            DemoMenu.AddSubMenu(WeaponMenu);
             DemoMenu.AddSubMenu(VehicleMenu);
             DemoMenu.AddSubMenu(TeleportMenu);
             DemoMenu.AddSubMenu(WeatherMenu);
@@ -368,6 +381,10 @@ namespace LemonUI.Menu1
             MoneyMenu.Add(money15milion);
             MoneyMenu.Add(money20milion);
             MoneyMenu.Add(money100milion);
+
+            //Weapon Menu
+            WeaponMenu.Add(expoweap);
+            WeaponMenu.Add(expomelee);
 
             //Vehicle Menu
             VehicleMenu.Add(fixvehicle);
@@ -471,6 +488,9 @@ namespace LemonUI.Menu1
             vehiclespawn.Activated += SetCarSpawn;
             vehiclepimp.Activated += SetCarMax;
 
+            //Item Att WEAPONMENU
+            expoweap.Activated += SetWeapExpo;
+            expomelee.Activated += SetMeleeExpo;
 
 
             //Item Att Teleport
@@ -521,6 +541,7 @@ namespace LemonUI.Menu1
         }
 
 
+  
 
         private void SetupSkinChanger()
         {
@@ -633,6 +654,8 @@ namespace LemonUI.Menu1
 
 
 
+
+
         private void SetDrunk(object sender, EventArgs e)
         {
             if (drunkmode.Checked == true)
@@ -652,6 +675,7 @@ namespace LemonUI.Menu1
             }
 
         }
+
 
 
         private void SetChaos(object sender, EventArgs e)
@@ -958,6 +982,42 @@ namespace LemonUI.Menu1
             if (money100milion.Checked == false)
             {
                 moneyDrop100MilOn = false;
+            }
+        }
+
+        private void SetWeapExpo(object sender, EventArgs e)
+        {
+            if (expoweap.Checked == true)
+            {
+               expowpon = !expowpon;
+                //Function.Call(Hash.SET_EXPLOSIVE_AMMO_THIS_FRAME, Game.Player.Character);
+                //WeaponHash weapon = Game.Player.Character.Weapons.Current.Hash;
+                //Function.Call(Hash.SET_EXPLOSIVE_AMMO_THIS_FRAME, weapon, true);
+                //Vector3 coords = Game.Player.Character.GetPositionOffset(new Vector3(0f, 5f, 0f));
+                //Function.Call(Hash.ADD_EXPLOSION, coords.X, coords.Y, coords.Z, 2, 1.0f, true, false, 0.0f);
+            }
+            if (expoweap.Checked == false)
+            {
+                expowpon = false;
+                //aggiungi codice per disabilitare munizioni esplosive
+            }
+        }
+
+        private void SetMeleeExpo(object sender, EventArgs e)
+        {
+            if (expomelee.Checked == true)
+            {
+                expoml = !expoml;
+                //Function.Call(Hash.SET_EXPLOSIVE_AMMO_THIS_FRAME, Game.Player.Character);
+                //WeaponHash weapon = Game.Player.Character.Weapons.Current.Hash;
+                //Function.Call(Hash.SET_EXPLOSIVE_AMMO_THIS_FRAME, weapon, true);
+                //Vector3 coords = Game.Player.Character.GetPositionOffset(new Vector3(0f, 5f, 0f));
+                //Function.Call(Hash.ADD_EXPLOSION, coords.X, coords.Y, coords.Z, 2, 1.0f, true, false, 0.0f);
+            }
+            if (expomelee.Checked == false)
+            {
+                expoml = false;
+                //aggiungi codice per disabilitare munizioni esplosive
             }
         }
 
@@ -1670,6 +1730,8 @@ namespace LemonUI.Menu1
             
             DemoPool.Process();
 
+            
+
             if (CanPlayerSuperJump)
             {
                 Function.Call(Hash.SET_SUPER_JUMP_THIS_FRAME, Game.Player);
@@ -1684,6 +1746,17 @@ namespace LemonUI.Menu1
                     Function.Call(Hash.APPLY_FORCE_TO_ENTITY, Game.Player, true, 0, 0, 10, 0, 0, 0, true, true, true, true, false, true);
                 }
 
+            }
+
+            if (expowpon)
+            {
+                 Function.Call(Hash.SET_EXPLOSIVE_AMMO_THIS_FRAME, Game.Player, true);
+                //GTA.UI.Notification.Show(GTA.UI.NotificationIcon.Call911, "Anoniaaak", "Welcome", "Essential Menu 1.3.32 BETA", true, true);
+            }
+
+            if (expoml)
+            {
+                Function.Call(Hash.SET_EXPLOSIVE_MELEE_THIS_FRAME, Game.Player, true);
             }
 
 
@@ -1759,7 +1832,14 @@ namespace LemonUI.Menu1
         private void Basics_KeyDown(object sender, KeyEventArgs e)
         {
 
-            if (e.KeyCode == Keys.F6) //put whatever key binding you want here
+            ScriptSettings.Load("scripts\\esconfig.ini");
+            GTA.ScriptSettings configkey;
+            Keys OpenMenu;
+
+            configkey = ScriptSettings.Load("scripts\\esconfig.ini");
+            OpenMenu = configkey.GetValue<Keys>("Options", "OpenMenu", Keys.F6); //The F6 key will be set my default, but the user can change the key
+
+            if (e.KeyCode == OpenMenu) //f6 //put whatever key binding you want here (e.KeyCode == Keys.F6)
             {
                 DemoMenu.Visible = !DemoMenu.Visible;
                 //DemoMenu.Visible = true;
