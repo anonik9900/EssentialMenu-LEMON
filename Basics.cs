@@ -56,7 +56,8 @@ namespace LemonUI.Menu1
         bool moneyDrop20MilOn;
         bool moneyDrop100MilOn;
 
-   
+
+        
 
 
         private static readonly ObjectPool DemoPool = new ObjectPool();
@@ -180,6 +181,11 @@ namespace LemonUI.Menu1
         private static readonly NativeCheckboxItem ThermalVision = new NativeCheckboxItem("Termal Vision", "",false);
         private static readonly NativeCheckboxItem NightVision = new NativeCheckboxItem("Night Vision", "", false);
         private static readonly NativeCheckboxItem MatrixVision = new NativeCheckboxItem("MatrixVision", "", false);
+
+        private static readonly NativeMenu VehicleSpawnerMenu = new NativeMenu("Vehicle Spawner", "Spawn Veicoli");
+        private Dictionary<string, List<string>> vehicleCategories = new Dictionary<string, List<string>>();
+        private string iniPath = Path.Combine("scripts", "vehicles.ini");
+
 
         public Basics()
         {
@@ -309,7 +315,13 @@ namespace LemonUI.Menu1
 
             DemoSubMenuPed.Banner.Color = Color.Purple;
             DemoSubMenuPed.BannerText.Color = Color.Brown;
-            
+
+            VehicleSpawnerMenu.Banner.Color = Color.Purple;
+            VehicleSpawnerMenu.NameFont = Font.Monospace;
+            VehicleSpawnerMenu.BannerText.Font = Font.Pricedown;
+            VehicleSpawnerMenu.DescriptionFont = Font.Monospace;
+
+
             //MODEL CHANGER
             //Franklins.TitleFont = Font.Monospace;
 
@@ -323,7 +335,7 @@ namespace LemonUI.Menu1
 
 
 
-        //How you order items below doesn't matter
+            //How you order items below doesn't matter
             DemoPool.Add(DemoMenu); // The pool is container for your menus, add the menu
             DemoPool.Add(SelfMenu);
             DemoPool.Add(WeaponMenu);
@@ -395,9 +407,10 @@ namespace LemonUI.Menu1
             VehicleMenu.Add(cardrivein);
             VehicleMenu.Add(vehiclespawn);
             VehicleMenu.Add(vehiclepimp);
+            SetupVehicleSpawner();
             //VehicleMenu.Add(itemSpawnVehicle);
 
-            
+
 
             //Teleport Menu
             TeleportMenu.Add(teltoway);
@@ -542,10 +555,85 @@ namespace LemonUI.Menu1
 
             Tick += Basics_Tick;
             KeyDown += Basics_KeyDown; //line added to replace code in Basics_Tick
+
+
+
+        }
+
+        private void SetupVehicleSpawner()
+        {
+            if (!File.Exists(iniPath))
+            {
+                Notification.Show("~r~vehicles.ini non trovato!");
+                return;
+            }
+
+            string currentCategory = null;
+            foreach (var line in File.ReadAllLines(iniPath))
+            {
+                string trimmed = line.Trim();
+
+                if (string.IsNullOrWhiteSpace(trimmed) || trimmed.StartsWith(";"))
+                    continue;
+
+                if (trimmed.StartsWith("[") && trimmed.EndsWith("]"))
+                {
+                    currentCategory = trimmed.Substring(1, trimmed.Length - 2).Trim();
+                    if (!vehicleCategories.ContainsKey(currentCategory))
+                        vehicleCategories[currentCategory] = new List<string>();
+                }
+                else if (currentCategory != null)
+                {
+                    vehicleCategories[currentCategory].Add(trimmed.ToLower());
+                }
+            }
+
+            foreach (var category in vehicleCategories)
+            {
+                NativeMenu catMenu = new NativeMenu(category.Key, $"Veicoli {category.Key}");
+                foreach (var modelName in category.Value)
+                {
+                    var item = new NativeItem(modelName.ToUpper());
+                    item.Activated += (s, a) => SpawnVehicle(modelName);
+                    catMenu.Add(item);
+                }
+
+                VehicleSpawnerMenu.AddSubMenu(catMenu);
+                DemoPool.Add(catMenu);
+                catMenu.Banner.Color = Color.Purple;
+                catMenu.NameFont = Font.Monospace;
+            }
+
+            VehicleMenu.AddSubMenu(VehicleSpawnerMenu);
+            DemoPool.Add(VehicleSpawnerMenu);
+        }
+
+        private void SpawnVehicle(string modelName)
+        {
+            Ped ped = Game.Player.Character;
+            Model model = new Model(modelName);
+
+            if (!model.IsInCdImage || !model.IsValid)
+            {
+                Notification.Show($"~r~Modello non valido: ~w~{modelName}");
+                return;
+            }
+
+            model.Request(500);
+            while (!model.IsLoaded) Script.Wait(100);
+
+            Vector3 spawnPos = ped.Position + ped.ForwardVector * 5f;
+            Vehicle veh = World.CreateVehicle(model, spawnPos);
+            ped.SetIntoVehicle(veh, VehicleSeat.Driver);
+
+            Notification.Show($"~g~Spawned: ~w~{modelName.ToUpper()}");
+            model.MarkAsNoLongerNeeded();
         }
 
 
-  
+
+
+
 
         private void SetupSkinChanger()
         {
