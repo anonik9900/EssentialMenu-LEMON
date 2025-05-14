@@ -708,7 +708,43 @@ namespace LemonUI.Menu1
             SelfMenu.AddSubMenu(SkinSpawnerMenu);
             DemoPool.Add(SkinSpawnerMenu);
         }
-        
+
+
+        /* private void SpawnPed(string modelName)
+         {
+             Ped ped = Game.Player.Character;
+             Model model = new Model(modelName);
+
+             if (!model.IsInCdImage || !model.IsValid)
+             {
+                 Notification.Show($"~r~Modello non valido: ~w~{modelName}");
+                 return;
+             }
+
+             model.Request(500);
+             while (!model.IsLoaded) Script.Wait(500);
+
+             if (ped.IsDead)
+             {
+                 Game.Player.ChangeModel(new Model("player_zero")); // Imposta il modello di default (o uno di base)
+                 return;
+             }
+
+             Game.Player.ChangeModel(model);
+             Function.Call(Hash.SET_PED_DEFAULT_COMPONENT_VARIATION, Game.Player.Character);
+             //Function.Call(Hash.SET_PED_RANDOM_COMPONENT_VARIATION, Game.Player.Character,0);
+             model.MarkAsNoLongerNeeded();
+             GC.Collect();
+             Script.Wait(500);
+
+             /*Vector3 spawnPos = ped.Position + ped.ForwardVector * 5f;
+             Vehicle veh = World.CreateVehicle(model, spawnPos);
+             ped.SetIntoVehicle(veh, VehicleSeat.Driver);*/
+
+        /*     Notification.Show($"~g~Changed: ~w~{modelName.ToUpper()}");
+             //model.MarkAsNoLongerNeeded();
+             Script.Wait(500);
+         }*/
 
         private void SpawnPed(string modelName)
         {
@@ -722,20 +758,56 @@ namespace LemonUI.Menu1
             }
 
             model.Request(500);
-            while (!model.IsLoaded) Script.Wait(300);
+            while (!model.IsLoaded) Script.Wait(100);
 
-            Game.Player.ChangeModel(model);
-            Function.Call(Hash.SET_PED_DEFAULT_COMPONENT_VARIATION, Game.Player.Character);
-            Function.Call(Hash.SET_PED_RANDOM_COMPONENT_VARIATION, Game.Player.Character,0);
-            Function.Call(Hash.SET_PED_RANDOM_PROPS, Game.Player.Character);
+            // Se il pedone è morto, eseguiamo il respawn e poi cambiamo il modello
+            if (ped.IsDead)
+            {
+                // Forza il respawn del pedone
+                RespawnPed();
 
-            /*Vector3 spawnPos = ped.Position + ped.ForwardVector * 5f;
-            Vehicle veh = World.CreateVehicle(model, spawnPos);
-            ped.SetIntoVehicle(veh, VehicleSeat.Driver);*/
+                // Attendi un po' di tempo per permettere al respawn di completarsi
+                Script.Wait(3000); // Prova con 3 secondi, ma regola questo valore se necessario
 
-            Notification.Show($"~g~Changed: ~w~{modelName.ToUpper()}");
-            model.MarkAsNoLongerNeeded();
+                // Cambia il modello solo dopo che il pedone è stato "resuscitato"
+                Game.Player.ChangeModel(model);
+                Function.Call(Hash.SET_PED_DEFAULT_COMPONENT_VARIATION, Game.Player.Character);
+                Notification.Show($"~g~Changed: ~w~{modelName.ToUpper()}");
+
+                model.MarkAsNoLongerNeeded();
+            }
+            else
+            {
+                // Cambia il modello solo se il pedone non è morto
+                if (ped.Model.Hash != model.Hash)
+                {
+                    Game.Player.ChangeModel(model);
+                    Function.Call(Hash.SET_PED_DEFAULT_COMPONENT_VARIATION, Game.Player.Character);
+                    Notification.Show($"~g~Changed: ~w~{modelName.ToUpper()}");
+
+                    model.MarkAsNoLongerNeeded();
+                }
+            }
+
+            Script.Wait(500);
         }
+
+        // Funzione per forzare il respawn del pedone
+        private void RespawnPed()
+        {
+            Ped ped = Game.Player.Character;
+
+            // Rimuovi il pedone attuale (questo "resuscita" il pedone)
+            ped.Delete(); // Elimina il pedone morto
+
+            // Attendi qualche frame per fare in modo che il pedone venga effettivamente rimosso
+            Script.Wait(500);
+
+            // Ora respawna il pedone con il modello di base (modello di default)
+            Game.Player.ChangeModel(new Model("player_zero")); // Cambia con il modello che preferisci
+            Notification.Show("Respawn completato!");
+        }
+
 
         //EndPedlist menu
 
@@ -1965,7 +2037,17 @@ namespace LemonUI.Menu1
             
             DemoPool.Process();
 
-            
+            if (Game.Player.Character.IsDead)
+            {
+                RespawnPed();
+                Game.Player.Character.Position = new Vector3(0, 0, 0);
+                Game.Player.Character.Health = 200;
+                Game.Player.Character.Armor = 100;
+            }
+
+
+
+
 
             if (CanPlayerSuperJump)
             {
