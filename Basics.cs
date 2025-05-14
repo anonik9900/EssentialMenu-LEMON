@@ -192,6 +192,14 @@ namespace LemonUI.Menu1
         private Dictionary<string, List<string>> pedCategories = new Dictionary<string, List<string>>();
         private string iniPPath = Path.Combine("scripts", "pedlist.ini");
 
+        //Bodyguard Menu
+        private static readonly NativeMenu BodyGuardMenu = new NativeMenu("Bodyguard Menu", "Bodyguard Menu");
+        private Dictionary<string, List<string>> bodyCategories = new Dictionary<string, List<string>>();
+        private string iniPPPath = Path.Combine("scripts", "bguard.ini");
+        private static readonly NativeItem RemoveBody = new NativeItem("Remove Bodyguard", "Remove all Bodyguard"); //Item 1 of submenu
+        private static readonly NativeCheckboxItem BodyGodMode = new NativeCheckboxItem("Bodygard Invincible", "Bodyguard GodMode", false);
+        private List<Ped> bodyguards = new List<Ped>();
+
         public Basics()
         {
 
@@ -367,6 +375,7 @@ namespace LemonUI.Menu1
             DemoMenu.AddSubMenu(TeleportMenu);
             DemoMenu.AddSubMenu(WeatherMenu);
             DemoMenu.AddSubMenu(VisionMenu);
+            SetupBodyChanger();
             DemoMenu.AddSubMenu(BetaMenu);
 
             //Submenu Categories
@@ -455,7 +464,10 @@ namespace LemonUI.Menu1
             VisionMenu.Add(NightVision);
             VisionMenu.Add(MatrixVision);
 
-         
+            //Bodyguard Menu
+            BodyGuardMenu.Add(BodyGodMode);
+            BodyGuardMenu.Add(RemoveBody);
+            
 
             // Aggiungi i menu al pool
 
@@ -556,7 +568,12 @@ namespace LemonUI.Menu1
             //Item North Menu - TELEPORTMENU
             loadnorth.Activated += SetNorthLoad;
             unloadnorth.Activated += SetNorthUnload;
-                
+
+            //Item Bodyguard Menu
+            BodyGodMode.Activated += SetBodyGodMode;
+            RemoveBody.Activated += SetRemoveBody;
+            
+
             //
 
             Tick += Basics_Tick;
@@ -608,6 +625,8 @@ namespace LemonUI.Menu1
                 DemoPool.Add(catMenu);
                 catMenu.Banner.Color = Color.Purple;
                 catMenu.NameFont = Font.Monospace;
+                VehicleSpawnerMenu.Banner.Color = Color.Purple;
+                VehicleSpawnerMenu.NameFont = Font.Monospace;
             }
 
             VehicleMenu.AddSubMenu(VehicleSpawnerMenu);
@@ -703,6 +722,8 @@ namespace LemonUI.Menu1
                 DemoPool.Add(cat1Menu);
                 cat1Menu.Banner.Color = Color.Purple;
                 cat1Menu.NameFont = Font.Monospace;
+                SkinSpawnerMenu.Banner.Color = Color.Purple;
+                SkinSpawnerMenu.NameFont = Font.Monospace;
             }
 
             SelfMenu.AddSubMenu(SkinSpawnerMenu);
@@ -807,6 +828,180 @@ namespace LemonUI.Menu1
             Game.Player.ChangeModel(new Model("player_zero")); // Cambia con il modello che preferisci
             Notification.Show("Respawn completato!");
         }
+
+
+        //EndPedlist menu
+
+
+        //bodymenu
+        private void SetupBodyChanger()
+        {
+            if (!File.Exists(iniPPPath))
+            {
+                Notification.Show("~r~bguard.ini non trovato!");
+                return;
+            }
+
+            string currentCategory2 = null;
+            foreach (var line in File.ReadAllLines(iniPPPath))
+            {
+                string trimmed = line.Trim();
+
+                if (string.IsNullOrWhiteSpace(trimmed) || trimmed.StartsWith(";"))
+                    continue;
+
+                if (trimmed.StartsWith("[") && trimmed.EndsWith("]"))
+                {
+                    currentCategory2 = trimmed.Substring(1, trimmed.Length - 2).Trim();
+                    if (!bodyCategories.ContainsKey(currentCategory2))
+                        bodyCategories[currentCategory2] = new List<string>();
+                }
+                else if (currentCategory2 != null)
+                {
+                    string display = trimmed;
+                    string model = trimmed;
+
+                    if (trimmed.Contains("="))
+                    {
+                        var parts = trimmed.Split(new[] { '=' }, 2);
+                        display = parts[0].Trim();
+                        model = parts[1].Trim().ToLower();
+                    }
+
+                    bodyCategories[currentCategory2].Add($"{display}|{model}");
+                }
+            }
+
+            foreach (var category in bodyCategories)
+            {
+                NativeMenu cat2Menu = new NativeMenu(category.Key, $"Bodyguard {category.Key}");
+                foreach (var entry in category.Value)
+                {
+                    string visibleName = entry;
+                    string modelName = entry;
+
+                    if (entry.Contains("|"))
+                    {
+                        var parts = entry.Split('|');
+                        visibleName = parts[0];
+                        modelName = parts[1];
+                    }
+
+                    var item = new NativeItem(visibleName);
+                    item.Activated += (s, a) => SpawnBody(modelName);
+                    cat2Menu.Add(item);
+                }
+
+                BodyGuardMenu.AddSubMenu(cat2Menu);
+                DemoPool.Add(cat2Menu);
+                cat2Menu.Banner.Color = Color.Purple;
+                cat2Menu.NameFont = Font.Monospace;
+                BodyGuardMenu.Banner.Color = Color.Purple;
+                BodyGuardMenu.NameFont = Font.Monospace;
+                
+            }
+
+            DemoMenu.AddSubMenu(BodyGuardMenu);
+            DemoPool.Add(BodyGuardMenu);
+        }
+
+
+        private void SpawnBody(string modelName)
+        {
+            Ped ped = Game.Player.Character;
+            Model model = new Model(modelName);
+
+            if (!model.IsInCdImage || !model.IsValid)
+            {
+                Notification.Show($"~r~Modello non valido: ~w~{modelName}");
+                return;
+            }
+
+            model.Request(500);
+            while (!model.IsLoaded) Script.Wait(100);
+
+            // Se il pedone è morto, eseguiamo il respawn e poi cambiamo il modello
+
+                // Cambia il modello solo se il pedone non è morto
+                if (ped.Model.Hash != model.Hash)
+                {
+                /*Game.Player.ChangeModel(model);
+                // Imposta il pedone come bodyguard
+                Function.Call(Hash.SET_PED_DEFAULT_COMPONENT_VARIATION, Game.Player.Character);*/
+
+                Ped player = Game.Player.Character;
+
+                Vector3 loc = player.Position + (player.ForwardVector * 5);
+
+                Ped bodyguard = World.CreatePed(model, loc);
+
+                bodyguard.Weapons.Give(WeaponHash.Pistol50, 9999, true, true);
+
+                bodyguard.Armor = 100;
+
+                PedGroup ped1 = player.PedGroup;
+
+                Function.Call(Hash.SET_PED_AS_GROUP_MEMBER, bodyguard, ped1);
+
+                Function.Call(Hash.SET_PED_COMBAT_ABILITY, bodyguard, 100);
+
+                Function.Call(Hash.SET_PED_ACCURACY, bodyguard, 100);
+
+                bodyguard.Task.FightAgainstHatedTargets(50000);
+                bodyguards.Add(bodyguard);
+
+                Notification.Show($"~g~Spawned: ~w~{modelName.ToUpper()}");
+
+                    model.MarkAsNoLongerNeeded();
+                }
+
+
+            Script.Wait(500);
+        }
+
+        private void SetRemoveBody(object sender, EventArgs e)
+        {
+            Ped player = Game.Player.Character;
+            if (player.PedGroup != null)
+            {
+                Vector3 loc = player.Position + (player.ForwardVector * 5);
+                PedGroup ped = player.PedGroup;
+                Function.Call(Hash.SET_ENTITY_INVINCIBLE, ped, false);
+                Function.Call(Hash.REMOVE_GROUP, ped);
+
+                foreach (Ped p in bodyguards)
+                {
+                    if (p.Exists()) p.Delete();
+                }
+                bodyguards.Clear();
+
+                Notification.Show("~g~Bodyguard rimosso!");
+            }
+            else
+            {
+                Notification.Show("~r~Nessun Bodyguard da rimuovere!");
+            }
+        }
+
+   
+
+        private void SetBodyGodMode(object sender, EventArgs e)
+        {
+            bool enable = BodyGodMode.Checked;
+
+            foreach (Ped bodyguard in bodyguards)
+            {
+                if (bodyguard.Exists())
+                {
+                    bodyguard.IsInvincible = enable;
+                    Function.Call(Hash.SET_ENTITY_PROOFS, bodyguard, enable, enable, enable, enable, enable, enable, enable, enable); // opzionale per protezione completa
+                }
+            }
+
+            Notification.Show($"~g~God Mode Bodyguard: {(enable ? "ON" : "OFF")}");
+        }
+
+
 
 
         //EndPedlist menu
