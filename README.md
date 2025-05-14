@@ -46,8 +46,6 @@ Essential Menu is my biggest project when it comes to gta 5 mods. This is a work
 <h3> [Config File] </h3>
    <p>
     <ul>
-     <li>Press "F6" To Open the Menu Or Edit the esconfig.ini and choose your fav Key</li>
-     Config File
      <li>[Edit vehicle.ini to edit,delete or add new vehicle]</li>
      <li>[Edit pedlist.ini to add new pedmodel or remove]</li>
      <li>[Edit bguard.ini to change your bodyguard ped model,name or categories]</li>
