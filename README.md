@@ -5,7 +5,7 @@ Old version with NativeUI <a href="https://github.com/anonik9900/Essential-Menu"
 
 Essential Menu is my biggest project when it comes to gta 5 mods. This is a work in progress version still being rewritten with the LemonUI graphics library, as NativeUI is now deprecated.
 
-![Menupreview](https://github.com/user-attachments/assets/f6a08bc9-2569-42e9-a1a7-bfb18eda65c9)
+![menupreview2](https://github.com/user-attachments/assets/2e45099e-fc43-46d2-b752-069455209bb3)
 
 
 <h2>[Requirements]</h2>
@@ -27,6 +27,8 @@ Essential Menu is my biggest project when it comes to gta 5 mods. This is a work
     <li>Teleport Options</li>
     <li>Weather Options</li>
     <li>Vision Options</li>
+    <li>Bodyguard Options</li>
+    <li>Beta Options</li>
     </ul
    </p>
 
@@ -38,6 +40,17 @@ Essential Menu is my biggest project when it comes to gta 5 mods. This is a work
      <li>Use "Arrow_Down" to move Down.</li>
      <li>Use "Enter" to select an Option.</li>
      <li>Use "Esc" to exit from Mod menu.</li>
+     </ul>
+     </p>   
+
+<h3> [Config File] </h3>
+   <p>
+    <ul>
+     <li>Press "F6" To Open the Menu Or Edit the esconfig.ini and choose your fav Key</li>
+     Config File
+     <li>[Edit vehicle.ini to edit,delete or add new vehicle]</li>
+     <li>[Edit pedlist.ini to add new pedmodel or remove]</li>
+     <li>[Edit bguard.ini to change your bodyguard ped model,name or categories]</li>
      </ul>
      </p>   
      
