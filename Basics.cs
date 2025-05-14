@@ -61,7 +61,7 @@ namespace LemonUI.Menu1
 
 
         private static readonly ObjectPool DemoPool = new ObjectPool();
-        private static readonly NativeMenu DemoMenu = new NativeMenu(bannerText: "Essential Menu", name: "Made By Anonik v1332 ~r~BETA", description: "Made By Anonik v1332 ~r~BETA");
+        private static readonly NativeMenu DemoMenu = new NativeMenu(bannerText: "Essential Menu", name: "Made By Anonik v1335 ~r~BETA", description: "Made By Anonik v1332 ~r~BETA");
 
         // Aggiungi i menu per lo Skin Changer
         private static readonly NativeMenu SkinChangerMenu = new NativeMenu("Skin Changer", "Change Player Model");
@@ -182,10 +182,15 @@ namespace LemonUI.Menu1
         private static readonly NativeCheckboxItem NightVision = new NativeCheckboxItem("Night Vision", "", false);
         private static readonly NativeCheckboxItem MatrixVision = new NativeCheckboxItem("MatrixVision", "", false);
 
+        //Vehicle Spawner Menu
         private static readonly NativeMenu VehicleSpawnerMenu = new NativeMenu("Vehicle Spawner", "Spawn Veicoli");
         private Dictionary<string, List<string>> vehicleCategories = new Dictionary<string, List<string>>();
         private string iniPath = Path.Combine("scripts", "vehicles.ini");
 
+        //Model Spawner Menu
+        private static readonly NativeMenu SkinSpawnerMenu = new NativeMenu("Skin Changer", "Change Skin");
+        private Dictionary<string, List<string>> pedCategories = new Dictionary<string, List<string>>();
+        private string iniPPath = Path.Combine("scripts", "pedlist.ini");
 
         public Basics()
         {
@@ -203,7 +208,7 @@ namespace LemonUI.Menu1
             DemoPool.Add(StoryMenu);
 
             // Aggiungi SkinChangerMenu al menu principale
-            DemoMenu.AddSubMenu(SkinChangerMenu);
+            //DemoMenu.AddSubMenu(SkinChangerMenu);
 
             // Configura la gerarchia dei menu per lo Skin Changer
             SkinChangerMenu.AddSubMenu(ProtagonistMenu);
@@ -388,6 +393,7 @@ namespace LemonUI.Menu1
             SelfMenu.Add(superjump);
             SelfMenu.Add(invisible);
             SelfMenu.Add(fastrun);
+            SetupPedChanger();
             SelfMenu.AddSubMenu(MoneyMenu);
             MoneyMenu.Add(money40k);
             MoneyMenu.Add(money1milion);
@@ -629,6 +635,109 @@ namespace LemonUI.Menu1
             Notification.Show($"~g~Spawned: ~w~{modelName.ToUpper()}");
             model.MarkAsNoLongerNeeded();
         }
+
+
+
+
+        //Pedlist menu
+
+        private void SetupPedChanger()
+        {
+            if (!File.Exists(iniPPath))
+            {
+                Notification.Show("~r~pedlist.ini non trovato!");
+                return;
+            }
+
+            string currentCategory1 = null;
+            foreach (var line in File.ReadAllLines(iniPPath))
+            {
+                string trimmed = line.Trim();
+
+                if (string.IsNullOrWhiteSpace(trimmed) || trimmed.StartsWith(";"))
+                    continue;
+
+                if (trimmed.StartsWith("[") && trimmed.EndsWith("]"))
+                {
+                    currentCategory1 = trimmed.Substring(1, trimmed.Length - 2).Trim();
+                    if (!pedCategories.ContainsKey(currentCategory1))
+                        pedCategories[currentCategory1] = new List<string>();
+                }
+                else if (currentCategory1 != null)
+                {
+                    string display = trimmed;
+                    string model = trimmed;
+
+                    if (trimmed.Contains("="))
+                    {
+                        var parts = trimmed.Split(new[] { '=' }, 2);
+                        display = parts[0].Trim();
+                        model = parts[1].Trim().ToLower();
+                    }
+
+                    pedCategories[currentCategory1].Add($"{display}|{model}");
+                }
+            }
+
+            foreach (var category in pedCategories)
+            {
+                NativeMenu cat1Menu = new NativeMenu(category.Key, $"Skin {category.Key}");
+                foreach (var entry in category.Value)
+                {
+                    string visibleName = entry;
+                    string modelName = entry;
+
+                    if (entry.Contains("|"))
+                    {
+                        var parts = entry.Split('|');
+                        visibleName = parts[0];
+                        modelName = parts[1];
+                    }
+
+                    var item = new NativeItem(visibleName);
+                    item.Activated += (s, a) => SpawnPed(modelName);
+                    cat1Menu.Add(item);
+                }
+
+                SkinSpawnerMenu.AddSubMenu(cat1Menu);
+                DemoPool.Add(cat1Menu);
+                cat1Menu.Banner.Color = Color.Purple;
+                cat1Menu.NameFont = Font.Monospace;
+            }
+
+            SelfMenu.AddSubMenu(SkinSpawnerMenu);
+            DemoPool.Add(SkinSpawnerMenu);
+        }
+        
+
+        private void SpawnPed(string modelName)
+        {
+            Ped ped = Game.Player.Character;
+            Model model = new Model(modelName);
+
+            if (!model.IsInCdImage || !model.IsValid)
+            {
+                Notification.Show($"~r~Modello non valido: ~w~{modelName}");
+                return;
+            }
+
+            model.Request(500);
+            while (!model.IsLoaded) Script.Wait(300);
+
+            Game.Player.ChangeModel(model);
+            Function.Call(Hash.SET_PED_DEFAULT_COMPONENT_VARIATION, Game.Player.Character);
+            Function.Call(Hash.SET_PED_RANDOM_COMPONENT_VARIATION, Game.Player.Character,0);
+            Function.Call(Hash.SET_PED_RANDOM_PROPS, Game.Player.Character);
+
+            /*Vector3 spawnPos = ped.Position + ped.ForwardVector * 5f;
+            Vehicle veh = World.CreateVehicle(model, spawnPos);
+            ped.SetIntoVehicle(veh, VehicleSeat.Driver);*/
+
+            Notification.Show($"~g~Changed: ~w~{modelName.ToUpper()}");
+            model.MarkAsNoLongerNeeded();
+        }
+
+        //EndPedlist menu
 
 
 
@@ -1993,7 +2102,7 @@ namespace LemonUI.Menu1
                 //DemoMenu.Visible = true;
  
                 //GTA.UI.Notification.Show("Welcome",true);
-                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.Call911,"Anonik","Welcome","Essential Menu 1.3.32 BETA", true,true);
+                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.Call911,"Anonik","Welcome","Essential Menu 1.3.35 BETA", true,true);
                
 
  
