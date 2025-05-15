@@ -27,6 +27,8 @@ using System.Xml.Linq;
 using System.Runtime.ConstrainedExecution;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static LemonUI.Menu1.Basics;
+using LemonUI.Scaleform;
+
 
 
 //uses lemon and SHVDN version 2, also added windows forms
@@ -57,7 +59,7 @@ namespace LemonUI.Menu1
         bool moneyDrop100MilOn;
 
 
-        
+
 
 
         private static readonly ObjectPool DemoPool = new ObjectPool();
@@ -140,6 +142,11 @@ namespace LemonUI.Menu1
         private static readonly NativeCheckboxItem cardrivein = new NativeCheckboxItem("Car Autopilot","Autopilot", false);
         private static readonly NativeItem vehiclespawn = new NativeItem("Spawn Input Vehicle","Type a input name vehicle");
         private static readonly NativeItem vehiclepimp = new NativeItem("Max Car Stats");
+        private static readonly NativeMenu colorMenu = new NativeMenu("Colori Veicolo", "Scegli un colore");
+        private static readonly NativeItem colorMenuItem = new NativeItem("Change Color");
+
+
+
 
 
         //TeleportMenu
@@ -199,6 +206,8 @@ namespace LemonUI.Menu1
         private static readonly NativeItem RemoveBody = new NativeItem("Remove Bodyguard", "Remove all Bodyguard"); //Item 1 of submenu
         private static readonly NativeCheckboxItem BodyGodMode = new NativeCheckboxItem("Bodygard Invincible", "Bodyguard GodMode", false);
         private List<Ped> bodyguards = new List<Ped>();
+
+
 
         public Basics()
         {
@@ -334,6 +343,8 @@ namespace LemonUI.Menu1
             VehicleSpawnerMenu.BannerText.Font = Font.Pricedown;
             VehicleSpawnerMenu.DescriptionFont = Font.Monospace;
 
+            colorMenu.Banner.Color = Color.Purple;
+            colorMenu.NameFont = Font.Monospace;
 
             //MODEL CHANGER
             //Franklins.TitleFont = Font.Monospace;
@@ -422,6 +433,10 @@ namespace LemonUI.Menu1
             VehicleMenu.Add(cardrivein);
             VehicleMenu.Add(vehiclespawn);
             VehicleMenu.Add(vehiclepimp);
+            //VehicleMenu.Add(colorMenuItem);
+            DemoPool.Add(colorMenu); // Aggiungi al pool
+            VehicleMenu.Add(colorMenuItem);
+
             SetupVehicleSpawner();
             //VehicleMenu.Add(itemSpawnVehicle);
 
@@ -521,6 +536,7 @@ namespace LemonUI.Menu1
             cardrivein.Activated += SetCarDriveIn;
             vehiclespawn.Activated += SetCarSpawn;
             vehiclepimp.Activated += SetCarMax;
+            colorMenuItem.Activated += SetVehicleColor;
 
             //Item Att WEAPONMENU
             expoweap.Activated += SetWeapExpo;
@@ -581,7 +597,12 @@ namespace LemonUI.Menu1
 
 
 
+
         }
+
+
+
+
 
         private void SetupVehicleSpawner()
         {
@@ -1092,6 +1113,13 @@ namespace LemonUI.Menu1
             AddModelToMenu(StoryMenu, "Jay Norris", PedHash.JayNorris);
         }
 
+
+
+
+
+
+
+
         private void AddModelToMenu(NativeMenu menu, string name, PedHash model)
         {
             var item = new NativeItem(name);
@@ -1597,6 +1625,55 @@ namespace LemonUI.Menu1
             }
 
         }
+
+        private void SetVehicleColor(object sender, EventArgs e)
+        {
+            if (!Game.Player.Character.IsInVehicle())
+            {
+                Notification.Show("~r~Non sei in un veicolo.");
+                return;
+            }
+
+            Vehicle veh = Game.Player.Character.CurrentVehicle;
+            colorMenu.Clear();
+
+            Dictionary<string, VehicleColor> colors = new Dictionary<string, VehicleColor>
+    {
+        { "Red", VehicleColor.MetallicTorinoRed },
+        { "Greem", VehicleColor.MetallicDarkGreen },
+        { "Blue", VehicleColor.MetallicBlue },
+        { "Black", VehicleColor.MetallicBlack },
+        { "White", VehicleColor.MetallicWhite }
+    };
+
+            foreach (KeyValuePair<string, VehicleColor> kv in colors)
+            {
+                NativeItem item = new NativeItem(kv.Key);
+                item.Activated += (s2, a2) =>
+                {
+                    Function.Call(Hash.SET_VEHICLE_MOD_KIT, veh, 0);
+                    Function.Call(Hash.SET_VEHICLE_COLOURS, veh, (int)kv.Value, (int)kv.Value);
+                    Notification.Show($"~g~Colore impostato: ~w~{kv.Key}");
+                };
+                colorMenu.Add(item);
+            }
+
+            // Aggiunge il pulsante Indietro
+            NativeItem backItem = new NativeItem("Go Back");
+            backItem.Activated += (s2, a2) =>
+            {
+                colorMenu.Visible = false;
+                VehicleMenu.Visible = true;
+            };
+            colorMenu.Add(backItem);
+
+            if (VehicleMenu.Visible)
+                VehicleMenu.Visible = false;
+
+            colorMenu.Visible = true;
+        }
+
+
 
         private void SetCarMax(object sender, EventArgs e)
         {
@@ -2229,7 +2306,9 @@ namespace LemonUI.Menu1
 
         private void Basics_Tick(object sender, EventArgs e)
         {
-            
+
+     
+
             DemoPool.Process();
 
             if (Game.Player.Character.IsDead)
@@ -2377,12 +2456,18 @@ namespace LemonUI.Menu1
             {
                 DemoMenu.Visible = !DemoMenu.Visible;
                 //DemoMenu.Visible = true;
- 
+
                 //GTA.UI.Notification.Show("Welcome",true);
                 GTA.UI.Notification.Show(GTA.UI.NotificationIcon.Call911,"Anonik","Welcome","Essential Menu 1.3.35 BETA", true,true);
-               
+                //ShowMissionPassedMessage("ESSENTIAL MENU", "Versione BETA");
+                // Crea e mostra un messaggio grande stile "Mission Passed" con titolo e sottotitolo
+                //bigMessage = new BigMessage("ESSENTIAL MENU", "VERSIONE BETA", MessageType.MissionPassedOldGen);
+               // bigMessageTimer = Environment.TickCount;
 
- 
+
+
+
+
             }
         }
     }
