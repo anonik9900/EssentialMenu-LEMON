@@ -144,7 +144,13 @@ namespace LemonUI.Menu1
         private static readonly NativeItem vehiclepimp = new NativeItem("Max Car Stats");
         private static readonly NativeMenu colorMenu = new NativeMenu("Colori Veicolo", "Scegli un colore");
         private static readonly NativeItem colorMenuItem = new NativeItem("Change Color");
-
+        private static readonly NativeMenu upgradeMenu = new NativeMenu("Upgrades", "Vehicle Tuning");
+        private static readonly NativeItem fullUpgradeItem = new NativeItem("🔧 Max Upgrade");
+        private static readonly NativeListItem<string> engineItem = new NativeListItem<string>("🔋 Motore", new[] { "Stock", "Level 1", "Level 2", "Level 3" });
+        private static readonly NativeListItem<string> brakesItem = new NativeListItem<string>("🛑 Freni", new[] { "Stock", "Street", "Sport", "Race" });
+        private static readonly NativeListItem<string> transmissionItem = new NativeListItem<string>("⚙️ Cambio", new[] { "Stock", "Street", "Sport", "Race" });
+        private static readonly NativeListItem<string> suspensionItem = new NativeListItem<string>("🌀 Sospensioni", new[] { "Stock", "Lowered", "Street", "Sport", "Competition" });
+        private static readonly NativeCheckboxItem turboItem = new NativeCheckboxItem("🚀 Turbo", false);
 
 
 
@@ -437,6 +443,15 @@ namespace LemonUI.Menu1
             DemoPool.Add(colorMenu); // Aggiungi al pool
             VehicleMenu.Add(colorMenuItem);
 
+            upgradeMenu.Add(fullUpgradeItem);
+            upgradeMenu.Add(engineItem);
+            upgradeMenu.Add(brakesItem);
+            upgradeMenu.Add(transmissionItem);
+            upgradeMenu.Add(suspensionItem);
+            upgradeMenu.Add(turboItem);
+            VehicleMenu.AddSubMenu(upgradeMenu);
+            DemoPool.Add(upgradeMenu);
+
             SetupVehicleSpawner();
             //VehicleMenu.Add(itemSpawnVehicle);
 
@@ -537,6 +552,23 @@ namespace LemonUI.Menu1
             vehiclespawn.Activated += SetCarSpawn;
             vehiclepimp.Activated += SetCarMax;
             colorMenuItem.Activated += SetVehicleColor;
+
+            fullUpgradeItem.Activated += (s, e) =>
+            {
+                ApplyVehicleMod(11, 3); // Motore
+                ApplyVehicleMod(12, 3); // Freni
+                ApplyVehicleMod(13, 3); // Trasmissione
+                ApplyVehicleMod(15, 4); // Sospensioni
+                SetTurbo(true);
+                Notification.Show("~g~Upgrade completo installato!");
+            };
+
+            engineItem.ItemChanged += (s, e) => ApplyVehicleMod(11, e.Index); // Motore
+            brakesItem.ItemChanged += (s, e) => ApplyVehicleMod(12, e.Index); // Freni
+            transmissionItem.ItemChanged += (s, e) => ApplyVehicleMod(13, e.Index); // Cambio
+            suspensionItem.ItemChanged += (s, e) => ApplyVehicleMod(15, e.Index); // Sospensioni
+            turboItem.CheckboxChanged += (s, e) => SetTurbo(turboItem.Checked);
+
 
             //Item Att WEAPONMENU
             expoweap.Activated += SetWeapExpo;
@@ -676,6 +708,22 @@ namespace LemonUI.Menu1
             model.MarkAsNoLongerNeeded();
         }
 
+        private void ApplyVehicleMod(int modType, int index)
+        {
+            Vehicle veh = Game.Player.Character.CurrentVehicle;
+            if (veh == null || !veh.Exists()) return;
+            Function.Call(Hash.SET_VEHICLE_MOD_KIT, veh, 0);
+            Function.Call(Hash.SET_VEHICLE_MOD, veh, modType, index, false);
+        }
+
+        private void SetTurbo(bool enabled)
+        {
+            Vehicle veh = Game.Player.Character.CurrentVehicle;
+            if (veh == null || !veh.Exists()) return;
+            Function.Call(Hash.TOGGLE_VEHICLE_MOD, veh, 18, enabled); // 18 = Turbo
+        }
+
+       
 
 
 
