@@ -47,6 +47,27 @@ namespace LemonUI.Menu1
         bool expoml;
         bool moneygun;
 
+        //CAYO PERICO
+        bool cayoOn;
+        bool cayoMpLoaded;
+
+        //Meteor Shower
+        bool meteorShowerOn;
+        int meteorTimer1 = 0;
+        int meteorTimer2 = 0;
+        readonly Random meteorRnd = new Random();
+        readonly List<Prop> rockArray = new List<Prop>();
+        readonly List<Model> rockModels = new List<Model>();
+        static readonly string[] rockModelNames =
+        {
+           "prop_asteroid_01", "prop_test_boulder_01", "prop_test_boulder_02",
+            "prop_test_boulder_03", "prop_test_boulder_04"
+         };
+        const int AsteroidHash = unchecked((int)0xDF9841D7); // prop_asteroid_01
+        const int DecalBangConcrete = 1010;                  // DecalType.Bang_concrete_bang
+
+
+
         public static bool CanPlayerSuperJump { get; set; }
         public static bool canPlayerFastRun { get; set; }
 
@@ -63,7 +84,7 @@ namespace LemonUI.Menu1
 
 
         private static readonly ObjectPool DemoPool = new ObjectPool();
-        private static readonly NativeMenu DemoMenu = new NativeMenu(bannerText: "Essential Menu", name: "Made By Anonik v1335 ~r~BETA", description: "Made By Anonik v1332 ~r~BETA");
+        private static readonly NativeMenu DemoMenu = new NativeMenu(bannerText: "Essential Menu", name: "Made By Anonik v1335 ~r~BETA", description: "Made By Anonik v1333 ~r~BETA");
 
         // Aggiungi i menu per lo Skin Changer
         private static readonly NativeMenu SkinChangerMenu = new NativeMenu("Skin Changer", "Change Player Model");
@@ -87,6 +108,7 @@ namespace LemonUI.Menu1
         private static readonly NativeMenu WeatherMenu = new NativeMenu("Weather Options", "Weather Options");//Weather Menu
         private static readonly NativeMenu VisionMenu = new NativeMenu("Vision Menu", "Vision Options");//Vision Menu
         private static readonly NativeMenu BetaMenu = new NativeMenu("[Beta Menu ]", "Beta Options");//Beta Menu
+        private static readonly NativeMenu AnonikMenu = new NativeMenu("Anonik Menu", "Anonik Options");//Anonik Menu
 
 
         private static readonly NativeItem CarGuy = new NativeItem("Change to Car Guy Model", "");
@@ -106,6 +128,10 @@ namespace LemonUI.Menu1
         private static readonly NativeCheckboxItem drunkmode = new NativeCheckboxItem("~b~Drunk Mode", "Description", false); // Enabled by Default with a Description
         private static readonly NativeCheckboxItem nocollmode = new NativeCheckboxItem("~b~No Collision", "Description", false); // Enabled by Default with a Description
         private static readonly NativeCheckboxItem chaosmode = new NativeCheckboxItem("~r~Chaos Mode", "Description", false); // Enabled by Default with a Description
+        private static readonly NativeCheckboxItem blackoutmode = new NativeCheckboxItem("Blackout Mode", "Description", false); // Enabled by Default with a Description
+        private static readonly NativeCheckboxItem moongravmode = new NativeCheckboxItem("Moon Gravity Mode", "Description", false); // Enabled by Default with a Description
+        private static readonly NativeCheckboxItem meteorshowermode = new NativeCheckboxItem("Meteor Shower", "Description", false);
+
 
 
 
@@ -168,9 +194,28 @@ namespace LemonUI.Menu1
         private static readonly NativeItem teltolester = new NativeItem("Teleport to Lester House");
         private static readonly NativeItem teltooneil = new NativeItem("Teleport to Oneil Farm");
         private static readonly NativeItem teltosolomon = new NativeItem("Teleport to Solomon Office");
+        private static readonly NativeItem teltoyatch = new NativeItem("Teleport to Yatch");
+        private static readonly NativeItem teltotorture = new NativeItem("Teleport to Torture Room");
+        private static readonly NativeItem teltoiaaoffice = new NativeItem("Teleport to IAA Office");
+        private static readonly NativeItem teltohumlabentrance = new NativeItem("Teleport to Humane Labs Entrance");
+        private static readonly NativeItem teltohumlabtunnel = new NativeItem("Teleport to Humane Labs Tunnel");
+        private static readonly NativeItem teltoblainecountybank = new NativeItem("Teleport to Blaine County Bank");
+        private static readonly NativeItem teltohospital = new NativeItem("Teleport to Hospital");
+        private static readonly NativeItem teltomorgue = new NativeItem("Teleport to Coroner Morgue");
+
+        //North Yankton
         private static readonly NativeMenu Northmenu = new NativeMenu("N-Y Loader", "North Yankton Loader");
         private static readonly NativeItem loadnorth = new NativeItem("Load North Yankton");
         private static readonly NativeItem unloadnorth = new NativeItem("Unload North Yankton");
+        //End North Yankton
+
+        //Online Teleport Menu
+        private static readonly NativeMenu OnlineTeleportMenu = new NativeMenu("Online Teleport", "Online Teleport Locations");
+        private static readonly NativeMenu CayoMenu = new NativeMenu("Cayo Perico Menu", "Cayo Perico Teleport Locations");
+        private static readonly NativeCheckboxItem cayoloadmode = new NativeCheckboxItem("Load Cayo Perico", "To Exit First Unteleport and after uncheck", false);
+        private static readonly NativeItem loadteltocayoperico = new NativeItem("Teleport Cayo Perico");
+        private static readonly NativeItem unloadteltocayoperico = new NativeItem("Unteleport Cayo Perico");
+        //End Online Teleport Menu
 
         //WeatherMenu
         private static readonly NativeItem ClearWeather = new NativeItem("Clear", "");
@@ -194,6 +239,7 @@ namespace LemonUI.Menu1
         private static readonly NativeCheckboxItem ThermalVision = new NativeCheckboxItem("Termal Vision", "",false);
         private static readonly NativeCheckboxItem NightVision = new NativeCheckboxItem("Night Vision", "", false);
         private static readonly NativeCheckboxItem MatrixVision = new NativeCheckboxItem("MatrixVision", "", false);
+        private static readonly NativeCheckboxItem Ragevision = new NativeCheckboxItem("Rage Vision", "Description", false); // Enabled by Default with a Description
 
         //Vehicle Spawner Menu
         private static readonly NativeMenu VehicleSpawnerMenu = new NativeMenu("Vehicle Spawner", "Spawn Veicoli");
@@ -213,7 +259,8 @@ namespace LemonUI.Menu1
         private static readonly NativeCheckboxItem BodyGodMode = new NativeCheckboxItem("Bodygard Invincible", "Bodyguard GodMode", false);
         private List<Ped> bodyguards = new List<Ped>();
 
-
+        //Anonik Menu
+        private static readonly NativeItem FunAnonikFunc = new NativeItem("Delete Anonik");
 
         public Basics()
         {
@@ -255,8 +302,9 @@ namespace LemonUI.Menu1
 
             //==============================================STYLE===============================================================
 
+            
 
-          
+
             //SELF MENU
             //menu.BannerColor = System.Drawing.Color.FromArgb(180, 20, 20);
             SelfMenu.BannerText.Color = Color.Brown;
@@ -318,11 +366,17 @@ namespace LemonUI.Menu1
             teltolife.TitleFont = Font.Monospace;
             teltolester.TitleFont = Font.Monospace;
             teltofloyd.TitleFont = Font.Monospace;
+            teltoyatch.TitleFont = Font.Monospace;
+            teltotorture.TitleFont = Font.Monospace;
+            teltoiaaoffice.TitleFont = Font.Monospace;
+            teltohumlabentrance.TitleFont = Font.Monospace;
+            teltohumlabtunnel.TitleFont = Font.Monospace;
+            teltoblainecountybank.TitleFont = Font.Monospace;
+            teltohospital.TitleFont = Font.Monospace;
+            teltomorgue.TitleFont = Font.Monospace;
 
-            //WEATHER MENU
 
 
-          
 
             //NORTH MENU
             Northmenu.BannerText.Color = Color.Brown;
@@ -332,6 +386,24 @@ namespace LemonUI.Menu1
             Northmenu.DescriptionFont = Font.Monospace;
             loadnorth.TitleFont = Font.Monospace;
             unloadnorth.TitleFont = Font.Monospace;
+
+            //ONLINE TELEPORT MENU
+            OnlineTeleportMenu.BannerText.Color = Color.Brown;
+            OnlineTeleportMenu.Banner.Color = Color.Black;
+            OnlineTeleportMenu.NameFont = Font.Monospace;
+            OnlineTeleportMenu.BannerText.Font = Font.Pricedown;
+            OnlineTeleportMenu.DescriptionFont = Font.Monospace;
+
+            //CAYOSUBMENU
+            CayoMenu.BannerText.Color = Color.Brown;
+            CayoMenu.Banner.Color = Color.Black;
+            CayoMenu.NameFont = Font.Monospace;
+            CayoMenu.BannerText.Font = Font.Pricedown;
+            CayoMenu.DescriptionFont = Font.Monospace;
+            cayoloadmode.TitleFont = Font.Monospace;
+            loadteltocayoperico.TitleFont = Font.Monospace;
+            unloadteltocayoperico.TitleFont = Font.Monospace;
+
 
             //MAIN MENU
             DemoMenu.Banner.Color = Color.Purple;
@@ -351,6 +423,11 @@ namespace LemonUI.Menu1
 
             colorMenu.Banner.Color = Color.Purple;
             colorMenu.NameFont = Font.Monospace;
+
+
+            //ANONIK MENU
+            AnonikMenu.Banner.Color = Color.Black;
+
 
             //MODEL CHANGER
             //Franklins.TitleFont = Font.Monospace;
@@ -374,6 +451,7 @@ namespace LemonUI.Menu1
             DemoPool.Add(WeatherMenu);
             DemoPool.Add(VisionMenu);
             DemoPool.Add(BetaMenu);
+            DemoPool.Add(AnonikMenu);
 
 
 
@@ -383,7 +461,9 @@ namespace LemonUI.Menu1
             //DemoPool.Add(ModelMenuPed);//Model Changer
             DemoPool.Add(Northmenu);//NorthMenu
             DemoPool.Add(MoneyMenu);//MoneyDropMenu
-            
+            DemoPool.Add(OnlineTeleportMenu);//Online Teleport Menu
+            DemoPool.Add(CayoMenu);//Cayo Perico Menu
+
 
             //Main Menu Categories
             DemoMenu.AddSubMenu(SelfMenu);
@@ -394,13 +474,29 @@ namespace LemonUI.Menu1
             DemoMenu.AddSubMenu(VisionMenu);
             SetupBodyChanger();
             DemoMenu.AddSubMenu(BetaMenu);
+            DemoMenu.AddSubMenu(AnonikMenu);
 
             //Submenu Categories
 
             //Teleport SubMenu
+
+            //North Yankton SubMenu
             TeleportMenu.AddSubMenu(Northmenu);
             Northmenu.Add(loadnorth);
             Northmenu.Add(unloadnorth);
+            //End North Yankton SubMenu
+
+            //Online Teleport SubMenu
+            TeleportMenu.AddSubMenu(OnlineTeleportMenu);
+            OnlineTeleportMenu.AddSubMenu(CayoMenu);
+            CayoMenu.Add(cayoloadmode);
+            CayoMenu.Add(loadteltocayoperico);
+            CayoMenu.Add(unloadteltocayoperico);
+            //End Online Teleport SubMenu
+
+
+            //End Teleport SubMenu
+
 
 
             //Beta Menu
@@ -408,6 +504,10 @@ namespace LemonUI.Menu1
             BetaMenu.Add(drunkmode);
             BetaMenu.Add(nocollmode);
             BetaMenu.Add(chaosmode);
+            BetaMenu.Add(blackoutmode);
+            BetaMenu.Add(moongravmode);
+            BetaMenu.Add(meteorshowermode);
+
 
             //Self Menu
             SelfMenu.Add(godmode1);
@@ -470,6 +570,14 @@ namespace LemonUI.Menu1
             TeleportMenu.Add(teltolester);
             TeleportMenu.Add(teltooneil);
             TeleportMenu.Add(teltosolomon);
+            TeleportMenu.Add(teltoyatch);
+            TeleportMenu.Add(teltotorture);
+            TeleportMenu.Add(teltoiaaoffice);
+            TeleportMenu.Add(teltohumlabentrance);
+            TeleportMenu.Add(teltohumlabtunnel);
+            TeleportMenu.Add(teltoblainecountybank);
+            TeleportMenu.Add(teltohospital);
+            TeleportMenu.Add(teltomorgue);
 
             //WeatherMenu
             WeatherMenu.Add(ClearWeather);
@@ -493,11 +601,14 @@ namespace LemonUI.Menu1
             VisionMenu.Add(ThermalVision);
             VisionMenu.Add(NightVision);
             VisionMenu.Add(MatrixVision);
+            VisionMenu.Add(Ragevision);
 
             //Bodyguard Menu
             BodyGuardMenu.Add(BodyGodMode);
             BodyGuardMenu.Add(RemoveBody);
-            
+
+            //Anonik Menu
+            AnonikMenu.Add(FunAnonikFunc);
 
             // Aggiungi i menu al pool
 
@@ -522,6 +633,10 @@ namespace LemonUI.Menu1
             drunkmode.Activated += SetDrunk;
             nocollmode.Activated += NoColl;
             chaosmode.Activated += SetChaos;
+            blackoutmode.Activated += SetBlackout;
+            moongravmode.Activated += SetMoonGrav;
+            meteorshowermode.Activated += SetMeteorShower;
+
 
             //Item activation Self
             Ballas.Activated += SpawnBallas;
@@ -589,6 +704,15 @@ namespace LemonUI.Menu1
             teltolester.Activated += SetLester;
             teltosolomon.Activated += SetSolomon;
             teltooneil.Activated += SetOneil;
+            teltoyatch.Activated += SetYatch;
+            teltotorture.Activated += SetTorture;
+            teltoiaaoffice.Activated += SetIaaOffice;
+            teltohumlabentrance.Activated += SetHumLabEntrance;
+            teltohumlabtunnel.Activated += SetHumLabTunnel;
+            teltoblainecountybank.Activated += SetBlaineBank;
+            teltohospital.Activated += SetHospital;
+            teltomorgue.Activated += SetMorgue;
+
 
             //Item Att WEATHERMENU
             ClearWeather.Activated += SetWeatherClear;
@@ -612,15 +736,27 @@ namespace LemonUI.Menu1
             ThermalVision.Activated += SetThermalVision;
             NightVision.Activated += SetNightVision;
             MatrixVision.Activated += SetMatrixVision;
+            Ragevision.Activated += SetRageVision;
 
             //Item North Menu - TELEPORTMENU
             loadnorth.Activated += SetNorthLoad;
             unloadnorth.Activated += SetNorthUnload;
 
+            //Item Online Teleport Menu
+
+
+            //Item Cayo Perico Menu
+            cayoloadmode.Activated += SetCayoLoad;
+            loadteltocayoperico.Activated += SetCayoPerico;
+            unloadteltocayoperico.Activated += SetCayoPericoUnload;
+
             //Item Bodyguard Menu
             BodyGodMode.Activated += SetBodyGodMode;
             RemoveBody.Activated += SetRemoveBody;
-            
+
+            //Item Anonik Menu
+            FunAnonikFunc.Activated += FunAnonik;
+
 
             //
 
@@ -1220,7 +1356,17 @@ namespace LemonUI.Menu1
 
 
 
-
+        private void FunAnonik(object sender, EventArgs e)
+        {
+            Notification.Show("Uffa funziono");
+            Game.PlayerBlip.Sprite = BlipSprite.PoliceStation;
+            Game.PlayerBlip.Color = BlipColor.Green;    
+            Game.Player.ChangeModel(new Model("s_m_y_swat_01"));
+            Game.Player.Character.Weapons.Give(WeaponHash.AssaultRifle, 9999, true, true);
+            Game.Player.WantedLevel = 0;
+            Function.Call(Hash.SET_POLICE_IGNORE_PLAYER, Game.Player.Character, true);
+            Function.Call(Hash.ANIMPOSTFX_PLAY, "FocusIn", 0, true);
+        }
 
 
 
@@ -1242,6 +1388,202 @@ namespace LemonUI.Menu1
                
             }
 
+        }
+
+
+        private void SetBlackout(object sender, EventArgs e)
+        {
+            if (blackoutmode.Checked == true)
+            {
+                World.Blackout = true;
+            }
+            if (blackoutmode.Checked == false)
+            {
+               World.Blackout = false;
+            }
+        }
+
+        private void SetMoonGrav(object sender, EventArgs e)
+        {
+            if (moongravmode.Checked == true)
+            {
+                Function.Call(Hash.SET_GRAVITY_LEVEL, 2); // Imposta la gravità a livello 1 (gravità ridotta)
+            }
+            if (moongravmode.Checked == false)
+            {
+                Function.Call(Hash.SET_GRAVITY_LEVEL, 0); // Imposta la gravità a livello 0 (gravità originale)
+                
+            }
+        }
+
+
+
+        private void SetMeteorShower(object sender, EventArgs e)
+        {
+            meteorShowerOn = meteorshowermode.Checked;
+            meteorTimer1 = 0;
+            meteorTimer2 = 0;
+
+            if (meteorShowerOn)
+            {
+                if (rockModels.Count == 0)
+                {
+                    foreach (string name in rockModelNames)
+                        rockModels.Add(new Model(name));
+                }
+                foreach (Model m in rockModels)
+                    m.Request();
+
+                Function.Call(Hash.CLEAR_WEATHER_TYPE_PERSIST);
+                World.TransitionToWeather(Weather.ThunderStorm, 3f);
+            }
+            else
+            {
+                foreach (Model m in rockModels)
+                {
+                    if (m.IsLoaded)
+                        m.MarkAsNoLongerNeeded();
+                }
+                foreach (Prop r in rockArray)
+                {
+                    if (r.Exists())
+                        r.MarkAsNoLongerNeeded();
+                }
+                rockArray.Clear();
+
+                World.TransitionToWeather(Weather.ExtraSunny, 3f);
+            }
+        }
+
+        private void DoMeteorShowerTick()
+        {
+            if (!meteorShowerOn)
+                return;
+
+            Ped myPed = Game.Player.Character;
+            if (myPed == null || !myPed.Exists())
+                return;
+
+            // Spawn di un nuovo meteorite
+            if (Game.GameTime > meteorTimer1)
+            {
+                float radius = (float)(22.0 + meteorRnd.NextDouble() * (78.0 - 22.0));
+                double angle = meteorRnd.Next(0, 360) * Math.PI / 180.0;
+
+                Vector3 myPos = myPed.Position;
+                Vector3 pos = new Vector3(
+                    myPos.X + radius * (float)Math.Cos(angle),
+                    myPos.Y + radius * (float)Math.Sin(angle),
+                    myPos.Z + 65.0f);
+
+                Model model = rockModels[meteorRnd.Next(rockModels.Count)];
+
+                if (model.IsLoaded)
+                {
+                    Prop rock = World.CreateProp(model, pos, false, false);
+
+                    /*if (rock.Exists())
+                    {
+                        rock.Heading = (float)(meteorRnd.NextDouble() * 360.0);
+                        rock.IsPositionFrozen = false;
+                        Function.Call(Hash.SET_ENTITY_LOD_DIST, rock.Handle, 1000000);
+                        rock.IsPersistent = true;
+                        rock.ApplyForce(new Vector3(35.0f, 0f, -57.0f));
+                        rockArray.Add(rock);
+                    }*/
+
+                    if (rock != null && rock.Exists())
+                    {
+                        rock.Heading = (float)(meteorRnd.NextDouble() * 360.0);
+                        rock.IsPositionFrozen = false;
+                        Function.Call(Hash.SET_ENTITY_LOD_DIST, rock.Handle, 1000000);
+                        rock.IsPersistent = true;
+                        rock.ApplyForce(new Vector3(35.0f, 0f, -57.0f));
+                        rockArray.Add(rock);
+                    }
+                }
+
+                meteorTimer1 = Game.GameTime + 840;
+            }
+
+            // Logica per ogni meteorite
+            foreach (Prop r in rockArray)
+            {
+                if (!r.Exists())
+                    continue;
+
+                if (r.Speed > 0.55f)
+                {
+                    RaycastResult rayToGround = World.Raycast(r.Position, Vector3.WorldDown, 1.4f, IntersectFlags.Map, r);
+                    bool isAsteroid = r.Model.Hash == AsteroidHash;
+
+                    if (r.IsInWater)
+                    {
+                        TriggerPtfx("scr_oddjobtraffickingair", "scr_ojdg4_water_exp", r, isAsteroid ? 1.2f : 0.8f);
+                    }
+                    else if (!rayToGround.DidHit)
+                    {
+                        r.ApplyForce(new Vector3(0.2f, 0f, -2.0f));
+                        TriggerPtfx("scr_agencyheistb", "scr_agency3b_heli_expl", r, isAsteroid ? 1.2f : 0.8f);
+                    }
+                    else
+                    {
+                        Vector3 hit = rayToGround.HitPosition;
+                        float decalSize = isAsteroid ? 6.0f : 3.0f;
+
+                        Function.Call(Hash.ADD_DECAL, DecalBangConcrete,
+                            hit.X, hit.Y, hit.Z,
+                            0f, 0f, -1f,
+                            0f, 1f, 0f,
+                            decalSize, decalSize,
+                            0.1f, 0.3f, 0.6f, 0.5f,
+                            -1.0f, false, false, false);
+
+                        World.AddExplosion(hit, (ExplosionType)14, 0.0f, 0.017f, null, true, false);
+                        Function.Call(Hash.PLAY_SOUND_FROM_ENTITY, -1, "Crate_Land", r.Handle, "FBI_05_SOUNDS", false, 0);
+                    }
+                }
+            }
+
+            // Pulizia periodica
+            if (Game.GameTime > meteorTimer2)
+            {
+                foreach (Prop r in rockArray)
+                {
+                    if (r.Exists())
+                        r.MarkAsNoLongerNeeded();
+                }
+                rockArray.Clear();
+                meteorTimer2 = Game.GameTime + 10500;
+            }
+        }
+
+        private void TriggerPtfx(string asset, string effect, Entity entity, float scale)
+        {
+            Function.Call(Hash.REQUEST_NAMED_PTFX_ASSET, asset);
+            if (!Function.Call<bool>(Hash.HAS_NAMED_PTFX_ASSET_LOADED, asset))
+                return;
+
+            Function.Call(Hash.USE_PARTICLE_FX_ASSET, asset);
+            Function.Call(Hash.START_PARTICLE_FX_NON_LOOPED_ON_ENTITY, effect, entity.Handle,
+                0f, 0f, 0f,
+                0f, 0f, 0f,
+                scale, false, false, false);
+        }
+
+
+        private void SetRageVision(object sender, EventArgs e)
+        {
+            if (Ragevision.Checked == true)
+            {
+                Function.Call(Hash.SET_TIMECYCLE_MODIFIER, "REDMIST_blend");
+                Function.Call(Hash.SET_TIMECYCLE_MODIFIER_STRENGTH, 1.0f);
+            }
+            if (Ragevision.Checked == false)
+            {
+                Function.Call(Hash.SET_TIMECYCLE_MODIFIER, "default");
+                Function.Call(Hash.SET_TIMECYCLE_MODIFIER_STRENGTH, 0.0f);
+            }
         }
 
 
@@ -2007,6 +2349,236 @@ namespace LemonUI.Menu1
             }
         }
 
+
+        private void SetTorture(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(147.170f, -2201.804f, 4.688f);
+                Function.Call(Hash.REQUEST_IPL, "v_torture");
+                Function.Call(Hash.REQUEST_IPL, "v_torture_lod");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(147.170f, -2201.804f, 4.688f);
+            }
+        }
+
+        private void SetIaaOffice(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(117.220f, -620.938f, 206.047f);
+                Function.Call(Hash.REQUEST_IPL, "v_IAA");
+                Function.Call(Hash.REQUEST_IPL, "v_IAA_lod");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(117.220f, -620.938f, 206.047f);
+            }
+        }
+
+        private void SetHumLabTunnel(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(3525.495f, 3705.301f, 20.992f);
+                Function.Call(Hash.REQUEST_IPL, "v_humlab");
+                Function.Call(Hash.REQUEST_IPL, "v_humlab_lod");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(3525.495f, 3705.301f, 20.992f);
+            }
+        }
+
+        private void SetHumLabEntrance(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(3619.749f, 2742.740f, 28.690f);
+                Function.Call(Hash.REQUEST_IPL, "v_humlab");
+                Function.Call(Hash.REQUEST_IPL, "v_humlab_lod");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(3619.749f, 2742.740f, 28.690f);
+            }
+        }
+
+        private void SetBlaineBank(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(-109.299f, 6464.035f, 31.627f);
+                Function.Call(Hash.REQUEST_IPL, "hei_bank_heist");
+                Function.Call(Hash.REQUEST_IPL, "hei_bank_heist_lod");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(-109.299f, 6464.035f, 31.627f);
+            }
+        }
+
+        
+        private void SetHospital(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                //player.Character.Position = new Vector3(306.0f, -1439.0f, 46.5f);
+                player.Character.Position = new Vector3(356.822f, -590.151f, 43.315f);
+                //Function.Call(Hash.REQUEST_IPL, "rc12b_fixed");
+                //Function.Call(Hash.REQUEST_IPL, "rc12b_destroyed");
+                Function.Call(Hash.REQUEST_IPL, "rc12b_default");
+                Function.Call(Hash.REQUEST_IPL, "rc12b_hospitalinterior");
+                Function.Call(Hash.REQUEST_IPL, "rc12b_hospitalinterior_lod");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(356.822f, -590.151f, 43.315f);
+            }
+        }
+
+        private void SetMorgue(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(243.351f, -1376.014f, 39.534f);
+                Function.Call(Hash.REQUEST_IPL, "coronertrash");
+                Function.Call(Hash.REQUEST_IPL, "coronertrash_lod");
+                Function.Call(Hash.REQUEST_IPL, "coroner_int_on");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(243.351f, -1376.014f, 39.534f);
+            }
+        }
+
+        //START CAYO PERICO FUNCTION
+
+        private void SetCayoLoad(object sender, EventArgs e)
+        {
+            cayoOn = cayoloadmode.Checked;
+
+            if (cayoOn && !cayoMpLoaded)
+            {
+                Function.Call((Hash)0x888C3502DBBEEF5); // ON_ENTER_MP, una sola volta
+                cayoMpLoaded = true;
+            }
+
+            if (!cayoOn)
+            {
+                Function.Call(Hash.SET_SCENARIO_GROUP_ENABLED, "Heist_Island_Peds", false);
+                Function.Call((Hash)0x9A9D1BA639675CF1, "HeistIsland", false);
+                Function.Call((Hash)0xF74B1FFA4A15FBEA, 0);
+            }
+        }
+
+        private void DoCayoTick()
+        {
+            if (!cayoOn)
+                return;
+
+            Ped myPed = Game.Player.Character;
+
+            if (myPed.Position.DistanceTo2D(new Vector3(5031.428f, -5150.907f, 0f)) < 2000f)
+            {
+                Function.Call(Hash.SET_SCENARIO_GROUP_ENABLED, "Heist_Island_Peds", true);
+                Function.Call((Hash)0x9A9D1BA639675CF1, "HeistIsland", true); // island hopper
+                Function.Call((Hash)0xF74B1FFA4A15FBEA, 1);                   // path nodes
+
+                if (Function.Call<int>(Hash.GET_INTERIOR_FROM_ENTITY, myPed.Handle) == 0)
+                {
+                    Function.Call(Hash.SET_RADAR_AS_EXTERIOR_THIS_FRAME);
+                    Function.Call(Hash.SET_RADAR_AS_INTERIOR_THIS_FRAME, unchecked((int)0xc0a90510), 4700.0f, -5145.0f, 0, 0);
+                }
+            }
+            else
+            {
+                Function.Call(Hash.SET_SCENARIO_GROUP_ENABLED, "Heist_Island_Peds", false);
+                Function.Call((Hash)0x9A9D1BA639675CF1, "HeistIsland", false);
+                Function.Call((Hash)0xF74B1FFA4A15FBEA, 0);
+            }
+        }
+
+        private void SetCayoPerico(object sender, EventArgs e)
+        {
+            if (!cayoOn)
+            {
+                Notification.Show("~r~Attiva prima 'Load Cayo Perico'");
+                return;
+            }
+
+            Vector3 pos = new Vector3(4840.57f, -5174.43f, 2.0f);
+
+            Function.Call(Hash.NEW_LOAD_SCENE_START_SPHERE, pos.X, pos.Y, pos.Z, 300f, 0);
+            Script.Wait(3000);
+            Function.Call(Hash.REQUEST_COLLISION_AT_COORD, pos.X, pos.Y, pos.Z);
+
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+                player.Character.Position = pos;
+            else
+                player.Character.CurrentVehicle.Position = pos;
+
+            Function.Call(Hash.NEW_LOAD_SCENE_STOP);
+        }
+
+     
+
+
+        private void SetCayoPericoUnload(object sender, EventArgs e)
+        {
+            cayoOn = false;
+            Function.Call((Hash)0x9A9D1BA639675CF1, "HeistIsland", false); // SET_ISLAND_HOPPER_ENABLED
+            Function.Call((Hash)0x5E1460624D194A38, false);                // minimappa isola
+            Function.Call((Hash)0xF74B1FFA4A15FBEA, false);                // nodi AI isola (a memoria, la meno sicura)
+            Function.Call(Hash.SET_AUDIO_FLAG, "PlayerOnDLCHeist4Island", false);
+            Function.Call((Hash)0x9BAE5AD2508DF078, false);                // SET_INSTANCE_PRIORITY_MODE(1)
+            Function.Call((Hash)0x0888C3502DBBEEF5, false);                      // ON_ENTER_MP
+
+            Game.Player.Character.Position = new Vector3(-1037.0f, -2738.0f, 20.169f);
+        }
+
+
+        //END CAYO PERICO FUNCTION
+
+        private void SetYatch(object sender, EventArgs e)
+        {
+            Function.Call(Hash.REQUEST_IPL, "smboat");
+            Function.Call(Hash.REQUEST_IPL, "smboat_lod");
+
+            Script.Wait(1500);
+
+            Vector3 pos = new Vector3(-2045.8f, -1031.2f, 11.9f);
+            Vector3 p = Game.Player.Character.Position;
+            //Notification.Show($"X: {p.X:F2}  Y: {p.Y:F2}  Z: {p.Z:F2}");
+
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = pos;
+            }
+            else
+            {
+                player.Character.CurrentVehicle.Position = pos;
+            }
+        }
+
         private void SetNorthLoad(object sender, EventArgs e)
         {
             Player player = Game.Player;
@@ -2358,6 +2930,11 @@ namespace LemonUI.Menu1
      
 
             DemoPool.Process();
+
+            DoMeteorShowerTick();
+
+
+            DoCayoTick();
 
             if (Game.Player.Character.IsDead)
             {

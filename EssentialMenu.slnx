@@ -1,0 +1,9 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="EssentialMenu.csproj" Id="c68ae6b0-5a1f-4aab-9c52-6e15ef9be489">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+</Solution>
