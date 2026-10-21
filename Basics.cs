@@ -84,7 +84,7 @@ namespace LemonUI.Menu1
 
 
         private static readonly ObjectPool DemoPool = new ObjectPool();
-        private static readonly NativeMenu DemoMenu = new NativeMenu(bannerText: "Essential Menu", name: "Made By Anonik v1335 ~r~BETA", description: "Made By Anonik v1333 ~r~BETA");
+        private static readonly NativeMenu DemoMenu = new NativeMenu(bannerText: "Essential Menu", name: "Made By Anonik v1336 ~r~BETA", description: "Made By Anonik v1336 ~r~BETA");
 
         // Aggiungi i menu per lo Skin Changer
         private static readonly NativeMenu SkinChangerMenu = new NativeMenu("Skin Changer", "Change Player Model");
@@ -211,10 +211,86 @@ namespace LemonUI.Menu1
 
         //Online Teleport Menu
         private static readonly NativeMenu OnlineTeleportMenu = new NativeMenu("Online Teleport", "Online Teleport Locations");
+
+        //Cayo Perico Submenu
         private static readonly NativeMenu CayoMenu = new NativeMenu("Cayo Perico Menu", "Cayo Perico Teleport Locations");
         private static readonly NativeCheckboxItem cayoloadmode = new NativeCheckboxItem("Load Cayo Perico", "To Exit First Unteleport and after uncheck", false);
         private static readonly NativeItem loadteltocayoperico = new NativeItem("Teleport Cayo Perico");
         private static readonly NativeItem unloadteltocayoperico = new NativeItem("Unteleport Cayo Perico");
+        // End Cayo Perico Submenu
+        
+        
+        //Lab Teleport
+        private static readonly NativeItem teltomethfarm = new NativeItem("Teleport to Meth Farm");
+        private static readonly NativeItem teltoweedlab = new NativeItem("Teleport to Weed Lab");
+        private static readonly NativeItem teltococainelab = new NativeItem("Teleport to Cocaine Lab");
+        private static readonly NativeItem teltocounterfeitlab = new NativeItem("Teleport to Counterfeit Lab");
+        private static readonly NativeItem teltodocforgeryofficelab = new NativeItem("Teleport to Document Forgery Office");
+        //End Lab Teleport
+
+        //Club House Teleport
+        private static readonly NativeItem teltoclub1 = new NativeItem("Teleport to Club House 1");
+        private static readonly NativeItem teltoclub2 = new NativeItem("Teleport to Club House 2");
+        //End Club House Teleport
+
+        //Stores Teleport
+        private static readonly NativeItem teltojewelstore = new NativeItem("Teleport to Jewel Store");
+        private static readonly NativeItem teltomaxrendastorre = new NativeItem("Teleport to Max Renda Store");
+        private static readonly NativeItem teltostadium = new NativeItem("Teleport to Stadium");
+        private static readonly NativeItem teltouniondep = new NativeItem("Teleport to Union Depository");
+        //End Stores Teleport
+
+        //ONLINE APPARTMENT SUB MENU ====================================================================
+
+        // MODERN HOUSE
+        private static readonly NativeMenu OnlineHouseMenu = new NativeMenu("Online House Menu", "Online House");
+        private static readonly NativeMenu ModernAppMenu = new NativeMenu("Modern Appartment","Modern Appartment");
+        private static readonly NativeItem teltomodernhouse1 = new NativeItem("Teleport to Modernhouse1");
+        private static readonly NativeItem teltomodernhouse2 = new NativeItem("Teleport to Modernhouse2");
+        private static readonly NativeItem teltovibrant1 = new NativeItem("Vibrant 1 Apartment");
+        private static readonly NativeItem teltovibrant2 = new NativeItem("Vibrant 2 Apartment");
+        private static readonly NativeItem teltovibrant3 = new NativeItem("Vibrant 3 Apartment");
+        private static readonly NativeItem teltosharp1 = new NativeItem("Sharp 1 Apartment");
+        private static readonly NativeItem teltosharp2 = new NativeItem("Sharp 2 Apartment");
+        private static readonly NativeItem teltosharp3 = new NativeItem("Sharp 3 Apartment");
+        private static readonly NativeItem teltomonochrome1 = new NativeItem("Monochrome 1 Apartment");
+        private static readonly NativeItem teltomonochrome2 = new NativeItem("Monochrome 2 Apartment");
+        private static readonly NativeItem teltomonochrome3 = new NativeItem("Monochrome 3 Apartment");
+        private static readonly NativeItem teltoseductive1 = new NativeItem("Seductive 1 Apartment");
+        private static readonly NativeItem teltoseductive2 = new NativeItem("Seductive 2 Apartment");
+        private static readonly NativeItem teltoseductive3 = new NativeItem("Seductive 3 Apartment");
+        private static readonly NativeItem teltoregal1 = new NativeItem("Regal 1 Apartment");
+        private static readonly NativeItem teltoregal2 = new NativeItem("Regal 2 Apartment");
+        private static readonly NativeItem teltoregal3 = new NativeItem("Regal 3 Apartment");
+        private static readonly NativeItem teltoaqua1 = new NativeItem("Aqua 1 Apartment");
+        private static readonly NativeItem teltoaqua2 = new NativeItem("Aqua 2 Apartment");
+        private static readonly NativeItem teltoaqua3 = new NativeItem("Aqua 3 Apartment");
+
+        //END MODERN HOUSE
+
+        //ARCADIUS INTERIOR
+        private static readonly NativeMenu ArcadiusAppMenu = new NativeMenu("Arcadius Menu", "Arcadius Interiors");
+        private static readonly NativeItem telexecrich = new NativeItem("Executive Rich");
+        private static readonly NativeItem telexeccool = new NativeItem("Executive Cool");
+        private static readonly NativeItem telexeccontrast = new NativeItem("Executive Contrast");
+        private static readonly NativeItem teloldspicewarm = new NativeItem("Old Spice Warm");
+        private static readonly NativeItem teloldspiceclassical = new NativeItem("Old Spice Classical");
+        private static readonly NativeItem teloldspicevintage = new NativeItem("Old Spice Vintage");
+        private static readonly NativeItem telpowerbrokerice = new NativeItem("Power Broker Ice");
+        private static readonly NativeItem telpowerbrokerconservative = new NativeItem("Power Broker Conservative");
+        private static readonly NativeItem telpowerbrokerpolished = new NativeItem("Power Broker Polished");
+        private static readonly NativeItem telarcgarage1 = new NativeItem("Garage 1");
+        private static readonly NativeItem telarcgarage2 = new NativeItem("Garage 2");
+        private static readonly NativeItem telarcgarage3 = new NativeItem("Garage 3");
+        private static readonly NativeItem telarcmodshop = new NativeItem("Mod Shop");
+
+        //END ARCADIUS INTERIOR
+
+
+
+
+        //ONLINE APPARTMENT END SUB MENU ================================================================
+
         //End Online Teleport Menu
 
         //WeatherMenu
@@ -374,7 +450,10 @@ namespace LemonUI.Menu1
             teltoblainecountybank.TitleFont = Font.Monospace;
             teltohospital.TitleFont = Font.Monospace;
             teltomorgue.TitleFont = Font.Monospace;
-
+            teltojewelstore.TitleFont = Font.Monospace;
+            teltomaxrendastorre.TitleFont = Font.Monospace;
+            teltostadium.TitleFont = Font.Monospace;
+            teltouniondep.TitleFont = Font.Monospace;
 
 
 
@@ -393,6 +472,14 @@ namespace LemonUI.Menu1
             OnlineTeleportMenu.NameFont = Font.Monospace;
             OnlineTeleportMenu.BannerText.Font = Font.Pricedown;
             OnlineTeleportMenu.DescriptionFont = Font.Monospace;
+            teltomethfarm.TitleFont = Font.Monospace;
+            teltoweedlab.TitleFont = Font.Monospace;
+            teltococainelab.TitleFont = Font.Monospace;
+            teltocounterfeitlab.TitleFont = Font.Monospace;
+            teltodocforgeryofficelab.TitleFont = Font.Monospace;
+            teltoclub1.TitleFont = Font.Monospace;
+            teltoclub2.TitleFont = Font.Monospace;
+
 
             //CAYOSUBMENU
             CayoMenu.BannerText.Color = Color.Brown;
@@ -403,6 +490,48 @@ namespace LemonUI.Menu1
             cayoloadmode.TitleFont = Font.Monospace;
             loadteltocayoperico.TitleFont = Font.Monospace;
             unloadteltocayoperico.TitleFont = Font.Monospace;
+
+            //OnlineHouseSUBMENU
+            OnlineHouseMenu.BannerText.Color = Color.Brown;
+            OnlineHouseMenu.Banner.Color = Color.Black;
+            OnlineHouseMenu.NameFont = Font.Monospace;
+            OnlineHouseMenu.BannerText.Font = Font.Pricedown;
+            OnlineHouseMenu.DescriptionFont = Font.Monospace;
+            ModernAppMenu.BannerText.Color = Color.Brown;
+            ModernAppMenu.Banner.Color = Color.Black;
+            ModernAppMenu.NameFont = Font.Monospace;
+            ModernAppMenu.BannerText.Font = Font.Pricedown;
+            ModernAppMenu.DescriptionFont = Font.Monospace;
+            ArcadiusAppMenu.BannerText.Color = Color.Brown;
+            ArcadiusAppMenu.Banner.Color = Color.Black;
+            ArcadiusAppMenu.NameFont = Font.Monospace;
+            ArcadiusAppMenu.BannerText.Font = Font.Pricedown;
+            ArcadiusAppMenu.DescriptionFont = Font.Monospace;
+
+            //HOUSE
+            teltomodernhouse1.TitleFont = Font.Monospace;
+            teltomodernhouse2.TitleFont = Font.Monospace;
+            teltovibrant1.TitleFont = Font.Monospace; teltovibrant2.TitleFont = Font.Monospace; teltovibrant3.TitleFont = Font.Monospace;
+            teltosharp1.TitleFont = Font.Monospace; teltosharp2.TitleFont = Font.Monospace; teltosharp3.TitleFont = Font.Monospace;
+            teltomonochrome1.TitleFont = Font.Monospace; teltomonochrome2.TitleFont = Font.Monospace; teltomonochrome3.TitleFont = Font.Monospace;
+            teltoseductive1.TitleFont = Font.Monospace; teltoseductive2.TitleFont = Font.Monospace; teltoseductive3.TitleFont = Font.Monospace;
+            teltoregal1.TitleFont = Font.Monospace; teltoregal2.TitleFont = Font.Monospace; teltoregal3.TitleFont = Font.Monospace;
+            teltoaqua1.TitleFont = Font.Monospace; teltoaqua2.TitleFont = Font.Monospace; teltoaqua3.TitleFont = Font.Monospace;
+
+            //ARCADIUS
+            telexecrich.TitleFont = Font.Monospace;
+            telexeccool.TitleFont = Font.Monospace;
+            telexeccontrast.TitleFont = Font.Monospace;
+            teloldspicewarm.TitleFont = Font.Monospace;
+            teloldspiceclassical.TitleFont = Font.Monospace;
+            teloldspicevintage.TitleFont = Font.Monospace;
+            telpowerbrokerice.TitleFont = Font.Monospace;
+            telpowerbrokerconservative.TitleFont = Font.Monospace;
+            telpowerbrokerpolished.TitleFont = Font.Monospace;
+            telarcgarage1.TitleFont = Font.Monospace;
+            telarcgarage2.TitleFont = Font.Monospace;
+            telarcgarage3.TitleFont = Font.Monospace;
+            telarcmodshop.TitleFont = Font.Monospace;
 
 
             //MAIN MENU
@@ -463,6 +592,9 @@ namespace LemonUI.Menu1
             DemoPool.Add(MoneyMenu);//MoneyDropMenu
             DemoPool.Add(OnlineTeleportMenu);//Online Teleport Menu
             DemoPool.Add(CayoMenu);//Cayo Perico Menu
+            DemoPool.Add(OnlineHouseMenu);//House menu
+            DemoPool.Add(ModernAppMenu);//Modern House
+            DemoPool.Add(ArcadiusAppMenu);//Arcadius Interior
 
 
             //Main Menu Categories
@@ -489,10 +621,49 @@ namespace LemonUI.Menu1
             //Online Teleport SubMenu
             TeleportMenu.AddSubMenu(OnlineTeleportMenu);
             OnlineTeleportMenu.AddSubMenu(CayoMenu);
+            OnlineTeleportMenu.AddSubMenu(OnlineHouseMenu);
             CayoMenu.Add(cayoloadmode);
             CayoMenu.Add(loadteltocayoperico);
             CayoMenu.Add(unloadteltocayoperico);
+            OnlineHouseMenu.AddSubMenu(ModernAppMenu);
+            OnlineHouseMenu.AddSubMenu(ArcadiusAppMenu);
             //End Online Teleport SubMenu
+
+            //Online Teleporrt Item
+            OnlineTeleportMenu.Add(teltomethfarm);
+            OnlineTeleportMenu.Add(teltoweedlab);
+            OnlineTeleportMenu.Add(teltococainelab);
+            OnlineTeleportMenu.Add(teltocounterfeitlab);
+            OnlineTeleportMenu.Add(teltodocforgeryofficelab);
+            OnlineTeleportMenu.Add(teltoclub1);
+            OnlineTeleportMenu.Add(teltoclub2);
+
+            //OnlineHouse Item
+            ModernAppMenu.Add(teltomodernhouse1);
+            ModernAppMenu.Add(teltomodernhouse2);
+            ModernAppMenu.Add(teltovibrant1); ModernAppMenu.Add(teltovibrant2); ModernAppMenu.Add(teltovibrant3);
+            ModernAppMenu.Add(teltosharp1); ModernAppMenu.Add(teltosharp2); ModernAppMenu.Add(teltosharp3);
+            ModernAppMenu.Add(teltomonochrome1); ModernAppMenu.Add(teltomonochrome2); ModernAppMenu.Add(teltomonochrome3);
+            ModernAppMenu.Add(teltoseductive1); ModernAppMenu.Add(teltoseductive2); ModernAppMenu.Add(teltoseductive3);
+            ModernAppMenu.Add(teltoregal1); ModernAppMenu.Add(teltoregal2); ModernAppMenu.Add(teltoregal3);
+            ModernAppMenu.Add(teltoaqua1); ModernAppMenu.Add(teltoaqua2); ModernAppMenu.Add(teltoaqua3);
+            //End Onlinehouse Item
+
+            //Arcadius Item
+            ArcadiusAppMenu.Add(telexecrich);
+            ArcadiusAppMenu.Add(telexeccool);
+            ArcadiusAppMenu.Add(telexeccontrast);
+            ArcadiusAppMenu.Add(teloldspicewarm);
+            ArcadiusAppMenu.Add(teloldspiceclassical);
+            ArcadiusAppMenu.Add(teloldspicevintage);
+            ArcadiusAppMenu.Add(telpowerbrokerice);
+            ArcadiusAppMenu.Add(telpowerbrokerconservative);
+            ArcadiusAppMenu.Add(telpowerbrokerpolished);
+            ArcadiusAppMenu.Add(telarcgarage1);
+            ArcadiusAppMenu.Add(telarcgarage2);
+            ArcadiusAppMenu.Add(telarcgarage3);
+            ArcadiusAppMenu.Add(telarcmodshop);
+            //End Arcadius Item
 
 
             //End Teleport SubMenu
@@ -578,6 +749,10 @@ namespace LemonUI.Menu1
             TeleportMenu.Add(teltoblainecountybank);
             TeleportMenu.Add(teltohospital);
             TeleportMenu.Add(teltomorgue);
+            TeleportMenu.Add(teltojewelstore);
+            TeleportMenu.Add(teltomaxrendastorre);
+            TeleportMenu.Add(teltostadium);
+            TeleportMenu.Add(teltouniondep);
 
             //WeatherMenu
             WeatherMenu.Add(ClearWeather);
@@ -712,6 +887,10 @@ namespace LemonUI.Menu1
             teltoblainecountybank.Activated += SetBlaineBank;
             teltohospital.Activated += SetHospital;
             teltomorgue.Activated += SetMorgue;
+            teltojewelstore.Activated += SetJewelStore;
+            teltomaxrendastorre.Activated += SetMaxRendaStore;
+            teltostadium.Activated += SetStadium;
+            teltouniondep.Activated += SetUnionDepo;
 
 
             //Item Att WEATHERMENU
@@ -743,12 +922,43 @@ namespace LemonUI.Menu1
             unloadnorth.Activated += SetNorthUnload;
 
             //Item Online Teleport Menu
-
+            teltomethfarm.Activated += SetMethFarm;
+            teltoweedlab.Activated += SetWeedLab;
+            teltococainelab.Activated += SetCocaineLab;
+            teltocounterfeitlab.Activated += SetCounterfeitLab;
+            teltodocforgeryofficelab.Activated += SetForgeryOffice;
+            teltoclub1.Activated += SetClubhouse1;
+            teltoclub2.Activated += SetClubhouse2;
 
             //Item Cayo Perico Menu
             cayoloadmode.Activated += SetCayoLoad;
             loadteltocayoperico.Activated += SetCayoPerico;
             unloadteltocayoperico.Activated += SetCayoPericoUnload;
+
+            //Item Modern Appartmen
+            teltomodernhouse1.Activated += SetModernApp1;
+            teltomodernhouse2.Activated += SetModernApp2;
+            teltovibrant1.Activated += SetVibrant1; teltovibrant2.Activated += SetVibrant2; teltovibrant3.Activated += SetVibrant3;
+            teltosharp1.Activated += SetSharp1; teltosharp2.Activated += SetSharp2; teltosharp3.Activated += SetSharp3;
+            teltomonochrome1.Activated += SetMonochrome1; teltomonochrome2.Activated += SetMonochrome2; teltomonochrome3.Activated += SetMonochrome3;
+            teltoseductive1.Activated += SetSeductive1; teltoseductive2.Activated += SetSeductive2; teltoseductive3.Activated += SetSeductive3;
+            teltoregal1.Activated += SetRegal1; teltoregal2.Activated += SetRegal2; teltoregal3.Activated += SetRegal3;
+            teltoaqua1.Activated += SetAqua1; teltoaqua2.Activated += SetAqua2; teltoaqua3.Activated += SetAqua3;
+
+            //Item Arcadius
+            telexecrich.Activated += SetExecRich;
+            telexeccool.Activated += SetExecCool;
+            telexeccontrast.Activated += SetExecContrast;
+            teloldspicewarm.Activated += SetOldSpiceWarm;
+            teloldspiceclassical.Activated += SetOldSpiceClassical;
+            teloldspicevintage.Activated += SetOldSpiceVintage;
+            telpowerbrokerice.Activated += SetPowerBrokerIce;
+            telpowerbrokerconservative.Activated += SetPowerBrokerConservative;
+            telpowerbrokerpolished.Activated += SetPowerBrokerPolished;
+            telarcgarage1.Activated += SetArcadiusGarage1;
+            telarcgarage2.Activated += SetArcadiusGarage2;
+            telarcgarage3.Activated += SetArcadiusGarage3;
+            telarcmodshop.Activated += SetArcadiusModShop;
 
             //Item Bodyguard Menu
             BodyGodMode.Activated += SetBodyGodMode;
@@ -2555,7 +2765,481 @@ namespace LemonUI.Menu1
         }
 
 
+
         //END CAYO PERICO FUNCTION
+
+
+        private void SetMethFarm(object sender, EventArgs e)
+        {
+            // Carica i dati MP, come per Cayo (una sola volta)
+            if (!cayoMpLoaded)
+            {
+                Function.Call((Hash)0x888C3502DBBEEF5); // ON_ENTER_MP
+                cayoMpLoaded = true;
+                Script.Wait(1000);
+            }
+
+            // Nomi a memoria: non so quale dei ware0X sia il meth, quindi li chiedo tutti
+            string[] bikerIpls =
+            {
+                 "bkr_biker_interior_placement_interior_1_biker_dlc_int_ware01_milo", //Meth Lab
+                 "bkr_biker_interior_placement_interior_2_biker_dlc_int_ware02_milo", 
+                 "bkr_biker_interior_placement_interior_3_biker_dlc_int_ware03_milo",
+                 "bkr_biker_interior_placement_interior_4_biker_dlc_int_ware04_milo",
+                 "bkr_biker_interior_placement_interior_5_biker_dlc_int_ware05_milo",
+                 "bkr_biker_interior_placement_interior_0_biker_dlc_int_01_milo",   // clubhouse 1
+                 "bkr_biker_interior_placement_interior_1_biker_dlc_int_02_milo"   // clubhouse 2
+            };
+            foreach (string ipl in bikerIpls)
+                Function.Call(Hash.REQUEST_IPL, ipl);
+
+            Script.Wait(1500);
+
+            Vector3 pos = new Vector3(1009.5f, -3196.6f, -38.99f);
+
+            int interior = Function.Call<int>(Hash.GET_INTERIOR_AT_COORDS, pos.X, pos.Y, pos.Z);
+            //Notification.Show("Interior ID: " + interior);
+
+            if (interior == 0)
+            {
+                Notification.Show("~r~Interno non trovato, teleport annullato");
+                return;
+            }
+
+            Function.Call(Hash.PIN_INTERIOR_IN_MEMORY, interior);
+            Function.Call(Hash.DISABLE_INTERIOR, interior, false);
+            Function.Call(Hash.CAP_INTERIOR, interior, false);
+
+            int waited = 0;
+            while (!Function.Call<bool>(Hash.IS_INTERIOR_READY, interior) && waited < 5000)
+            {
+                Script.Wait(100);
+                waited += 100;
+            }
+
+            // Entity set del meth lab (nomi a memoria)
+            string[] methSets =
+            {
+                 //"meth_lab_basic",
+                 "meth_lab_upgrade",
+                 "meth_lab_production",
+                 "meth_lab_security_high",
+                 "meth_lab_setup"
+            };
+
+            string report = "";
+            foreach (string set in methSets)
+            {
+                Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, interior, set);
+                report += set + ": " + Function.Call<bool>(Hash.IS_INTERIOR_ENTITY_SET_ACTIVE, interior, set) + "\n";
+            }
+
+            Function.Call(Hash.REFRESH_INTERIOR, interior);
+            Script.Wait(1000);
+            //Notification.Show(report);
+
+            Function.Call(Hash.REQUEST_COLLISION_AT_COORD, pos.X, pos.Y, pos.Z);
+            Script.Wait(500);
+
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+                player.Character.Position = pos;
+            else
+                player.Character.CurrentVehicle.Position = pos;
+        }
+
+
+
+
+
+        private void LoadBikerBusiness(Vector3 pos, string[] sets)
+        {
+            if (!cayoMpLoaded)
+            {
+                Function.Call((Hash)0x888C3502DBBEEF5); // ON_ENTER_MP
+                cayoMpLoaded = true;
+                Script.Wait(1000);
+            }
+
+            string[] bikerIpls =
+            {
+        "bkr_biker_interior_placement_interior_1_biker_dlc_int_ware01_milo",
+        "bkr_biker_interior_placement_interior_2_biker_dlc_int_ware02_milo",
+        "bkr_biker_interior_placement_interior_3_biker_dlc_int_ware03_milo",
+        "bkr_biker_interior_placement_interior_4_biker_dlc_int_ware04_milo",
+        "bkr_biker_interior_placement_interior_5_biker_dlc_int_ware05_milo"
+    };
+            foreach (string ipl in bikerIpls)
+                Function.Call(Hash.REQUEST_IPL, ipl);
+
+            Script.Wait(1500);
+
+            int interior = Function.Call<int>(Hash.GET_INTERIOR_AT_COORDS, pos.X, pos.Y, pos.Z);
+            //Notification.Show("Interior ID: " + interior);
+
+            if (interior == 0)
+            {
+                Notification.Show("~r~Interno non trovato, teleport annullato");
+                return;
+            }
+
+            Function.Call(Hash.PIN_INTERIOR_IN_MEMORY, interior);
+            Function.Call(Hash.DISABLE_INTERIOR, interior, false);
+            Function.Call(Hash.CAP_INTERIOR, interior, false);
+
+            int waited = 0;
+            while (!Function.Call<bool>(Hash.IS_INTERIOR_READY, interior) && waited < 5000)
+            {
+                Script.Wait(100);
+                waited += 100;
+            }
+
+            string report = "";
+            foreach (string set in sets)
+            {
+                Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, interior, set);
+                report += set + ": " + Function.Call<bool>(Hash.IS_INTERIOR_ENTITY_SET_ACTIVE, interior, set) + "\n";
+            }
+
+            Function.Call(Hash.REFRESH_INTERIOR, interior);
+            Script.Wait(1000);
+            //Notification.Show(report);
+
+            Function.Call(Hash.REQUEST_COLLISION_AT_COORD, pos.X, pos.Y, pos.Z);
+            Script.Wait(500);
+
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+                player.Character.Position = pos;
+            else
+                player.Character.CurrentVehicle.Position = pos;
+        }
+
+        private void SetWeedLab(object sender, EventArgs e)
+        {
+            LoadBikerBusiness(new Vector3(1051.491f, -3196.536f, -39.14f), new string[]
+            {
+        "weed_standard_equip", "weed_upgrade_equip", "weed_security_upgrade",
+        "weed_drying", "weed_chairs", "weed_production",
+        "weed_growtha_stage3", "weed_growthb_stage3", "weed_growthc_stage3",
+        "weed_growthd_stage3", "weed_growthe_stage3", "weed_growthf_stage3",
+        "weed_growthg_stage3", "weed_growthh_stage3", "weed_growthi_stage3",
+        "weed_hosea", "weed_hoseb", "weed_hosec", "weed_hosed", "weed_hosee",
+        "weed_hosef", "weed_hoseg", "weed_hoseh", "weed_hosei"
+            });
+        }
+
+        private void SetCocaineLab(object sender, EventArgs e)
+        {
+            LoadBikerBusiness(new Vector3(1093.6f, -3196.6f, -38.99f), new string[]
+            {
+        "set_up", "equipment_basic", "equipment_upgrade", "security_high",
+        "production_basic", "production_upgrade", "table_equipment",
+        "table_equipment_upgrade", "coke_press_upgrade", "furniture_upgrade",
+        "special_chairs", "coke_cut_01", "coke_cut_02", "coke_cut_03",
+        "coke_cut_04", "coke_cut_05"
+            });
+        }
+
+        private void SetCounterfeitLab(object sender, EventArgs e)
+        {
+            LoadBikerBusiness(new Vector3(1121.897f, -3195.338f, -40.4f), new string[]
+            {
+        "counterfeit_setup", "counterfeit_standard_equip", "counterfeit_upgrade_equip",
+        "counterfeit_security", "money_cutter", "special_chairs",
+        "dryera_on", "dryerb_on", "dryerc_on", "dryerd_on",
+        "counterfeit_cashpile_a", "counterfeit_cashpile_b",
+        "counterfeit_cashpile_c", "counterfeit_cashpile_d"
+            });
+        }
+
+        private void SetForgeryOffice(object sender, EventArgs e)
+        {
+            LoadBikerBusiness(new Vector3(1165.0f, -3196.6f, -39.01f), new string[]
+            {
+        /*"interior_basic",*/ "interior_upgrade",
+        "set_up", /*"equipment_basic",*/ "equipment_upgrade",
+        "production", /*"security_low",*/ "security_high",
+        "clutter", "chair01", "chair02", "chair03",
+        "chair04", "chair05", "chair06", "chair07"
+            });
+        }
+
+
+        private void SetClubhouse1(object sender, EventArgs e)
+        {
+            LoadBikerBusiness(new Vector3(1107.04f, -3157.399f, -37.519f), new string[]
+            {
+        "walls_01", "furnishings_01", "decorative_01",
+        "mural_01", "gun_locker", "mod_booth",
+        "lower_walls_default", "upper_walls_default"
+            });
+        }
+
+        private void SetClubhouse2(object sender, EventArgs e)
+        {
+            LoadBikerBusiness(new Vector3(998.4809f, -3164.711f, -38.907f), new string[]
+            {
+        "walls_01", "furnishings_01", "decorative_01",
+        "mural_01", "gun_locker", "mod_booth",
+        "lower_walls_default", "upper_walls_default"
+            });
+        }
+
+
+
+
+        private void SetJewelStore(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(-631.0f, -236.0f, 38.2f);
+                Function.Call(Hash.REQUEST_IPL, "post_hiest_unload");
+                Function.Call(Hash.REQUEST_IPL, "post_hiest_unload_lod");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(-631.0f, -236.0f, 38.2f);
+            }
+        }
+
+        private void SetMaxRendaStore(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(-585.8247f, -282.72f, 35.45475f);
+                Function.Call(Hash.REQUEST_IPL, "refit_unload");
+                Function.Call(Hash.REQUEST_IPL, "refit_unload_lod");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(-585.8247f, -282.72f, 35.45475f);
+            }
+        }
+
+        private void SetStadium(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(-250.0f, -2010.0f, 30.0f);
+                Function.Call(Hash.REQUEST_IPL, "sp1_10_real_interior");
+                Function.Call(Hash.REQUEST_IPL, "sp1_10_real_interior_lod");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(-250.0f, -2010.0f, 30.0f);
+            }
+        }
+
+
+        private void SetUnionDepo(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(2.6968f, -667.0166f, 16.13061f);
+                Function.Call(Hash.REQUEST_IPL, "FINBANK");
+                Function.Call(Hash.REQUEST_IPL, "FINBANK_lod");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(2.6968f, -667.0166f, 16.13061f);
+            }
+        }
+
+        private void SetModernApp1(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(-786.8663f, 315.7642f, 217.6385f);
+                Function.Call(Hash.REQUEST_IPL, "apa_v_mp_h_01_a");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(-786.8663f, 315.7642f, 217.6385f);
+            }
+        }
+
+        private void SetModernApp2(object sender, EventArgs e)
+        {
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+            {
+                player.Character.Position = new Vector3(-786.9563f, 315.6229f, 187.9136f);
+                Function.Call(Hash.REQUEST_IPL, "apa_v_mp_h_01_c");
+            }
+            else
+            {
+                Vehicle v = player.Character.CurrentVehicle;
+                v.Position = new Vector3(-786.9563f, 315.6229f, 187.9136f);
+            }
+        }
+
+
+
+        private static readonly string[] apartmentIpls =
+        {
+        "apa_v_mp_h_03_a", "apa_v_mp_h_03_b", "apa_v_mp_h_03_c",
+        "apa_v_mp_h_04_a", "apa_v_mp_h_04_b", "apa_v_mp_h_04_c",
+        "apa_v_mp_h_05_a", "apa_v_mp_h_05_b", "apa_v_mp_h_05_c",
+        "apa_v_mp_h_06_a", "apa_v_mp_h_06_b", "apa_v_mp_h_06_c",
+        "apa_v_mp_h_07_a", "apa_v_mp_h_07_b", "apa_v_mp_h_07_c",
+        "apa_v_mp_h_08_a", "apa_v_mp_h_08_b", "apa_v_mp_h_08_c"
+        };
+
+        private void LoadApartment(string ipl, Vector3 pos)
+        {
+            if (!cayoMpLoaded)
+            {
+                Function.Call((Hash)0x888C3502DBBEEF5); // ON_ENTER_MP
+                cayoMpLoaded = true;
+                Script.Wait(1000);
+            }
+
+            // Toglie gli altri stili, per non avere due arredamenti sovrapposti
+            foreach (string other in apartmentIpls)
+            {
+                if (other != ipl)
+                    Function.Call(Hash.REMOVE_IPL, other);
+            }
+
+            Function.Call(Hash.REQUEST_IPL, ipl);
+            Script.Wait(1500);
+
+            Notification.Show(ipl + " attivo: " + Function.Call<bool>(Hash.IS_IPL_ACTIVE, ipl));
+
+            int interior = Function.Call<int>(Hash.GET_INTERIOR_AT_COORDS, pos.X, pos.Y, pos.Z);
+            if (interior != 0)
+            {
+                Function.Call(Hash.PIN_INTERIOR_IN_MEMORY, interior);
+                Function.Call(Hash.DISABLE_INTERIOR, interior, false);
+                Function.Call(Hash.CAP_INTERIOR, interior, false);
+
+                int waited = 0;
+                while (!Function.Call<bool>(Hash.IS_INTERIOR_READY, interior) && waited < 5000)
+                {
+                    Script.Wait(100);
+                    waited += 100;
+                }
+            }
+
+            Function.Call(Hash.REQUEST_COLLISION_AT_COORD, pos.X, pos.Y, pos.Z);
+            Script.Wait(500);
+
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+                player.Character.Position = pos;
+            else
+                player.Character.CurrentVehicle.Position = pos;
+        }
+
+
+        private void SetVibrant1(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_03_a", new Vector3(-786.6245f, 315.6175f, 217.6385f)); }
+        private void SetVibrant2(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_03_c", new Vector3(-786.9584f, 315.7974f, 187.9135f)); }
+        private void SetVibrant3(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_03_b", new Vector3(-774.0223f, 342.1718f, 196.6863f)); }
+
+        private void SetSharp1(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_04_a", new Vector3(-787.0902f, 315.7039f, 217.6384f)); }
+        private void SetSharp2(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_04_c", new Vector3(-787.0155f, 315.7071f, 187.9135f)); }
+        private void SetSharp3(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_04_b", new Vector3(-773.8976f, 342.1525f, 196.6863f)); }
+
+        private void SetMonochrome1(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_05_a", new Vector3(-786.9887f, 315.7393f, 217.6386f)); }
+        private void SetMonochrome2(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_05_c", new Vector3(-786.8809f, 315.6634f, 187.9136f)); }
+        private void SetMonochrome3(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_05_b", new Vector3(-774.0675f, 342.0773f, 196.6864f)); }
+
+        private void SetSeductive1(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_06_a", new Vector3(-787.1423f, 315.6943f, 217.6384f)); }
+        private void SetSeductive2(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_06_c", new Vector3(-787.0961f, 315.815f, 187.9135f)); }
+        private void SetSeductive3(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_06_b", new Vector3(-773.9552f, 341.9892f, 196.6862f)); }
+
+        private void SetRegal1(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_07_a", new Vector3(-787.029f, 315.7113f, 217.6385f)); }
+        private void SetRegal2(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_07_c", new Vector3(-787.0574f, 315.6567f, 187.9135f)); }
+        private void SetRegal3(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_07_b", new Vector3(-774.0109f, 342.0965f, 196.6863f)); }
+
+        private void SetAqua1(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_08_a", new Vector3(-786.9469f, 315.5655f, 217.6383f)); }
+        private void SetAqua2(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_08_c", new Vector3(-786.9756f, 315.723f, 187.9134f)); }
+        private void SetAqua3(object sender, EventArgs e) { LoadApartment("apa_v_mp_h_08_b", new Vector3(-774.0349f, 342.0296f, 196.6862f)); }
+
+
+        private static readonly string[] arcadiusOfficeIpls =
+        {
+        "ex_dt1_02_office_01a", "ex_dt1_02_office_01b", "ex_dt1_02_office_01c",
+        "ex_dt1_02_office_02a", "ex_dt1_02_office_02b", "ex_dt1_02_office_02c",
+        "ex_dt1_02_office_03a", "ex_dt1_02_office_03b", "ex_dt1_02_office_03c"
+        };
+
+        private void LoadArcadius(string ipl, Vector3 pos, bool isOffice)
+        {
+            if (!cayoMpLoaded)
+            {
+                Function.Call((Hash)0x888C3502DBBEEF5); // ON_ENTER_MP
+                cayoMpLoaded = true;
+                Script.Wait(1000);
+            }
+
+            // Solo gli uffici sono stili alternativi: garage e mod shop sono indipendenti
+            if (isOffice)
+            {
+                foreach (string other in arcadiusOfficeIpls)
+                {
+                    if (other != ipl)
+                        Function.Call(Hash.REMOVE_IPL, other);
+                }
+            }
+
+            Function.Call(Hash.REQUEST_IPL, ipl);
+            Script.Wait(1500);
+
+            Notification.Show(ipl + " attivo: " + Function.Call<bool>(Hash.IS_IPL_ACTIVE, ipl));
+
+            int interior = Function.Call<int>(Hash.GET_INTERIOR_AT_COORDS, pos.X, pos.Y, pos.Z);
+            if (interior != 0)
+            {
+                Function.Call(Hash.PIN_INTERIOR_IN_MEMORY, interior);
+                Function.Call(Hash.DISABLE_INTERIOR, interior, false);
+                Function.Call(Hash.CAP_INTERIOR, interior, false);
+
+                int waited = 0;
+                while (!Function.Call<bool>(Hash.IS_INTERIOR_READY, interior) && waited < 5000)
+                {
+                    Script.Wait(100);
+                    waited += 100;
+                }
+            }
+
+            Function.Call(Hash.REQUEST_COLLISION_AT_COORD, pos.X, pos.Y, pos.Z);
+            Script.Wait(500);
+
+            Player player = Game.Player;
+            if (!player.Character.IsInVehicle())
+                player.Character.Position = pos;
+            else
+                player.Character.CurrentVehicle.Position = pos;
+        }
+
+        private void SetExecRich(object sender, EventArgs e) { LoadArcadius("ex_dt1_02_office_02b", new Vector3(-141.1987f, -620.913f, 168.8205f), true); }
+        private void SetExecCool(object sender, EventArgs e) { LoadArcadius("ex_dt1_02_office_02c", new Vector3(-141.5429f, -620.9524f, 168.8204f), true); }
+        private void SetExecContrast(object sender, EventArgs e) { LoadArcadius("ex_dt1_02_office_02a", new Vector3(-141.2896f, -620.9618f, 168.8204f), true); }
+        private void SetOldSpiceWarm(object sender, EventArgs e) { LoadArcadius("ex_dt1_02_office_01a", new Vector3(-141.4966f, -620.8292f, 168.8204f), true); }
+        private void SetOldSpiceClassical(object sender, EventArgs e) { LoadArcadius("ex_dt1_02_office_01b", new Vector3(-141.3997f, -620.9006f, 168.8204f), true); }
+        private void SetOldSpiceVintage(object sender, EventArgs e) { LoadArcadius("ex_dt1_02_office_01c", new Vector3(-141.5361f, -620.9186f, 168.8204f), true); }
+        private void SetPowerBrokerIce(object sender, EventArgs e) { LoadArcadius("ex_dt1_02_office_03a", new Vector3(-141.392f, -621.0451f, 168.8204f), true); }
+        private void SetPowerBrokerConservative(object sender, EventArgs e) { LoadArcadius("ex_dt1_02_office_03b", new Vector3(-141.1945f, -620.8729f, 168.8204f), true); }
+        private void SetPowerBrokerPolished(object sender, EventArgs e) { LoadArcadius("ex_dt1_02_office_03c", new Vector3(-141.4924f, -621.0035f, 168.8205f), true); }
+
+        private void SetArcadiusGarage1(object sender, EventArgs e) { LoadArcadius("imp_dt1_02_cargarage_a", new Vector3(-191.0133f, -579.1428f, 135.0f), false); }
+        private void SetArcadiusGarage2(object sender, EventArgs e) { LoadArcadius("imp_dt1_02_cargarage_b", new Vector3(-117.4989f, -568.1132f, 135.0f), false); }
+        private void SetArcadiusGarage3(object sender, EventArgs e) { LoadArcadius("imp_dt1_02_cargarage_c", new Vector3(-136.078f, -630.1852f, 135.0f), false); }
+        private void SetArcadiusModShop(object sender, EventArgs e) { LoadArcadius("imp_dt1_02_modgarage", new Vector3(-146.6166f, -596.6301f, 166.0f), false); }
+
+
 
         private void SetYatch(object sender, EventArgs e)
         {
@@ -3083,7 +3767,7 @@ namespace LemonUI.Menu1
                 //DemoMenu.Visible = true;
 
                 //GTA.UI.Notification.Show("Welcome",true);
-                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.Call911,"Anonik","Welcome","Essential Menu 1.3.35 BETA", true,true);
+                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.Call911,"Anonik","Welcome","Essential Menu 1.336 BETA", true,true);
                 //ShowMissionPassedMessage("ESSENTIAL MENU", "Versione BETA");
                 // Crea e mostra un messaggio grande stile "Mission Passed" con titolo e sottotitolo
                 //bigMessage = new BigMessage("ESSENTIAL MENU", "VERSIONE BETA", MessageType.MissionPassedOldGen);
