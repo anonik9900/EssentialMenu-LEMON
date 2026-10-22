@@ -5,7 +5,8 @@ Old version with NativeUI <a href="https://github.com/anonik9900/Essential-Menu"
 
 Essential Menu is my biggest project when it comes to gta 5 mods. This is a work in progress version still being rewritten with the LemonUI graphics library, as NativeUI is now deprecated.
 
-![menupreview2](https://github.com/user-attachments/assets/2e45099e-fc43-46d2-b752-069455209bb3)
+<img width="574" height="693" alt="menu1" src="https://github.com/user-attachments/assets/415bed34-abd2-4987-b783-0f80630e8fde" />
+
 
 
 <h2>[Requirements]</h2>
@@ -51,4 +52,5 @@ Essential Menu is my biggest project when it comes to gta 5 mods. This is a work
      <li>[Edit bguard.ini to change your bodyguard ped model,name or categories]</li>
      </ul>
      </p>   
-     
+
+
