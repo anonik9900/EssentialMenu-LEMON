@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,6 +46,25 @@ namespace LemonUI.Menu1
         bool expowpon;
         bool expoml;
         bool moneygun;
+
+        //NO CLIP / TELEPORT GUN
+        bool noclipOn;
+        Entity noclipEntity;
+        readonly HashSet<Keys> noclipKeys = new HashSet<Keys>();
+        bool teleportGunOn;
+        int teleportGunCooldown = 0;
+
+        //DELETE GUN
+        bool deleteGunOn;
+        bool showCoordsOn;
+        bool fontPreviewOn;
+        int deleteGunCooldown = 0;
+
+        //GRAVITY GUN
+        bool gravityGunOn;
+        Entity gravHeld;
+        float gravDist = 10f;
+        int gravCooldown = 0;
 
         //CAYO PERICO
         bool cayoOn;
@@ -106,9 +125,10 @@ namespace LemonUI.Menu1
         private static readonly NativeMenu WeaponMenu = new NativeMenu("Weapon Options", "Weapon Options", "");  //The first submenu
         private static readonly NativeMenu TeleportMenu = new NativeMenu("Teleport Options", "Teleporting Options");
         private static readonly NativeMenu WeatherMenu = new NativeMenu("Weather Options", "Weather Options");//Weather Menu
+        private static readonly NativeMenu TimeMenu = new NativeMenu("Time Options", "Time Options");//Time Menu
         private static readonly NativeMenu VisionMenu = new NativeMenu("Vision Menu", "Vision Options");//Vision Menu
         private static readonly NativeMenu BetaMenu = new NativeMenu("[Beta Menu ]", "Beta Options");//Beta Menu
-        private static readonly NativeMenu AnonikMenu = new NativeMenu("Anonik Menu", "Anonik Options");//Anonik Menu
+        private static readonly NativeMenu AnonikMenu = new NativeMenu("Misc Menu", "Misc Ops");//Misc Menu (ex Anonik Menu)
 
 
         private static readonly NativeItem CarGuy = new NativeItem("Change to Car Guy Model", "");
@@ -147,6 +167,9 @@ namespace LemonUI.Menu1
         private static readonly NativeCheckboxItem superjump = new NativeCheckboxItem("Super Jump", false);
         private static readonly NativeCheckboxItem invisible = new NativeCheckboxItem("Invisible", false);
         private static readonly NativeCheckboxItem fastrun = new NativeCheckboxItem("Fast Run", false);
+        private static readonly NativeCheckboxItem noclipmode = new NativeCheckboxItem("No Clip", "WASD per muoverti, Spazio su, Ctrl giu, Shift veloce", false);
+        private static readonly NativeCheckboxItem showcoords = new NativeCheckboxItem("Show Coordinates", "Mostra X, Y, Z e heading a schermo", false);
+        private static readonly NativeCheckboxItem fontpreview = new NativeCheckboxItem("Font Preview", "Mostra i font di gioco (temporaneo)", false);
         private static readonly NativeMenu MoneyMenu = new NativeMenu("Money Drop", "Money Drop", "");
         private static readonly NativeCheckboxItem money40k = new NativeCheckboxItem("Money Drop 40k", false);
         private static readonly NativeCheckboxItem money1milion = new NativeCheckboxItem("Money Drop 1Mil", false);
@@ -160,6 +183,9 @@ namespace LemonUI.Menu1
         private static readonly NativeCheckboxItem expoweap = new NativeCheckboxItem("Explosive Ammo", "Description", false); // Enabled by Default with a Description
         private static readonly NativeCheckboxItem expomelee = new NativeCheckboxItem("Explosive Melee", "Description", false);
         private static readonly NativeCheckboxItem moneygunop = new NativeCheckboxItem("Money Gun", "Description", false);
+        private static readonly NativeCheckboxItem teleportgunop = new NativeCheckboxItem("Teleport Gun", "Ti teletrasporti dove spari", false);
+        private static readonly NativeCheckboxItem deletegunop = new NativeCheckboxItem("Delete Gun", "Elimina il ped o il veicolo che colpisci", false);
+        private static readonly NativeCheckboxItem gravitygunop = new NativeCheckboxItem("Gravity Gun", "Mira + click: afferra. Click: lancia. PagSu/PagGiu: distanza", false);
 
         //VehicleMenu
 
@@ -311,6 +337,20 @@ namespace LemonUI.Menu1
         private static readonly NativeItem SnowlightWeather = new NativeItem("Snowligt", "");
         private static readonly NativeCheckboxItem XmasWeather = new NativeCheckboxItem("Xmas Snow","Persistent Snow", false);
 
+        //TimeMenu
+        private static readonly NativeItem timemidnight = new NativeItem("Midnight (00:00)", "");
+        private static readonly NativeItem timedawn = new NativeItem("Dawn (06:00)", "");
+        private static readonly NativeItem timemorning = new NativeItem("Morning (09:00)", "");
+        private static readonly NativeItem timenoon = new NativeItem("Noon (12:00)", "");
+        private static readonly NativeItem timeafternoon = new NativeItem("Afternoon (15:00)", "");
+        private static readonly NativeItem timesunset = new NativeItem("Sunset (19:00)", "");
+        private static readonly NativeItem timenight = new NativeItem("Night (22:00)", "");
+        private static readonly NativeItem timeplushour = new NativeItem("+1 Hour", "Avanza di un'ora");
+        private static readonly NativeItem timeminushour = new NativeItem("-1 Hour", "Torna indietro di un'ora");
+        private static readonly NativeCheckboxItem timefreeze = new NativeCheckboxItem("Freeze Time", "Ferma l'orologio di gioco", false);
+        private static readonly NativeSliderItem timeslider = new NativeSliderItem("Hour (0-23)", "Scegli l'ora con le frecce", 23, 12);
+        bool timeSliderUpdating = false;
+
         //VisionMenu
         private static readonly NativeCheckboxItem ThermalVision = new NativeCheckboxItem("Termal Vision", "",false);
         private static readonly NativeCheckboxItem NightVision = new NativeCheckboxItem("Night Vision", "", false);
@@ -336,7 +376,56 @@ namespace LemonUI.Menu1
         private List<Ped> bodyguards = new List<Ped>();
 
         //Anonik Menu
-        private static readonly NativeItem FunAnonikFunc = new NativeItem("Delete Anonik");
+
+        //==================== TEMA GLOBALE DEI MENU (Neon Glass) ====================
+        // Cambia queste costanti per cambiare il tema di tutti i menu in un colpo solo
+        private static readonly Color MenuBannerColor = Color.FromArgb(15, 22, 32);       // #0F1620
+        private static readonly Color MenuBannerTextColor = Color.FromArgb(61, 224, 255); // #3DE0FF
+        // Font di voci, sottotitoli, descrizioni e frecce (il titolo nel banner ha il suo font in ApplyMenuStyle)
+        // ChaletComprimeCologne = ID 4 del gioco (castato per non dipendere dal nome nell'enum)
+        private static readonly Font MenuFont = (Font)4;
+
+        private static void ApplyMenuStyle(NativeMenu m)
+        {
+            m.Banner.Color = MenuBannerColor;
+            m.BannerText.Color = MenuBannerTextColor;
+            m.BannerText.Font = Font.Monospace;
+            m.NameFont = MenuFont;
+            m.DescriptionFont = MenuFont;
+            ApplyItemColors(m);
+        }
+
+        // Colori delle righe (Neon Glass)
+        private static readonly Color ItemBg = Color.FromArgb(225, 12, 18, 26);
+        private static readonly Color ItemBgSelected = Color.FromArgb(225, 18, 96, 120);
+        private static readonly Color ItemText = Color.FromArgb(230, 244, 250);
+        private static readonly Color ItemTextSelected = Color.White;
+        private static readonly Color ItemTextDisabled = Color.FromArgb(107, 125, 143);
+        private static readonly Color ItemAccent = Color.FromArgb(61, 224, 255);
+
+        // Va chiamata quando le righe sono gia' nel menu (le righe aggiunte dopo non vengono colorate)
+        private static void ApplyItemColors(NativeMenu m)
+        {
+            foreach (NativeItem item in m.Items)
+            {
+                item.UseCustomBackground = true;
+                item.TitleFont = MenuFont;
+                item.AltTitleFont = MenuFont;
+                item.Colors.BackgroundNormal = ItemBg;
+                item.Colors.BackgroundHovered = ItemBgSelected;
+                item.Colors.BackgroundDisabled = ItemBg;
+                item.Colors.TitleNormal = ItemText;
+                item.Colors.TitleHovered = ItemTextSelected;
+                item.Colors.TitleDisabled = ItemTextDisabled;
+                item.Colors.AltTitleNormal = ItemText;
+                item.Colors.AltTitleHovered = ItemTextSelected;
+                item.Colors.AltTitleDisabled = ItemTextDisabled;
+                item.Colors.ArrowsNormal = ItemAccent;
+                item.Colors.ArrowsHovered = ItemTextSelected;
+                item.Colors.ArrowsDisabled = ItemTextDisabled;
+                item.UpdateColors();
+            }
+        }
 
         public Basics()
         {
@@ -368,9 +457,7 @@ namespace LemonUI.Menu1
             SkinChangerMenu.AddSubMenu(StoryMenu);
 
             // Configura lo stile per i nuovi menu
-            SkinChangerMenu.Banner.Color = Color.Purple;
-            SkinChangerMenu.BannerText.Font = Font.Pricedown;
-            SkinChangerMenu.NameFont = Font.Monospace;
+            ApplyMenuStyle(SkinChangerMenu);
 
             // Popola i menu con i modelli
             SetupSkinChanger();
@@ -383,185 +470,174 @@ namespace LemonUI.Menu1
 
             //SELF MENU
             //menu.BannerColor = System.Drawing.Color.FromArgb(180, 20, 20);
-            SelfMenu.BannerText.Color = Color.Brown;
-            SelfMenu.NameFont = Font.Monospace;
-            SelfMenu.Banner.Color = Color.FromArgb(180, 20, 20);//Purple;
-            SelfMenu.BannerText.Font = Font.Monospace;
-            SelfMenu.DescriptionFont = Font.Monospace;
-            maxhealth.TitleFont = Font.Monospace;
-            godmode1.TitleFont = Font.Monospace;
-            neverwanted.TitleFont = Font.Monospace;
-            giveallwep.TitleFont = Font.Monospace;
-            givemaxammo.TitleFont = Font.Monospace;
-            infiniteammo.TitleFont = Font.Monospace;
-            superjump.TitleFont = Font.Monospace;
-            invisible.TitleFont = Font.Monospace;  
-            fastrun.TitleFont = Font.Monospace;
+            ApplyMenuStyle(SelfMenu);
+            maxhealth.TitleFont = MenuFont;
+            godmode1.TitleFont = MenuFont;
+            neverwanted.TitleFont = MenuFont;
+            giveallwep.TitleFont = MenuFont;
+            givemaxammo.TitleFont = MenuFont;
+            infiniteammo.TitleFont = MenuFont;
+            superjump.TitleFont = MenuFont;
+            invisible.TitleFont = MenuFont;  
+            fastrun.TitleFont = MenuFont;
+            noclipmode.TitleFont = MenuFont;
+            showcoords.TitleFont = MenuFont;
+            fontpreview.TitleFont = MenuFont;
+            teleportgunop.TitleFont = MenuFont;
+            deletegunop.TitleFont = MenuFont;
+            gravitygunop.TitleFont = MenuFont;
 
             //MONEY MENU
-            MoneyMenu.BannerText.Color = Color.Brown;
-            MoneyMenu.NameFont = Font.Monospace;
-            MoneyMenu.Banner.Color = Color.Black;
-            MoneyMenu.BannerText.Font = Font.Pricedown;
-            MoneyMenu.DescriptionFont  = Font.Monospace;
-            money40k.TitleFont = Font.Monospace;
-            money1milion.TitleFont = Font.Monospace;
-            money10milion.TitleFont = Font.Monospace;
-            money15milion.TitleFont = Font.Monospace;
-            money20milion.TitleFont = Font.Monospace;
-            money100milion.TitleFont = Font.Monospace;
+            ApplyMenuStyle(MoneyMenu);
+            money40k.TitleFont = MenuFont;
+            money1milion.TitleFont = MenuFont;
+            money10milion.TitleFont = MenuFont;
+            money15milion.TitleFont = MenuFont;
+            money20milion.TitleFont = MenuFont;
+            money100milion.TitleFont = MenuFont;
 
             //VEHICLE MENU
-            VehicleMenu.BannerText.Color = Color.Brown;
-            VehicleMenu.NameFont = Font.Monospace;
-            VehicleMenu.Banner.Color = Color.Black;
-            VehicleMenu.BannerText.Font = Font.Pricedown;
-            VehicleMenu.DescriptionFont = Font.Monospace;
-            fixvehicle.TitleFont = Font.Monospace;
-            cargodmod.TitleFont = Font.Monospace;
-            cardrivein.TitleFont = Font.Monospace;
-            cardrivein.AltTitleFont = Font.Monospace;   
-            vehiclespawn.TitleFont = Font.Monospace;
-            vehiclepimp.TitleFont = Font.Monospace;
+            ApplyMenuStyle(VehicleMenu);
+            fixvehicle.TitleFont = MenuFont;
+            cargodmod.TitleFont = MenuFont;
+            cardrivein.TitleFont = MenuFont;
+            cardrivein.AltTitleFont = MenuFont;   
+            vehiclespawn.TitleFont = MenuFont;
+            vehiclepimp.TitleFont = MenuFont;
 
             //TELEPORT MENU
-            TeleportMenu.BannerText.Color = Color.Brown;
-            TeleportMenu.NameFont = Font.Monospace;
-            TeleportMenu.Banner.Color = Color.Black;
-            TeleportMenu.BannerText.Font = Font.Pricedown;
-            TeleportMenu.DescriptionFont = Font.Monospace;
-            teltoway.TitleFont = Font.Monospace;
-            teltochiliad.TitleFont = Font.Monospace;
-            teltopub1.TitleFont = Font.Monospace;
-            teltofib.TitleFont = Font.Monospace;
-            teltobell.TitleFont = Font.Monospace; 
-            teltobank.TitleFont = Font.Monospace;
-            teltopub2.TitleFont = Font.Monospace;
-            teltosolomon.TitleFont = Font.Monospace;    
-            teltooneil.TitleFont = Font.Monospace;  
-            teltolife.TitleFont = Font.Monospace;
-            teltolester.TitleFont = Font.Monospace;
-            teltofloyd.TitleFont = Font.Monospace;
-            teltoyatch.TitleFont = Font.Monospace;
-            teltotorture.TitleFont = Font.Monospace;
-            teltoiaaoffice.TitleFont = Font.Monospace;
-            teltohumlabentrance.TitleFont = Font.Monospace;
-            teltohumlabtunnel.TitleFont = Font.Monospace;
-            teltoblainecountybank.TitleFont = Font.Monospace;
-            teltohospital.TitleFont = Font.Monospace;
-            teltomorgue.TitleFont = Font.Monospace;
-            teltojewelstore.TitleFont = Font.Monospace;
-            teltomaxrendastorre.TitleFont = Font.Monospace;
-            teltostadium.TitleFont = Font.Monospace;
-            teltouniondep.TitleFont = Font.Monospace;
+            ApplyMenuStyle(TeleportMenu);
+            teltoway.TitleFont = MenuFont;
+            teltochiliad.TitleFont = MenuFont;
+            teltopub1.TitleFont = MenuFont;
+            teltofib.TitleFont = MenuFont;
+            teltobell.TitleFont = MenuFont; 
+            teltobank.TitleFont = MenuFont;
+            teltopub2.TitleFont = MenuFont;
+            teltosolomon.TitleFont = MenuFont;    
+            teltooneil.TitleFont = MenuFont;  
+            teltolife.TitleFont = MenuFont;
+            teltolester.TitleFont = MenuFont;
+            teltofloyd.TitleFont = MenuFont;
+            teltoyatch.TitleFont = MenuFont;
+            teltotorture.TitleFont = MenuFont;
+            teltoiaaoffice.TitleFont = MenuFont;
+            teltohumlabentrance.TitleFont = MenuFont;
+            teltohumlabtunnel.TitleFont = MenuFont;
+            teltoblainecountybank.TitleFont = MenuFont;
+            teltohospital.TitleFont = MenuFont;
+            teltomorgue.TitleFont = MenuFont;
+            teltojewelstore.TitleFont = MenuFont;
+            teltomaxrendastorre.TitleFont = MenuFont;
+            teltostadium.TitleFont = MenuFont;
+            teltouniondep.TitleFont = MenuFont;
 
 
 
             //NORTH MENU
-            Northmenu.BannerText.Color = Color.Brown;
-            Northmenu.Banner.Color = Color.Black;
-            Northmenu.NameFont = Font.Monospace; 
-            Northmenu.BannerText.Font = Font.Pricedown;
-            Northmenu.DescriptionFont = Font.Monospace;
-            loadnorth.TitleFont = Font.Monospace;
-            unloadnorth.TitleFont = Font.Monospace;
+            ApplyMenuStyle(Northmenu);
+            loadnorth.TitleFont = MenuFont;
+            unloadnorth.TitleFont = MenuFont;
 
             //ONLINE TELEPORT MENU
-            OnlineTeleportMenu.BannerText.Color = Color.Brown;
-            OnlineTeleportMenu.Banner.Color = Color.Black;
-            OnlineTeleportMenu.NameFont = Font.Monospace;
-            OnlineTeleportMenu.BannerText.Font = Font.Pricedown;
-            OnlineTeleportMenu.DescriptionFont = Font.Monospace;
-            teltomethfarm.TitleFont = Font.Monospace;
-            teltoweedlab.TitleFont = Font.Monospace;
-            teltococainelab.TitleFont = Font.Monospace;
-            teltocounterfeitlab.TitleFont = Font.Monospace;
-            teltodocforgeryofficelab.TitleFont = Font.Monospace;
-            teltoclub1.TitleFont = Font.Monospace;
-            teltoclub2.TitleFont = Font.Monospace;
+            ApplyMenuStyle(OnlineTeleportMenu);
+            teltomethfarm.TitleFont = MenuFont;
+            teltoweedlab.TitleFont = MenuFont;
+            teltococainelab.TitleFont = MenuFont;
+            teltocounterfeitlab.TitleFont = MenuFont;
+            teltodocforgeryofficelab.TitleFont = MenuFont;
+            teltoclub1.TitleFont = MenuFont;
+            teltoclub2.TitleFont = MenuFont;
 
 
             //CAYOSUBMENU
-            CayoMenu.BannerText.Color = Color.Brown;
-            CayoMenu.Banner.Color = Color.Black;
-            CayoMenu.NameFont = Font.Monospace;
-            CayoMenu.BannerText.Font = Font.Pricedown;
-            CayoMenu.DescriptionFont = Font.Monospace;
-            cayoloadmode.TitleFont = Font.Monospace;
-            loadteltocayoperico.TitleFont = Font.Monospace;
-            unloadteltocayoperico.TitleFont = Font.Monospace;
+            ApplyMenuStyle(CayoMenu);
+            cayoloadmode.TitleFont = MenuFont;
+            loadteltocayoperico.TitleFont = MenuFont;
+            unloadteltocayoperico.TitleFont = MenuFont;
 
             //OnlineHouseSUBMENU
-            OnlineHouseMenu.BannerText.Color = Color.Brown;
-            OnlineHouseMenu.Banner.Color = Color.Black;
-            OnlineHouseMenu.NameFont = Font.Monospace;
-            OnlineHouseMenu.BannerText.Font = Font.Pricedown;
-            OnlineHouseMenu.DescriptionFont = Font.Monospace;
-            ModernAppMenu.BannerText.Color = Color.Brown;
-            ModernAppMenu.Banner.Color = Color.Black;
-            ModernAppMenu.NameFont = Font.Monospace;
-            ModernAppMenu.BannerText.Font = Font.Pricedown;
-            ModernAppMenu.DescriptionFont = Font.Monospace;
-            ArcadiusAppMenu.BannerText.Color = Color.Brown;
-            ArcadiusAppMenu.Banner.Color = Color.Black;
-            ArcadiusAppMenu.NameFont = Font.Monospace;
-            ArcadiusAppMenu.BannerText.Font = Font.Pricedown;
-            ArcadiusAppMenu.DescriptionFont = Font.Monospace;
+            ApplyMenuStyle(OnlineHouseMenu);
+            ApplyMenuStyle(ModernAppMenu);
+            ApplyMenuStyle(ArcadiusAppMenu);
 
             //HOUSE
-            teltomodernhouse1.TitleFont = Font.Monospace;
-            teltomodernhouse2.TitleFont = Font.Monospace;
-            teltovibrant1.TitleFont = Font.Monospace; teltovibrant2.TitleFont = Font.Monospace; teltovibrant3.TitleFont = Font.Monospace;
-            teltosharp1.TitleFont = Font.Monospace; teltosharp2.TitleFont = Font.Monospace; teltosharp3.TitleFont = Font.Monospace;
-            teltomonochrome1.TitleFont = Font.Monospace; teltomonochrome2.TitleFont = Font.Monospace; teltomonochrome3.TitleFont = Font.Monospace;
-            teltoseductive1.TitleFont = Font.Monospace; teltoseductive2.TitleFont = Font.Monospace; teltoseductive3.TitleFont = Font.Monospace;
-            teltoregal1.TitleFont = Font.Monospace; teltoregal2.TitleFont = Font.Monospace; teltoregal3.TitleFont = Font.Monospace;
-            teltoaqua1.TitleFont = Font.Monospace; teltoaqua2.TitleFont = Font.Monospace; teltoaqua3.TitleFont = Font.Monospace;
+            teltomodernhouse1.TitleFont = MenuFont;
+            teltomodernhouse2.TitleFont = MenuFont;
+            teltovibrant1.TitleFont = MenuFont; teltovibrant2.TitleFont = MenuFont; teltovibrant3.TitleFont = MenuFont;
+            teltosharp1.TitleFont = MenuFont; teltosharp2.TitleFont = MenuFont; teltosharp3.TitleFont = MenuFont;
+            teltomonochrome1.TitleFont = MenuFont; teltomonochrome2.TitleFont = MenuFont; teltomonochrome3.TitleFont = MenuFont;
+            teltoseductive1.TitleFont = MenuFont; teltoseductive2.TitleFont = MenuFont; teltoseductive3.TitleFont = MenuFont;
+            teltoregal1.TitleFont = MenuFont; teltoregal2.TitleFont = MenuFont; teltoregal3.TitleFont = MenuFont;
+            teltoaqua1.TitleFont = MenuFont; teltoaqua2.TitleFont = MenuFont; teltoaqua3.TitleFont = MenuFont;
 
             //ARCADIUS
-            telexecrich.TitleFont = Font.Monospace;
-            telexeccool.TitleFont = Font.Monospace;
-            telexeccontrast.TitleFont = Font.Monospace;
-            teloldspicewarm.TitleFont = Font.Monospace;
-            teloldspiceclassical.TitleFont = Font.Monospace;
-            teloldspicevintage.TitleFont = Font.Monospace;
-            telpowerbrokerice.TitleFont = Font.Monospace;
-            telpowerbrokerconservative.TitleFont = Font.Monospace;
-            telpowerbrokerpolished.TitleFont = Font.Monospace;
-            telarcgarage1.TitleFont = Font.Monospace;
-            telarcgarage2.TitleFont = Font.Monospace;
-            telarcgarage3.TitleFont = Font.Monospace;
-            telarcmodshop.TitleFont = Font.Monospace;
+            telexecrich.TitleFont = MenuFont;
+            telexeccool.TitleFont = MenuFont;
+            telexeccontrast.TitleFont = MenuFont;
+            teloldspicewarm.TitleFont = MenuFont;
+            teloldspiceclassical.TitleFont = MenuFont;
+            teloldspicevintage.TitleFont = MenuFont;
+            telpowerbrokerice.TitleFont = MenuFont;
+            telpowerbrokerconservative.TitleFont = MenuFont;
+            telpowerbrokerpolished.TitleFont = MenuFont;
+            telarcgarage1.TitleFont = MenuFont;
+            telarcgarage2.TitleFont = MenuFont;
+            telarcgarage3.TitleFont = MenuFont;
+            telarcmodshop.TitleFont = MenuFont;
 
 
             //MAIN MENU
-            DemoMenu.Banner.Color = Color.Purple;
-            DemoMenu.NameFont = Font.Monospace;
-            DemoMenu.DescriptionFont = Font.Monospace;
-            DemoMenu.BannerText.Font = Font.Pricedown;
+            ApplyMenuStyle(DemoMenu);
             //DemoMenu.SetBanner("~HUD_COLOUR_GOLD~MOD MENU"); // Colore oro usando codici GTA
 
 
-            DemoSubMenuPed.Banner.Color = Color.Purple;
-            DemoSubMenuPed.BannerText.Color = Color.Brown;
+            ApplyMenuStyle(DemoSubMenuPed);
 
-            VehicleSpawnerMenu.Banner.Color = Color.Purple;
-            VehicleSpawnerMenu.NameFont = Font.Monospace;
-            VehicleSpawnerMenu.BannerText.Font = Font.Pricedown;
-            VehicleSpawnerMenu.DescriptionFont = Font.Monospace;
+            ApplyMenuStyle(VehicleSpawnerMenu);
 
-            colorMenu.Banner.Color = Color.Purple;
-            colorMenu.NameFont = Font.Monospace;
+            ApplyMenuStyle(colorMenu);
 
 
             //ANONIK MENU
-            AnonikMenu.Banner.Color = Color.Black;
+            ApplyMenuStyle(AnonikMenu);
 
 
             //MODEL CHANGER
-            //Franklins.TitleFont = Font.Monospace;
+            //Franklins.TitleFont = MenuFont;
 
 
+
+            //MENU SENZA STILE PRIMA (ora coerenti)
+            ApplyMenuStyle(ProtagonistMenu);
+            ApplyMenuStyle(GangMenu);
+            ApplyMenuStyle(CivMaleMenu);
+            ApplyMenuStyle(CivFemaleMenu);
+            ApplyMenuStyle(CopMenu);
+            ApplyMenuStyle(EmergencyMenu);
+            ApplyMenuStyle(MiscMenu);
+            ApplyMenuStyle(AnimalMenu);
+            ApplyMenuStyle(StoryMenu);
+            ApplyMenuStyle(WeaponMenu);
+            ApplyMenuStyle(WeatherMenu);
+            ApplyMenuStyle(TimeMenu);
+            timemidnight.TitleFont = MenuFont;
+            timedawn.TitleFont = MenuFont;
+            timemorning.TitleFont = MenuFont;
+            timenoon.TitleFont = MenuFont;
+            timeafternoon.TitleFont = MenuFont;
+            timesunset.TitleFont = MenuFont;
+            timenight.TitleFont = MenuFont;
+            timeplushour.TitleFont = MenuFont;
+            timeminushour.TitleFont = MenuFont;
+            timefreeze.TitleFont = MenuFont;
+            timeslider.TitleFont = MenuFont;
+            timeslider.SliderColor = Color.FromArgb(61, 224, 255);
+            ApplyMenuStyle(VisionMenu);
+            ApplyMenuStyle(BetaMenu);
+            ApplyMenuStyle(upgradeMenu);
+            ApplyMenuStyle(SkinSpawnerMenu);
+            ApplyMenuStyle(BodyGuardMenu);
 
             //========================================= END STYLE===============================================================
 
@@ -578,6 +654,7 @@ namespace LemonUI.Menu1
             DemoPool.Add(VehicleMenu);
             DemoPool.Add(TeleportMenu);
             DemoPool.Add(WeatherMenu);
+            DemoPool.Add(TimeMenu);
             DemoPool.Add(VisionMenu);
             DemoPool.Add(BetaMenu);
             DemoPool.Add(AnonikMenu);
@@ -603,6 +680,7 @@ namespace LemonUI.Menu1
             DemoMenu.AddSubMenu(VehicleMenu);
             DemoMenu.AddSubMenu(TeleportMenu);
             DemoMenu.AddSubMenu(WeatherMenu);
+            DemoMenu.AddSubMenu(TimeMenu);
             DemoMenu.AddSubMenu(VisionMenu);
             SetupBodyChanger();
             DemoMenu.AddSubMenu(BetaMenu);
@@ -703,6 +781,9 @@ namespace LemonUI.Menu1
             WeaponMenu.Add(expoweap);
             WeaponMenu.Add(expomelee);
             WeaponMenu.Add(moneygunop);
+            WeaponMenu.Add(teleportgunop);
+            WeaponMenu.Add(deletegunop);
+            WeaponMenu.Add(gravitygunop);
 
             //Vehicle Menu
             VehicleMenu.Add(fixvehicle);
@@ -772,6 +853,19 @@ namespace LemonUI.Menu1
             WeatherMenu.Add(SnowlightWeather);
             WeatherMenu.Add(XmasWeather);
 
+            //TimeMenu
+            TimeMenu.Add(timeslider);
+            TimeMenu.Add(timemidnight);
+            TimeMenu.Add(timedawn);
+            TimeMenu.Add(timemorning);
+            TimeMenu.Add(timenoon);
+            TimeMenu.Add(timeafternoon);
+            TimeMenu.Add(timesunset);
+            TimeMenu.Add(timenight);
+            TimeMenu.Add(timeplushour);
+            TimeMenu.Add(timeminushour);
+            TimeMenu.Add(timefreeze);
+
             //Vision Menu
             VisionMenu.Add(ThermalVision);
             VisionMenu.Add(NightVision);
@@ -783,7 +877,9 @@ namespace LemonUI.Menu1
             BodyGuardMenu.Add(RemoveBody);
 
             //Anonik Menu
-            AnonikMenu.Add(FunAnonikFunc);
+            AnonikMenu.Add(noclipmode);
+            AnonikMenu.Add(showcoords);
+            AnonikMenu.Add(fontpreview);
 
             // Aggiungi i menu al pool
 
@@ -826,6 +922,7 @@ namespace LemonUI.Menu1
             superjump.Activated += SetSuperJump;
             invisible.Activated += SetInvisible;
             fastrun.Activated += SetFastrun;
+            noclipmode.Activated += SetNoClip;
 
             //Item Att MoneyMenu SELFMENU
             money40k.Activated += SetMoneyDrop40k;
@@ -864,6 +961,9 @@ namespace LemonUI.Menu1
             expoweap.Activated += SetWeapExpo;
             expomelee.Activated += SetMeleeExpo;
             moneygunop.Activated += SetMoneyGun;
+            teleportgunop.Activated += SetTeleportGun;
+            deletegunop.Activated += SetDeleteGun;
+            gravitygunop.Activated += SetGravityGun;
 
 
             //Item Att Teleport
@@ -892,6 +992,19 @@ namespace LemonUI.Menu1
             teltostadium.Activated += SetStadium;
             teltouniondep.Activated += SetUnionDepo;
 
+
+            //Item Att TIMEMENU
+            timemidnight.Activated += SetTimeMidnight;
+            timedawn.Activated += SetTimeDawn;
+            timemorning.Activated += SetTimeMorning;
+            timenoon.Activated += SetTimeNoon;
+            timeafternoon.Activated += SetTimeAfternoon;
+            timesunset.Activated += SetTimeSunset;
+            timenight.Activated += SetTimeNight;
+            timeplushour.Activated += SetTimePlusHour;
+            timeminushour.Activated += SetTimeMinusHour;
+            timefreeze.Activated += SetTimeFreeze;
+            timeslider.ValueChanged += SetTimeSlider;
 
             //Item Att WEATHERMENU
             ClearWeather.Activated += SetWeatherClear;
@@ -965,13 +1078,30 @@ namespace LemonUI.Menu1
             RemoveBody.Activated += SetRemoveBody;
 
             //Item Anonik Menu
-            FunAnonikFunc.Activated += FunAnonik;
+            showcoords.Activated += SetShowCoords;
+            fontpreview.Activated += SetFontPreview;
 
 
             //
 
+            //Colori delle righe: qui tutti i menu hanno gia' le loro voci
+            foreach (NativeMenu styledMenu in new NativeMenu[]
+            {
+                DemoMenu, SkinChangerMenu, ProtagonistMenu, GangMenu, CivMaleMenu, CivFemaleMenu,
+                CopMenu, EmergencyMenu, MiscMenu, AnimalMenu, StoryMenu, SelfMenu,
+                VehicleMenu, WeaponMenu, TeleportMenu, WeatherMenu, VisionMenu, BetaMenu,
+                AnonikMenu, DemoSubMenuPed, MoneyMenu, colorMenu, upgradeMenu, Northmenu,
+                OnlineTeleportMenu, CayoMenu, OnlineHouseMenu, ModernAppMenu, ArcadiusAppMenu, VehicleSpawnerMenu,
+                SkinSpawnerMenu, BodyGuardMenu, TimeMenu,
+            })
+            {
+                ApplyItemColors(styledMenu);
+            }
+
             Tick += Basics_Tick;
             KeyDown += Basics_KeyDown; //line added to replace code in Basics_Tick
+            KeyDown += (s, ev) => noclipKeys.Add(ev.KeyCode);    // tasti per il No Clip
+            KeyUp += (s, ev) => noclipKeys.Remove(ev.KeyCode);
 
 
 
@@ -1022,10 +1152,8 @@ namespace LemonUI.Menu1
 
                 VehicleSpawnerMenu.AddSubMenu(catMenu);
                 DemoPool.Add(catMenu);
-                catMenu.Banner.Color = Color.Purple;
-                catMenu.NameFont = Font.Monospace;
-                VehicleSpawnerMenu.Banner.Color = Color.Purple;
-                VehicleSpawnerMenu.NameFont = Font.Monospace;
+                ApplyMenuStyle(catMenu);
+                ApplyMenuStyle(VehicleSpawnerMenu);
             }
 
             VehicleMenu.AddSubMenu(VehicleSpawnerMenu);
@@ -1135,10 +1263,8 @@ namespace LemonUI.Menu1
 
                 SkinSpawnerMenu.AddSubMenu(cat1Menu);
                 DemoPool.Add(cat1Menu);
-                cat1Menu.Banner.Color = Color.Purple;
-                cat1Menu.NameFont = Font.Monospace;
-                SkinSpawnerMenu.Banner.Color = Color.Purple;
-                SkinSpawnerMenu.NameFont = Font.Monospace;
+                ApplyMenuStyle(cat1Menu);
+                ApplyMenuStyle(SkinSpawnerMenu);
             }
 
             SelfMenu.AddSubMenu(SkinSpawnerMenu);
@@ -1309,10 +1435,8 @@ namespace LemonUI.Menu1
 
                 BodyGuardMenu.AddSubMenu(cat2Menu);
                 DemoPool.Add(cat2Menu);
-                cat2Menu.Banner.Color = Color.Purple;
-                cat2Menu.NameFont = Font.Monospace;
-                BodyGuardMenu.Banner.Color = Color.Purple;
-                BodyGuardMenu.NameFont = Font.Monospace;
+                ApplyMenuStyle(cat2Menu);
+                ApplyMenuStyle(BodyGuardMenu);
                 
             }
 
@@ -2150,6 +2274,337 @@ namespace LemonUI.Menu1
             }
         }
 
+
+        //==================== NO CLIP ====================
+        private void SetNoClip(object sender, EventArgs e)
+        {
+            noclipOn = noclipmode.Checked;
+            if (!noclipOn)
+                StopNoClip();
+            noclipKeys.Clear();
+        }
+
+        private void StopNoClip()
+        {
+            if (noclipEntity != null && noclipEntity.Exists())
+            {
+                Function.Call(Hash.SET_ENTITY_COLLISION, noclipEntity.Handle, true, true);
+                noclipEntity.IsPositionFrozen = false;
+                noclipEntity.Velocity = Vector3.Zero;
+            }
+            noclipEntity = null;
+        }
+
+        private void DoNoClipTick()
+        {
+            if (!noclipOn)
+                return;
+
+            Ped ped = Game.Player.Character;
+            if (ped == null || !ped.Exists())
+                return;
+
+            // In auto muovo il veicolo, a piedi il personaggio
+            Entity target = ped.IsInVehicle() ? (Entity)ped.CurrentVehicle : (Entity)ped;
+
+            if (noclipEntity != target)
+            {
+                StopNoClip();
+                noclipEntity = target;
+            }
+
+            Function.Call(Hash.SET_ENTITY_COLLISION, target.Handle, false, false);
+            target.IsPositionFrozen = true;
+
+            // Direzione dalla camera (yaw = Rotation.Z, pitch = Rotation.X, in gradi)
+            Vector3 camRot = GameplayCamera.Rotation;
+            float yaw = camRot.Z * (float)Math.PI / 180f;
+            float pitch = camRot.X * (float)Math.PI / 180f;
+
+            Vector3 forward = new Vector3(
+                -(float)Math.Sin(yaw) * (float)Math.Cos(pitch),
+                (float)Math.Cos(yaw) * (float)Math.Cos(pitch),
+                (float)Math.Sin(pitch));
+            Vector3 right = new Vector3((float)Math.Cos(yaw), (float)Math.Sin(yaw), 0f);
+
+            Vector3 move = Vector3.Zero;
+            if (noclipKeys.Contains(Keys.W)) move += forward;
+            if (noclipKeys.Contains(Keys.S)) move -= forward;
+            if (noclipKeys.Contains(Keys.D)) move += right;
+            if (noclipKeys.Contains(Keys.A)) move -= right;
+            if (noclipKeys.Contains(Keys.Space)) move += new Vector3(0f, 0f, 1f);
+            if (noclipKeys.Contains(Keys.ControlKey) || noclipKeys.Contains(Keys.LControlKey)) move -= new Vector3(0f, 0f, 1f);
+
+            bool fast = noclipKeys.Contains(Keys.ShiftKey) || noclipKeys.Contains(Keys.LShiftKey);
+            float speed = fast ? 40f : 12f;
+
+            if (move != Vector3.Zero)
+            {
+                Vector3 newPos = target.Position + move * speed * Game.LastFrameTime;
+                Function.Call(Hash.SET_ENTITY_COORDS_NO_OFFSET, target.Handle, newPos.X, newPos.Y, newPos.Z, false, false, false);
+            }
+
+            target.Heading = camRot.Z;
+        }
+
+        //==================== TELEPORT GUN ====================
+        private void SetTeleportGun(object sender, EventArgs e)
+        {
+            teleportGunOn = teleportgunop.Checked;
+        }
+
+        private void DoTeleportGunTick()
+        {
+            if (!teleportGunOn)
+                return;
+
+            Ped ped = Game.Player.Character;
+            if (ped == null || !ped.Exists())
+                return;
+
+            if (Game.GameTime < teleportGunCooldown)
+                return;
+
+            if (Function.Call<bool>(Hash.IS_PED_SHOOTING, ped.Handle))
+            {
+                OutputArgument arg = new OutputArgument();
+                Function.Call(Hash.GET_PED_LAST_WEAPON_IMPACT_COORD, ped.Handle, arg);
+                Vector3 hit = arg.GetResult<Vector3>();
+
+                if (hit != Vector3.Zero)
+                {
+                    Vector3 dest = hit + new Vector3(0f, 0f, 1.0f);
+
+                    if (ped.IsInVehicle())
+                        ped.CurrentVehicle.Position = dest;
+                    else
+                        ped.Position = dest;
+
+                    teleportGunCooldown = Game.GameTime + 400; // evita teleport multipli con il fuoco automatico
+                }
+            }
+        }
+
+        //==================== DELETE GUN ====================
+        private void SetDeleteGun(object sender, EventArgs e)
+        {
+            deleteGunOn = deletegunop.Checked;
+        }
+
+        private void DoDeleteGunTick()
+        {
+            if (!deleteGunOn)
+                return;
+
+            Ped player = Game.Player.Character;
+            if (player == null || !player.Exists())
+                return;
+
+            if (Game.GameTime < deleteGunCooldown)
+                return;
+
+            if (!Function.Call<bool>(Hash.IS_PED_SHOOTING, player.Handle))
+                return;
+
+            // Entita' verso cui il giocatore sta mirando (ped, veicolo o oggetto)
+            OutputArgument aimed = new OutputArgument();
+            if (!Function.Call<bool>(Hash.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT, Game.Player.Handle, aimed))
+                return;
+
+            int handle = aimed.GetResult<int>();
+            if (handle == 0)
+                return;
+
+            Entity target = Entity.FromHandle(handle);
+            if (target == null || !target.Exists())
+                return;
+
+            // Non eliminare se stessi ne' il proprio veicolo
+            if (target.Handle == player.Handle)
+                return;
+            if (player.IsInVehicle() && target.Handle == player.CurrentVehicle.Handle)
+                return;
+
+            // Serve per poter cancellare anche le entita' create dal gioco
+            Function.Call(Hash.SET_ENTITY_AS_MISSION_ENTITY, target.Handle, true, true);
+            target.Delete();
+
+            deleteGunCooldown = Game.GameTime + 150;
+        }
+
+        //==================== SHOW COORDINATES ====================
+        private void SetShowCoords(object sender, EventArgs e)
+        {
+            showCoordsOn = showcoords.Checked;
+        }
+
+        private void DoShowCoordsTick()
+        {
+            if (!showCoordsOn)
+                return;
+
+            Ped p = Game.Player.Character;
+            if (p == null || !p.Exists())
+                return;
+
+            Vector3 pos = p.Position;
+            var ci = System.Globalization.CultureInfo.InvariantCulture; // punto decimale, comodo da copiare nel codice
+
+            string caption = "X: " + pos.X.ToString("F2", ci)
+                + "   Y: " + pos.Y.ToString("F2", ci)
+                + "   Z: " + pos.Z.ToString("F2", ci)
+                + "   H: " + p.Heading.ToString("F1", ci);
+
+            new GTA.UI.TextElement(caption, new System.Drawing.PointF(1270f, 8f), 0.45f,
+                System.Drawing.Color.FromArgb(61, 224, 255), MenuFont, GTA.UI.Alignment.Right).Draw();
+        }
+
+        //==================== FONT PREVIEW (temporaneo) ====================
+        private void SetFontPreview(object sender, EventArgs e)
+        {
+            fontPreviewOn = fontpreview.Checked;
+        }
+
+        private void DoFontPreviewTick()
+        {
+            if (!fontPreviewOn)
+                return;
+
+            // ID dei font standard di GTA V (castati per evitare problemi di nome nell'enum)
+            int[] ids = { 0, 1, 2, 4, 7 };
+            string[] names = { "0 ChaletLondon", "1 HouseScript", "2 Monospace", "4 ChaletComprimeCologne", "7 Pricedown" };
+
+            for (int i = 0; i < ids.Length; i++)
+            {
+                new GTA.UI.TextElement(names[i] + ": Teleport to Blaine County Bank >>> 0123",
+                    new System.Drawing.PointF(700f, 180f + i * 50f), 0.6f,
+                    System.Drawing.Color.White, (Font)ids[i], GTA.UI.Alignment.Left).Draw();
+            }
+        }
+
+        //==================== GRAVITY GUN ====================
+        private void SetGravityGun(object sender, EventArgs e)
+        {
+            gravityGunOn = gravitygunop.Checked;
+            if (!gravityGunOn)
+                GravityRelease(false);
+        }
+
+        // Direzione in cui guarda la camera (yaw = Rotation.Z, pitch = Rotation.X, in gradi)
+        private static Vector3 GetCameraForward()
+        {
+            Vector3 rot = GameplayCamera.Rotation;
+            float yaw = rot.Z * (float)Math.PI / 180f;
+            float pitch = rot.X * (float)Math.PI / 180f;
+            return new Vector3(
+                -(float)Math.Sin(yaw) * (float)Math.Cos(pitch),
+                (float)Math.Cos(yaw) * (float)Math.Cos(pitch),
+                (float)Math.Sin(pitch));
+        }
+
+        // Lascia l'entita' (throwIt = true la lancia in avanti)
+        private void GravityRelease(bool throwIt)
+        {
+            if (gravHeld != null && gravHeld.Exists())
+            {
+                if (throwIt)
+                    gravHeld.Velocity = GetCameraForward() * 80f;
+
+                gravHeld.MarkAsNoLongerNeeded();
+            }
+
+            gravHeld = null;
+            gravCooldown = Game.GameTime + 300; // evita di riafferrare subito
+        }
+
+        private void DoGravityGunTick()
+        {
+            if (!gravityGunOn)
+                return;
+
+            Ped player = Game.Player.Character;
+            if (player == null || !player.Exists())
+                return;
+
+            bool aiming = Function.Call<bool>(Hash.IS_PLAYER_FREE_AIMING, Game.Player.Handle);
+
+            // Mentre miri il click serve alla gravity gun, non a sparare
+            if (aiming)
+                Function.Call(Hash.DISABLE_CONTROL_ACTION, 0, 24, true);
+            bool click = Function.Call<bool>(Hash.IS_DISABLED_CONTROL_JUST_PRESSED, 0, 24);
+
+            if (gravHeld != null && !gravHeld.Exists())
+                gravHeld = null;
+
+            Vector3 camPos = GameplayCamera.Position;
+            Vector3 forward = GetCameraForward();
+
+            // --- Nessun oggetto in mano: click per afferrare quello che stai mirando ---
+            if (gravHeld == null)
+            {
+                if (!aiming || !click || Game.GameTime < gravCooldown)
+                    return;
+
+                OutputArgument aimed = new OutputArgument();
+                if (!Function.Call<bool>(Hash.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT, Game.Player.Handle, aimed))
+                    return;
+
+                int handle = aimed.GetResult<int>();
+                if (handle == 0)
+                    return;
+
+                Entity target = Entity.FromHandle(handle);
+                if (target == null || !target.Exists() || target.Handle == player.Handle)
+                    return;
+
+                // Se miri il guidatore o un passeggero (per esempio dal parabrezza) afferri tutto il veicolo
+                Ped aimedPed = target as Ped;
+                if (aimedPed != null && aimedPed.IsInVehicle())
+                    target = aimedPed.CurrentVehicle;
+
+                if (player.IsInVehicle() && target.Handle == player.CurrentVehicle.Handle)
+                    return;
+
+                Function.Call(Hash.SET_ENTITY_AS_MISSION_ENTITY, target.Handle, true, true);
+                target.IsPositionFrozen = false;
+
+                gravHeld = target;
+                gravDist = Math.Max(4f, Math.Min(40f, camPos.DistanceTo(target.Position)));
+                return;
+            }
+
+            // --- Oggetto in mano ---
+            if (!aiming)
+            {
+                GravityRelease(false); // hai smesso di mirare: lo lasci cadere
+                return;
+            }
+
+            if (click)
+            {
+                GravityRelease(true); // secondo click: lancio
+                return;
+            }
+
+            // PagSu / PagGiu cambiano la distanza (i tasti arrivano dagli eventi KeyDown/KeyUp dello script)
+            if (noclipKeys.Contains(Keys.PageUp))
+                gravDist = Math.Min(60f, gravDist + 15f * Game.LastFrameTime);
+            if (noclipKeys.Contains(Keys.PageDown))
+                gravDist = Math.Max(3f, gravDist - 15f * Game.LastFrameTime);
+
+            // L'oggetto viene "tirato" verso il punto davanti alla camera
+            Vector3 desired = camPos + forward * gravDist;
+
+            // I veicoli fermi sono "addormentati" per la fisica: va risvegliata prima di dargli velocita'
+            if (gravHeld is Vehicle)
+                Function.Call(Hash.ACTIVATE_PHYSICS, gravHeld.Handle);
+
+            gravHeld.Velocity = (desired - gravHeld.Position) * 8f;
+
+            Ped heldPed = gravHeld as Ped;
+            if (heldPed != null)
+                Function.Call(Hash.SET_PED_TO_RAGDOLL, heldPed.Handle, 1000, 1000, 0, false, false, false);
+        }
 
         private void SetFixCar(object sender, EventArgs e)
         {
@@ -3444,6 +3899,58 @@ namespace LemonUI.Menu1
  
 
 
+        //==================== TIME MENU ====================
+        private void SetClockHour(int hour)
+        {
+            Function.Call(Hash.SET_CLOCK_TIME, hour, 0, 0);
+            SyncTimeSlider(hour);
+            Notification.Show("Ora impostata: " + hour.ToString("00") + ":00");
+        }
+
+        // Aggiorna lo slider senza far scattare di nuovo il suo evento
+        private void SyncTimeSlider(int hour)
+        {
+            timeSliderUpdating = true;
+            timeslider.Value = hour;
+            timeslider.Title = "Hour: " + hour.ToString("00") + ":00";
+            timeSliderUpdating = false;
+        }
+
+        private void SetTimeSlider(object sender, EventArgs e)
+        {
+            if (timeSliderUpdating)
+                return;
+
+            int hour = timeslider.Value;
+            Function.Call(Hash.SET_CLOCK_TIME, hour, 0, 0);
+            timeslider.Title = "Hour: " + hour.ToString("00") + ":00";
+        }
+
+        private void SetTimeMidnight(object sender, EventArgs e) { SetClockHour(0); }
+        private void SetTimeDawn(object sender, EventArgs e) { SetClockHour(6); }
+        private void SetTimeMorning(object sender, EventArgs e) { SetClockHour(9); }
+        private void SetTimeNoon(object sender, EventArgs e) { SetClockHour(12); }
+        private void SetTimeAfternoon(object sender, EventArgs e) { SetClockHour(15); }
+        private void SetTimeSunset(object sender, EventArgs e) { SetClockHour(19); }
+        private void SetTimeNight(object sender, EventArgs e) { SetClockHour(22); }
+
+        private void SetTimePlusHour(object sender, EventArgs e)
+        {
+            int h = Function.Call<int>(Hash.GET_CLOCK_HOURS);
+            SetClockHour((h + 1) % 24);
+        }
+
+        private void SetTimeMinusHour(object sender, EventArgs e)
+        {
+            int h = Function.Call<int>(Hash.GET_CLOCK_HOURS);
+            SetClockHour((h + 23) % 24);
+        }
+
+        private void SetTimeFreeze(object sender, EventArgs e)
+        {
+            Function.Call(Hash.PAUSE_CLOCK, timefreeze.Checked);
+        }
+
         private void SetWeatherClear(object sender, EventArgs e)
         { 
             World.Weather = Weather.Clear;
@@ -3619,6 +4126,13 @@ namespace LemonUI.Menu1
 
 
             DoCayoTick();
+
+            DoNoClipTick();
+            DoTeleportGunTick();
+            DoDeleteGunTick();
+            DoGravityGunTick();
+            DoShowCoordsTick();
+            DoFontPreviewTick();
 
             if (Game.Player.Character.IsDead)
             {
