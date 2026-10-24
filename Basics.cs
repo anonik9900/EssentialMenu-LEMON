@@ -9,16 +9,12 @@ using GTA;
 using GTA.Native;
 using GTA.Math;
 using GTA.NaturalMotion;
-using LemonUI;
-using LemonUI.Tools;
+using EssentialUI;
 using System.Media;
 using System.IO;
 using System.Threading;
 using System.Reflection;
-using LemonUI.Menus;
 using Font = GTA.UI.Font;
-using LemonUI.Elements;
-using LemonUI.Extensions;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 using System.Collections;
 using GTA.UI;
@@ -26,8 +22,7 @@ using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using System.Runtime.ConstrainedExecution;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using static LemonUI.Menu1.Basics;
-using LemonUI.Scaleform;
+using static EssentialMenu.Basics;
 
 
 
@@ -35,7 +30,7 @@ using LemonUI.Scaleform;
 
 
 
-namespace LemonUI.Menu1
+namespace EssentialMenu
 {
 
     public class Basics : Script
@@ -57,7 +52,6 @@ namespace LemonUI.Menu1
         //DELETE GUN
         bool deleteGunOn;
         bool showCoordsOn;
-        bool fontPreviewOn;
         int deleteGunCooldown = 0;
 
         //GRAVITY GUN
@@ -169,7 +163,6 @@ namespace LemonUI.Menu1
         private static readonly NativeCheckboxItem fastrun = new NativeCheckboxItem("Fast Run", false);
         private static readonly NativeCheckboxItem noclipmode = new NativeCheckboxItem("No Clip", "WASD per muoverti, Spazio su, Ctrl giu, Shift veloce", false);
         private static readonly NativeCheckboxItem showcoords = new NativeCheckboxItem("Show Coordinates", "Mostra X, Y, Z e heading a schermo", false);
-        private static readonly NativeCheckboxItem fontpreview = new NativeCheckboxItem("Font Preview", "Mostra i font di gioco (temporaneo)", false);
         private static readonly NativeMenu MoneyMenu = new NativeMenu("Money Drop", "Money Drop", "");
         private static readonly NativeCheckboxItem money40k = new NativeCheckboxItem("Money Drop 40k", false);
         private static readonly NativeCheckboxItem money1milion = new NativeCheckboxItem("Money Drop 1Mil", false);
@@ -377,55 +370,8 @@ namespace LemonUI.Menu1
 
         //Anonik Menu
 
-        //==================== TEMA GLOBALE DEI MENU (Neon Glass) ====================
-        // Cambia queste costanti per cambiare il tema di tutti i menu in un colpo solo
-        private static readonly Color MenuBannerColor = Color.FromArgb(15, 22, 32);       // #0F1620
-        private static readonly Color MenuBannerTextColor = Color.FromArgb(61, 224, 255); // #3DE0FF
-        // Font di voci, sottotitoli, descrizioni e frecce (il titolo nel banner ha il suo font in ApplyMenuStyle)
-        // ChaletComprimeCologne = ID 4 del gioco (castato per non dipendere dal nome nell'enum)
+        // Font usato da Show Coordinates (ChaletComprimeCologne = ID 4 del gioco)
         private static readonly Font MenuFont = (Font)4;
-
-        private static void ApplyMenuStyle(NativeMenu m)
-        {
-            m.Banner.Color = MenuBannerColor;
-            m.BannerText.Color = MenuBannerTextColor;
-            m.BannerText.Font = Font.Monospace;
-            m.NameFont = MenuFont;
-            m.DescriptionFont = MenuFont;
-            ApplyItemColors(m);
-        }
-
-        // Colori delle righe (Neon Glass)
-        private static readonly Color ItemBg = Color.FromArgb(225, 12, 18, 26);
-        private static readonly Color ItemBgSelected = Color.FromArgb(225, 18, 96, 120);
-        private static readonly Color ItemText = Color.FromArgb(230, 244, 250);
-        private static readonly Color ItemTextSelected = Color.White;
-        private static readonly Color ItemTextDisabled = Color.FromArgb(107, 125, 143);
-        private static readonly Color ItemAccent = Color.FromArgb(61, 224, 255);
-
-        // Va chiamata quando le righe sono gia' nel menu (le righe aggiunte dopo non vengono colorate)
-        private static void ApplyItemColors(NativeMenu m)
-        {
-            foreach (NativeItem item in m.Items)
-            {
-                item.UseCustomBackground = true;
-                item.TitleFont = MenuFont;
-                item.AltTitleFont = MenuFont;
-                item.Colors.BackgroundNormal = ItemBg;
-                item.Colors.BackgroundHovered = ItemBgSelected;
-                item.Colors.BackgroundDisabled = ItemBg;
-                item.Colors.TitleNormal = ItemText;
-                item.Colors.TitleHovered = ItemTextSelected;
-                item.Colors.TitleDisabled = ItemTextDisabled;
-                item.Colors.AltTitleNormal = ItemText;
-                item.Colors.AltTitleHovered = ItemTextSelected;
-                item.Colors.AltTitleDisabled = ItemTextDisabled;
-                item.Colors.ArrowsNormal = ItemAccent;
-                item.Colors.ArrowsHovered = ItemTextSelected;
-                item.Colors.ArrowsDisabled = ItemTextDisabled;
-                item.UpdateColors();
-            }
-        }
 
         public Basics()
         {
@@ -457,7 +403,6 @@ namespace LemonUI.Menu1
             SkinChangerMenu.AddSubMenu(StoryMenu);
 
             // Configura lo stile per i nuovi menu
-            ApplyMenuStyle(SkinChangerMenu);
 
             // Popola i menu con i modelli
             SetupSkinChanger();
@@ -470,137 +415,38 @@ namespace LemonUI.Menu1
 
             //SELF MENU
             //menu.BannerColor = System.Drawing.Color.FromArgb(180, 20, 20);
-            ApplyMenuStyle(SelfMenu);
-            maxhealth.TitleFont = MenuFont;
-            godmode1.TitleFont = MenuFont;
-            neverwanted.TitleFont = MenuFont;
-            giveallwep.TitleFont = MenuFont;
-            givemaxammo.TitleFont = MenuFont;
-            infiniteammo.TitleFont = MenuFont;
-            superjump.TitleFont = MenuFont;
-            invisible.TitleFont = MenuFont;  
-            fastrun.TitleFont = MenuFont;
-            noclipmode.TitleFont = MenuFont;
-            showcoords.TitleFont = MenuFont;
-            fontpreview.TitleFont = MenuFont;
-            teleportgunop.TitleFont = MenuFont;
-            deletegunop.TitleFont = MenuFont;
-            gravitygunop.TitleFont = MenuFont;
 
             //MONEY MENU
-            ApplyMenuStyle(MoneyMenu);
-            money40k.TitleFont = MenuFont;
-            money1milion.TitleFont = MenuFont;
-            money10milion.TitleFont = MenuFont;
-            money15milion.TitleFont = MenuFont;
-            money20milion.TitleFont = MenuFont;
-            money100milion.TitleFont = MenuFont;
 
             //VEHICLE MENU
-            ApplyMenuStyle(VehicleMenu);
-            fixvehicle.TitleFont = MenuFont;
-            cargodmod.TitleFont = MenuFont;
-            cardrivein.TitleFont = MenuFont;
-            cardrivein.AltTitleFont = MenuFont;   
-            vehiclespawn.TitleFont = MenuFont;
-            vehiclepimp.TitleFont = MenuFont;
 
             //TELEPORT MENU
-            ApplyMenuStyle(TeleportMenu);
-            teltoway.TitleFont = MenuFont;
-            teltochiliad.TitleFont = MenuFont;
-            teltopub1.TitleFont = MenuFont;
-            teltofib.TitleFont = MenuFont;
-            teltobell.TitleFont = MenuFont; 
-            teltobank.TitleFont = MenuFont;
-            teltopub2.TitleFont = MenuFont;
-            teltosolomon.TitleFont = MenuFont;    
-            teltooneil.TitleFont = MenuFont;  
-            teltolife.TitleFont = MenuFont;
-            teltolester.TitleFont = MenuFont;
-            teltofloyd.TitleFont = MenuFont;
-            teltoyatch.TitleFont = MenuFont;
-            teltotorture.TitleFont = MenuFont;
-            teltoiaaoffice.TitleFont = MenuFont;
-            teltohumlabentrance.TitleFont = MenuFont;
-            teltohumlabtunnel.TitleFont = MenuFont;
-            teltoblainecountybank.TitleFont = MenuFont;
-            teltohospital.TitleFont = MenuFont;
-            teltomorgue.TitleFont = MenuFont;
-            teltojewelstore.TitleFont = MenuFont;
-            teltomaxrendastorre.TitleFont = MenuFont;
-            teltostadium.TitleFont = MenuFont;
-            teltouniondep.TitleFont = MenuFont;
 
 
 
             //NORTH MENU
-            ApplyMenuStyle(Northmenu);
-            loadnorth.TitleFont = MenuFont;
-            unloadnorth.TitleFont = MenuFont;
 
             //ONLINE TELEPORT MENU
-            ApplyMenuStyle(OnlineTeleportMenu);
-            teltomethfarm.TitleFont = MenuFont;
-            teltoweedlab.TitleFont = MenuFont;
-            teltococainelab.TitleFont = MenuFont;
-            teltocounterfeitlab.TitleFont = MenuFont;
-            teltodocforgeryofficelab.TitleFont = MenuFont;
-            teltoclub1.TitleFont = MenuFont;
-            teltoclub2.TitleFont = MenuFont;
 
 
             //CAYOSUBMENU
-            ApplyMenuStyle(CayoMenu);
-            cayoloadmode.TitleFont = MenuFont;
-            loadteltocayoperico.TitleFont = MenuFont;
-            unloadteltocayoperico.TitleFont = MenuFont;
 
             //OnlineHouseSUBMENU
-            ApplyMenuStyle(OnlineHouseMenu);
-            ApplyMenuStyle(ModernAppMenu);
-            ApplyMenuStyle(ArcadiusAppMenu);
 
             //HOUSE
-            teltomodernhouse1.TitleFont = MenuFont;
-            teltomodernhouse2.TitleFont = MenuFont;
-            teltovibrant1.TitleFont = MenuFont; teltovibrant2.TitleFont = MenuFont; teltovibrant3.TitleFont = MenuFont;
-            teltosharp1.TitleFont = MenuFont; teltosharp2.TitleFont = MenuFont; teltosharp3.TitleFont = MenuFont;
-            teltomonochrome1.TitleFont = MenuFont; teltomonochrome2.TitleFont = MenuFont; teltomonochrome3.TitleFont = MenuFont;
-            teltoseductive1.TitleFont = MenuFont; teltoseductive2.TitleFont = MenuFont; teltoseductive3.TitleFont = MenuFont;
-            teltoregal1.TitleFont = MenuFont; teltoregal2.TitleFont = MenuFont; teltoregal3.TitleFont = MenuFont;
-            teltoaqua1.TitleFont = MenuFont; teltoaqua2.TitleFont = MenuFont; teltoaqua3.TitleFont = MenuFont;
 
             //ARCADIUS
-            telexecrich.TitleFont = MenuFont;
-            telexeccool.TitleFont = MenuFont;
-            telexeccontrast.TitleFont = MenuFont;
-            teloldspicewarm.TitleFont = MenuFont;
-            teloldspiceclassical.TitleFont = MenuFont;
-            teloldspicevintage.TitleFont = MenuFont;
-            telpowerbrokerice.TitleFont = MenuFont;
-            telpowerbrokerconservative.TitleFont = MenuFont;
-            telpowerbrokerpolished.TitleFont = MenuFont;
-            telarcgarage1.TitleFont = MenuFont;
-            telarcgarage2.TitleFont = MenuFont;
-            telarcgarage3.TitleFont = MenuFont;
-            telarcmodshop.TitleFont = MenuFont;
 
 
             //MAIN MENU
-            ApplyMenuStyle(DemoMenu);
             //DemoMenu.SetBanner("~HUD_COLOUR_GOLD~MOD MENU"); // Colore oro usando codici GTA
 
 
-            ApplyMenuStyle(DemoSubMenuPed);
 
-            ApplyMenuStyle(VehicleSpawnerMenu);
 
-            ApplyMenuStyle(colorMenu);
 
 
             //ANONIK MENU
-            ApplyMenuStyle(AnonikMenu);
 
 
             //MODEL CHANGER
@@ -609,35 +455,7 @@ namespace LemonUI.Menu1
 
 
             //MENU SENZA STILE PRIMA (ora coerenti)
-            ApplyMenuStyle(ProtagonistMenu);
-            ApplyMenuStyle(GangMenu);
-            ApplyMenuStyle(CivMaleMenu);
-            ApplyMenuStyle(CivFemaleMenu);
-            ApplyMenuStyle(CopMenu);
-            ApplyMenuStyle(EmergencyMenu);
-            ApplyMenuStyle(MiscMenu);
-            ApplyMenuStyle(AnimalMenu);
-            ApplyMenuStyle(StoryMenu);
-            ApplyMenuStyle(WeaponMenu);
-            ApplyMenuStyle(WeatherMenu);
-            ApplyMenuStyle(TimeMenu);
-            timemidnight.TitleFont = MenuFont;
-            timedawn.TitleFont = MenuFont;
-            timemorning.TitleFont = MenuFont;
-            timenoon.TitleFont = MenuFont;
-            timeafternoon.TitleFont = MenuFont;
-            timesunset.TitleFont = MenuFont;
-            timenight.TitleFont = MenuFont;
-            timeplushour.TitleFont = MenuFont;
-            timeminushour.TitleFont = MenuFont;
-            timefreeze.TitleFont = MenuFont;
-            timeslider.TitleFont = MenuFont;
             timeslider.SliderColor = Color.FromArgb(61, 224, 255);
-            ApplyMenuStyle(VisionMenu);
-            ApplyMenuStyle(BetaMenu);
-            ApplyMenuStyle(upgradeMenu);
-            ApplyMenuStyle(SkinSpawnerMenu);
-            ApplyMenuStyle(BodyGuardMenu);
 
             //========================================= END STYLE===============================================================
 
@@ -685,6 +503,7 @@ namespace LemonUI.Menu1
             SetupBodyChanger();
             DemoMenu.AddSubMenu(BetaMenu);
             DemoMenu.AddSubMenu(AnonikMenu);
+            DemoMenu.AddSubMenu(UiStyle.CreateMenus(DemoPool)); // menu Style: temi, animazioni, font
 
             //Submenu Categories
 
@@ -879,7 +698,6 @@ namespace LemonUI.Menu1
             //Anonik Menu
             AnonikMenu.Add(noclipmode);
             AnonikMenu.Add(showcoords);
-            AnonikMenu.Add(fontpreview);
 
             // Aggiungi i menu al pool
 
@@ -1079,24 +897,10 @@ namespace LemonUI.Menu1
 
             //Item Anonik Menu
             showcoords.Activated += SetShowCoords;
-            fontpreview.Activated += SetFontPreview;
 
 
             //
 
-            //Colori delle righe: qui tutti i menu hanno gia' le loro voci
-            foreach (NativeMenu styledMenu in new NativeMenu[]
-            {
-                DemoMenu, SkinChangerMenu, ProtagonistMenu, GangMenu, CivMaleMenu, CivFemaleMenu,
-                CopMenu, EmergencyMenu, MiscMenu, AnimalMenu, StoryMenu, SelfMenu,
-                VehicleMenu, WeaponMenu, TeleportMenu, WeatherMenu, VisionMenu, BetaMenu,
-                AnonikMenu, DemoSubMenuPed, MoneyMenu, colorMenu, upgradeMenu, Northmenu,
-                OnlineTeleportMenu, CayoMenu, OnlineHouseMenu, ModernAppMenu, ArcadiusAppMenu, VehicleSpawnerMenu,
-                SkinSpawnerMenu, BodyGuardMenu, TimeMenu,
-            })
-            {
-                ApplyItemColors(styledMenu);
-            }
 
             Tick += Basics_Tick;
             KeyDown += Basics_KeyDown; //line added to replace code in Basics_Tick
@@ -1152,8 +956,6 @@ namespace LemonUI.Menu1
 
                 VehicleSpawnerMenu.AddSubMenu(catMenu);
                 DemoPool.Add(catMenu);
-                ApplyMenuStyle(catMenu);
-                ApplyMenuStyle(VehicleSpawnerMenu);
             }
 
             VehicleMenu.AddSubMenu(VehicleSpawnerMenu);
@@ -1263,8 +1065,6 @@ namespace LemonUI.Menu1
 
                 SkinSpawnerMenu.AddSubMenu(cat1Menu);
                 DemoPool.Add(cat1Menu);
-                ApplyMenuStyle(cat1Menu);
-                ApplyMenuStyle(SkinSpawnerMenu);
             }
 
             SelfMenu.AddSubMenu(SkinSpawnerMenu);
@@ -1435,8 +1235,6 @@ namespace LemonUI.Menu1
 
                 BodyGuardMenu.AddSubMenu(cat2Menu);
                 DemoPool.Add(cat2Menu);
-                ApplyMenuStyle(cat2Menu);
-                ApplyMenuStyle(BodyGuardMenu);
                 
             }
 
@@ -2457,29 +2255,6 @@ namespace LemonUI.Menu1
 
             new GTA.UI.TextElement(caption, new System.Drawing.PointF(1270f, 8f), 0.45f,
                 System.Drawing.Color.FromArgb(61, 224, 255), MenuFont, GTA.UI.Alignment.Right).Draw();
-        }
-
-        //==================== FONT PREVIEW (temporaneo) ====================
-        private void SetFontPreview(object sender, EventArgs e)
-        {
-            fontPreviewOn = fontpreview.Checked;
-        }
-
-        private void DoFontPreviewTick()
-        {
-            if (!fontPreviewOn)
-                return;
-
-            // ID dei font standard di GTA V (castati per evitare problemi di nome nell'enum)
-            int[] ids = { 0, 1, 2, 4, 7 };
-            string[] names = { "0 ChaletLondon", "1 HouseScript", "2 Monospace", "4 ChaletComprimeCologne", "7 Pricedown" };
-
-            for (int i = 0; i < ids.Length; i++)
-            {
-                new GTA.UI.TextElement(names[i] + ": Teleport to Blaine County Bank >>> 0123",
-                    new System.Drawing.PointF(700f, 180f + i * 50f), 0.6f,
-                    System.Drawing.Color.White, (Font)ids[i], GTA.UI.Alignment.Left).Draw();
-            }
         }
 
         //==================== GRAVITY GUN ====================
@@ -4132,7 +3907,6 @@ namespace LemonUI.Menu1
             DoDeleteGunTick();
             DoGravityGunTick();
             DoShowCoordsTick();
-            DoFontPreviewTick();
 
             if (Game.Player.Character.IsDead)
             {
@@ -4277,7 +4051,10 @@ namespace LemonUI.Menu1
 
             if (e.KeyCode == OpenMenu) //f6 //put whatever key binding you want here (e.KeyCode == Keys.F6)
             {
-                DemoMenu.Visible = !DemoMenu.Visible;
+                if (DemoPool.AreAnyVisible)
+                    DemoPool.HideAll();
+                else
+                    DemoMenu.Visible = true;
                 //DemoMenu.Visible = true;
 
                 //GTA.UI.Notification.Show("Welcome",true);
