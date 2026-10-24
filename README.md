@@ -5,7 +5,9 @@ Old version with NativeUI <a href="https://github.com/anonik9900/Essential-Menu"
 
 Essential Menu is my biggest project when it comes to gta 5 mods. This is a work in progress version still being rewritten with the LemonUI graphics library, as NativeUI is now deprecated.
 
-<img width="574" height="693" alt="menu1" src="https://github.com/user-attachments/assets/415bed34-abd2-4987-b783-0f80630e8fde" />
+<img width="563" height="764" alt="menu19" src="https://github.com/user-attachments/assets/7cb21f48-7cec-4b42-949d-231d4bb0dc27" />
+
+
 
 
 
