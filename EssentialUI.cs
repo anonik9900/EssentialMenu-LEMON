@@ -77,7 +77,7 @@ namespace EssentialUI
             catch (Exception ex)
             {
                 // un errore in una funzione non deve fermare tutto lo script
-                Notification.Show("Errore: " + ex.Message);
+                Notification.Show("Error: " + ex.Message);
             }
         }
     }
@@ -104,7 +104,7 @@ namespace EssentialUI
                 if (handler != null)
                 {
                     try { handler(this, EventArgs.Empty); }
-                    catch (Exception ex) { Notification.Show("Errore: " + ex.Message); }
+                    catch (Exception ex) { Notification.Show("Error: " + ex.Message); }
                 }
             }
         }
@@ -172,7 +172,7 @@ namespace EssentialUI
                 args.Index = index;
                 args.Object = Items[index];
                 try { handler(this, args); }
-                catch (Exception ex) { Notification.Show("Errore: " + ex.Message); }
+                catch (Exception ex) { Notification.Show("Error: " + ex.Message); }
             }
         }
 
@@ -207,7 +207,7 @@ namespace EssentialUI
                 if (handler != null)
                 {
                     try { handler(this, EventArgs.Empty); }
-                    catch (Exception ex) { Notification.Show("Errore: " + ex.Message); }
+                    catch (Exception ex) { Notification.Show("Error: " + ex.Message); }
                 }
             }
         }
@@ -241,8 +241,8 @@ namespace EssentialUI
     // ------------------------------------------------------------ menu
     public class NativeMenu
     {
-        public string Title { get; set; }         // titolo nel banner
-        public string Subtitle { get; set; }      // nome mostrato anche come voce nel menu padre
+        public string Title { get; set; }         // title in the banner
+        public string Subtitle { get; set; }      // name also shown as an item in the parent menu
         public string Description { get; set; }
         public List<NativeItem> Items { get; private set; }
 
@@ -615,12 +615,12 @@ namespace EssentialUI
                 themeNames[i] = Themes[i].Name;
 
             // ---- Fonts ----
-            listItemFont = new NativeListItem<string>("Item Font", "Font delle voci", FontNames);
-            listTitleFont = new NativeListItem<string>("Title Font", "Font del titolo nel banner", FontNames);
-            listSubFont = new NativeListItem<string>("Subtitle Font", "Font del sottotitolo", FontNames);
-            listSize = new NativeListItem<string>("Text Size", "Dimensione delle scritte", new string[] { "Small", "Normal", "Large" });
-            togBold = new NativeCheckboxItem("Bold Text", "Scritte piu' marcate", Bold);
-            togUpper = new NativeCheckboxItem("Uppercase Title", "Titolo tutto maiuscolo", UpperTitle);
+            listItemFont = new NativeListItem<string>("Item Font", "Font of the menu items", FontNames);
+            listTitleFont = new NativeListItem<string>("Title Font", "Font of the banner title", FontNames);
+            listSubFont = new NativeListItem<string>("Subtitle Font", "Font of the subtitle", FontNames);
+            listSize = new NativeListItem<string>("Text Size", "Size of the text", new string[] { "Small", "Normal", "Large" });
+            togBold = new NativeCheckboxItem("Bold Text", "Heavier text", Bold);
+            togUpper = new NativeCheckboxItem("Uppercase Title", "Title in all capitals", UpperTitle);
 
             listItemFont.SelectedIndex = ItemFontIdx;
             listTitleFont.SelectedIndex = TitleFontIdx;
@@ -643,23 +643,23 @@ namespace EssentialUI
             fonts.Add(togUpper);
 
             // ---- Style ----
-            listPreset = new NativeListItem<string>("Preset", "Imposta colori, font e animazioni in un colpo solo",
+            listPreset = new NativeListItem<string>("Preset", "Sets colors, fonts and animations in one go",
                 new string[] { "Default", "Sky", "Classic", "Globe" });
-            listTheme = new NativeListItem<string>("Theme", "Cambia i colori del menu", themeNames);
-            listBanner = new NativeListItem<string>("Banner Animation", "Come si anima il banner",
+            listTheme = new NativeListItem<string>("Theme", "Changes the menu colors", themeNames);
+            listBanner = new NativeListItem<string>("Banner Animation", "How the banner animates",
                 new string[] { "Pulse", "Static", "Rainbow", "Shimmer", "Scanline", "Heartbeat", "Globe Spin", "Globe Shine" });
-            listOpen = new NativeListItem<string>("Open Animation", "Come appare il menu",
+            listOpen = new NativeListItem<string>("Open Animation", "How the menu appears",
                 new string[] { "Slide", "Drop", "Fade", "Cascade" });
-            listQuality = new NativeListItem<string>("Globe Quality", "Dettaglio del globo (High usa piu' risorse)",
+            listQuality = new NativeListItem<string>("Globe Quality", "Globe detail (High uses more resources)",
                 new string[] { "Low", "Normal", "High" });
-            togSlide = new NativeCheckboxItem("Sliding Selection", "La barra scivola da una riga all'altra", SlideSel);
+            togSlide = new NativeCheckboxItem("Sliding Selection", "The bar slides from one row to the next", SlideSel);
             togPulseSel = new NativeCheckboxItem("Selection Pulse", "La barra selezionata pulsa", SelPulse);
-            togNudge = new NativeCheckboxItem("Text Nudge", "La voce selezionata scatta a destra", Nudge);
-            togValArrows = new NativeCheckboxItem("Arrows On Selected", "Frecce dei valori solo sulla riga selezionata", ValArrows);
-            togLines = new NativeCheckboxItem("Accent Lines", "Linea colorata sotto il banner", Lines);
-            togSubBanner = new NativeCheckboxItem("Subtitle In Banner", "Titolo e sottotitolo dentro il banner", SubInBanner);
-            listWidth = new NativeListItem<string>("Width", "Larghezza del menu", new string[] { "Narrow", "Normal", "Wide" });
-            listPos = new NativeListItem<string>("Position", "Lato dello schermo", new string[] { "Left", "Right" });
+            togNudge = new NativeCheckboxItem("Text Nudge", "The selected item shifts to the right", Nudge);
+            togValArrows = new NativeCheckboxItem("Arrows On Selected", "Value arrows only on the selected row", ValArrows);
+            togLines = new NativeCheckboxItem("Accent Lines", "Colored line under the banner", Lines);
+            togSubBanner = new NativeCheckboxItem("Subtitle In Banner", "Title and subtitle inside the banner", SubInBanner);
+            listWidth = new NativeListItem<string>("Width", "Width of the menu", new string[] { "Narrow", "Normal", "Wide" });
+            listPos = new NativeListItem<string>("Position", "Side of the screen", new string[] { "Left", "Right" });
 
             listTheme.SelectedIndex = ThemeIdx;
             listBanner.SelectedIndex = BannerAnim;
@@ -682,7 +682,7 @@ namespace EssentialUI
             listWidth.ItemChanged += (s, e) => { WidthIdx = e.Index; Save(); };
             listPos.ItemChanged += (s, e) => { PosIdx = e.Index; Save(); };
 
-            NativeMenu style = new NativeMenu("Style", "Style", "Temi, animazioni e font");
+            NativeMenu style = new NativeMenu("Style", "Style", "Themes, animations and fonts");
             style.Add(listPreset);
             style.Add(listTheme);
             style.Add(listBanner);
@@ -724,7 +724,7 @@ namespace EssentialUI
         static readonly List<NativeMenu> stack = new List<NativeMenu>();
         static bool open;
         static float anim;      // 0 chiuso .. 1 aperto
-        static float selY;      // posizione animata della barra di selezione (in righe)
+        static float selY;      // animated position of the selection bar (in rows)
         static int lastProcess;
 
         static NativeMenu Top { get { return stack.Count == 0 ? null : stack[stack.Count - 1]; } }
@@ -967,7 +967,7 @@ namespace EssentialUI
                 new TextElement(s, new PointF(x + BoldOffset, y), scale, c, font, al).Draw();
         }
 
-        // Titolo del banner: con contorno scuro
+        // Banner title: with dark outline
         static void TitleText(string s, float x, float y, float scale, Color c, Font font)
         {
             if (string.IsNullOrEmpty(s))
@@ -1034,7 +1034,7 @@ namespace EssentialUI
                 addCurve(tt => new Vector3(cp * (float)Math.Sin(tt), sp, cp * (float)Math.Cos(tt)), cp, false);
             }
 
-            // contorno della sfera
+            // outline of the sphere
             addCurve(tt => new Vector3((float)Math.Cos(tt), (float)Math.Sin(tt), 0f), 1f, true);
 
             gx = lx.ToArray();
@@ -1058,7 +1058,7 @@ namespace EssentialUI
             // ogni punto e' un quadratino grande quanto la distanza fra i punti: le linee risultano continue
             float dot = Math.Max(1.1f, UiStyle.GlobeSpacing * r * 1.05f);
 
-            // posizione della fascia di luce: parte prima del bordo sinistro e finisce oltre il destro
+            // position of the light band: starts before the left edge and ends past the right
             float period = 3.4f;
             float bandPos = ((time % period) / period) * 2.0f - 0.5f;
 
@@ -1118,7 +1118,7 @@ namespace EssentialUI
                 }
             }
 
-            // contorno della sfera
+            // outline of the sphere
             for (int j = 0; j < 44; j++)
             {
                 float ang = (float)(2.0 * Math.PI * j / 44);
@@ -1320,7 +1320,7 @@ namespace EssentialUI
                 Rect(x, rowsTop + i * RowH, menuW, RowH, Fade(theme.Row, rk));
             }
 
-            // barra di selezione che scivola
+            // sliding selection bar
             if (visible > 0)
             {
                 int barRow = Math.Max(0, Math.Min(visible - 1, (int)Math.Round(selY)));
@@ -1390,7 +1390,7 @@ namespace EssentialUI
                 }
             }
 
-            // ---- descrizione in basso (con il contatore a destra se il sottotitolo e' nel banner) ----
+            // ---- description at the bottom (with the counter on the right if the subtitle is in the banner) ----
             if (count > 0)
             {
                 NativeItem current = m.Items[m.Selected];

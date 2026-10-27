@@ -97,9 +97,9 @@ namespace EssentialMenu
 
 
         private static readonly ObjectPool DemoPool = new ObjectPool();
-        private static readonly NativeMenu DemoMenu = new NativeMenu(bannerText: "Essential Menu", name: "Made By Anonik v1336 ~r~BETA", description: "Made By Anonik v1336 ~r~BETA");
+        private static readonly NativeMenu DemoMenu = new NativeMenu(bannerText: "Essential Menu", name: "Made By Anonik v1338 ~r~BETA", description: "Made By Anonik v1338 ~r~BETA");
 
-        // Aggiungi i menu per lo Skin Changer
+        // Add the menus for the Skin Changer
         private static readonly NativeMenu SkinChangerMenu = new NativeMenu("Skin Changer", "Change Player Model");
         private static readonly NativeMenu ProtagonistMenu = new NativeMenu("Protagonists", "Main Characters");
         private static readonly NativeMenu GangMenu = new NativeMenu("Gangs", "Gang Members");
@@ -156,13 +156,85 @@ namespace EssentialMenu
         private static readonly NativeItem maxhealth = new NativeItem("Max Health");
         private static readonly NativeCheckboxItem neverwanted = new NativeCheckboxItem("~b~Never Wanted", false);
         private static readonly NativeItem giveallwep = new NativeItem("Give All Weapons");
+        private static readonly NativeListItem<string> wantedlevelitem = new NativeListItem<string>("Wanted Level", "Set your wanted stars (0 = clear)", new[] { "0", "1", "2", "3", "4", "5" });
+        // ---- Weapon Spawner / Customizer / Hash Gun ----
+        private static readonly NativeMenu WeaponSpawnerMenu = new NativeMenu("Weapon Spawner", "Weapon Spawner", "Every weapon in the game, by category");
+        private static readonly NativeListItem<string> wsammoitem = new NativeListItem<string>("Ammo", "Ammo given with each weapon", new[] { "250", "1000", "9999" });
+        private static readonly NativeMenu WeaponCustomMenu = new NativeMenu("Weapon Customizer", "Weapon Customizer", "Tints, colors and components of the weapon in your hands");
+        private static readonly NativeListItem<string> wtintitem = new NativeListItem<string>("Tint", "Standard weapon tint", new[] { "Normal", "Green", "Gold", "Pink", "Army", "LSPD", "Orange", "Platinum" });
+        private static readonly NativeSliderItem wmk2tintslider = new NativeSliderItem("Mk2 Tint (0-31)", "Extra Mk2 colors: move the slider to change", 31, 0);
+        private static readonly NativeCheckboxItem wtintcycleitem = new NativeCheckboxItem("Cycle Tints", "Keeps changing the tint of your weapon", false);
+        private static readonly NativeItem wcompbrowseritem = new NativeItem("Component Browser", "Lists the components your weapon can take: scopes, grips, camos...");
+        private static readonly NativeItem wcompalladditem = new NativeItem("Add All Components", "Installs every compatible component");
+        private static readonly NativeItem wcompremoveallitem = new NativeItem("Remove All Components", "Removes every component");
+        private static readonly NativeMenu WeaponComponentBrowserMenu = new NativeMenu("Components", "Weapon Components", "");
+        private static readonly NativeCheckboxItem hashgunop = new NativeCheckboxItem("Hash Gun", "Shoot an entity to see its type, model hash and info (also written to scripts\\hashgun.log)", false);
+
+        int wsAmmoIdx = 1;
+        bool tintCycleOn;
+        int tintCycleNext, tintCycleIdx;
+        bool hashGunOn;
+        int hashGunCooldown;
+
+        // ---- Vehicle Extras ----
+        private static readonly NativeMenu VehicleExtrasMenu = new NativeMenu("Vehicle Extras", "Vehicle Extras", "Nitro, drift, doors, flight, neon and saved vehicles");
+        private static readonly NativeCheckboxItem nitroitem = new NativeCheckboxItem("Nitro", "Hold Left Shift while driving for a speed boost", false);
+        private static readonly NativeListItem<string> nitropoweritem = new NativeListItem<string>("Nitro Power", "How strong the boost is", new[] { "Low", "Normal", "High" });
+        private static readonly NativeCheckboxItem driftitem = new NativeCheckboxItem("Drift Mode", "Reduces tire grip so the car slides", false);
+        private static readonly NativeCheckboxItem glideitem = new NativeCheckboxItem("Glide", "Slows your fall when the vehicle is in the air", false);
+        private static readonly NativeCheckboxItem hoveritem = new NativeCheckboxItem("Hover Mode", "No gravity: Space = up, Ctrl = down", false);
+        private static readonly NativeItem vehjumpitem = new NativeItem("Vehicle Jump", "Launches the vehicle into the air");
+        private static readonly NativeListItem<string> dooritem = new NativeListItem<string>("Door", "Which door to control", new[] { "Front Left", "Front Right", "Rear Left", "Rear Right", "Hood", "Trunk" });
+        private static readonly NativeItem dooropenitem = new NativeItem("Open Door", "Opens the chosen door");
+        private static readonly NativeItem doorcloseitem = new NativeItem("Close Door", "Closes the chosen door");
+        private static readonly NativeItem doorremoveitem = new NativeItem("Remove Door", "Rips the chosen door off");
+        private static readonly NativeItem dooropenallitem = new NativeItem("Open All Doors", "Opens every door, the hood and the trunk");
+        private static readonly NativeItem doorcloseallitem = new NativeItem("Close All Doors", "Closes every door, the hood and the trunk");
+        private static readonly NativeCheckboxItem neonitem = new NativeCheckboxItem("Neon Lights", "Underglow on all four sides", false);
+        private static readonly NativeListItem<string> neoncoloritem = new NativeListItem<string>("Neon Color", "Color of the underglow", new[] { "White", "Red", "Green", "Blue", "Yellow", "Purple", "Pink", "Cyan", "Orange" });
+        private static readonly NativeListItem<string> vehslotitem = new NativeListItem<string>("Vehicle Slot", "Slot used to save and load vehicles", new[] { "Slot 1", "Slot 2", "Slot 3" });
+        private static readonly NativeItem vehsaveitem = new NativeItem("Save Current Vehicle", "Saves model, colors and mods (kept in scripts\\savedvehicles.ini)");
+        private static readonly NativeItem vehloaditem = new NativeItem("Spawn Saved Vehicle", "Spawns the vehicle from the chosen slot and puts you in it");
+
+        private static readonly System.Drawing.Color[] neonColors =
+        {
+            System.Drawing.Color.FromArgb(255, 255, 255), System.Drawing.Color.FromArgb(255, 0, 0), System.Drawing.Color.FromArgb(0, 255, 0),
+            System.Drawing.Color.FromArgb(0, 0, 255), System.Drawing.Color.FromArgb(255, 255, 0), System.Drawing.Color.FromArgb(160, 0, 255),
+            System.Drawing.Color.FromArgb(255, 0, 160), System.Drawing.Color.FromArgb(0, 255, 255), System.Drawing.Color.FromArgb(255, 120, 0)
+        };
+        private static readonly float[] nitroPowers = { 25f, 45f, 80f };
+
+        int nitroIdx = 1, doorIdx = 0, neonColorIdx = 0, vehSlot = 0;
+        bool nitroOn, driftOn, glideOn, hoverOn;
+        Vehicle hoverVeh;
+        private readonly string savedVehPath = Path.Combine("scripts", "savedvehicles.ini");
+
+        // ---- Player Extras ----
+        private static readonly NativeMenu PlayerExtrasMenu = new NativeMenu("Player Extras", "Player Extras", "Saved positions, game speed, stamina and ragdoll");
+        private static readonly NativeListItem<string> savedslotitem = new NativeListItem<string>("Position Slot", "Choose which slot to use", new[] { "Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5" });
+        private static readonly NativeItem savepositionitem = new NativeItem("Save Position", "Saves your current position in the chosen slot (kept in scripts\\savedpositions.ini)");
+        private static readonly NativeItem loadpositionitem = new NativeItem("Teleport To Saved Position", "Teleports you to the chosen slot");
+        private static readonly NativeItem listpositionsitem = new NativeItem("Show Saved Slots", "Shows which slots are filled");
+        private static readonly NativeSliderItem gamespeedslider = new NativeSliderItem("Game Speed", "10 = normal speed, 1 = slow motion", 10, 10);
+        private static readonly NativeCheckboxItem infstaminaitem = new NativeCheckboxItem("Infinite Stamina", "Run and sprint without getting tired", false);
+        private static readonly NativeCheckboxItem infbreathitem = new NativeCheckboxItem("Infinite Breath", "Stay underwater as long as you want", false);
+        private static readonly NativeItem ragdollnowitem = new NativeItem("Ragdoll Now", "Makes your character fall down for a few seconds");
+        private static readonly NativeCheckboxItem noragdollitem = new NativeCheckboxItem("No Ragdoll", "You never fall or get knocked down", false);
+
+        int savedSlot = 0;
+        bool infStamina, infBreath, noRagdoll;
+        bool gameSpeedUpdating;
+        private readonly string savedPosPath = Path.Combine("scripts", "savedpositions.ini");
+
+        private static readonly NativeItem removeallweapons = new NativeItem("Remove All Weapons", "Removes every weapon from your inventory");
+        private static readonly NativeItem removecurrentweapon = new NativeItem("Remove Current Weapon", "Removes only the weapon in your hands");
         private static readonly NativeItem givemaxammo = new NativeItem("Give Max Ammo");
         private static readonly NativeCheckboxItem infiniteammo = new NativeCheckboxItem("~r~Infinite Ammo", false);
         private static readonly NativeCheckboxItem superjump = new NativeCheckboxItem("Super Jump", false);
         private static readonly NativeCheckboxItem invisible = new NativeCheckboxItem("Invisible", false);
         private static readonly NativeCheckboxItem fastrun = new NativeCheckboxItem("Fast Run", false);
-        private static readonly NativeCheckboxItem noclipmode = new NativeCheckboxItem("No Clip", "WASD per muoverti, Spazio su, Ctrl giu, Shift veloce", false);
-        private static readonly NativeCheckboxItem showcoords = new NativeCheckboxItem("Show Coordinates", "Mostra X, Y, Z e heading a schermo", false);
+        private static readonly NativeCheckboxItem noclipmode = new NativeCheckboxItem("No Clip", "WASD to move, Space up, Ctrl down, Shift fast", false);
+        private static readonly NativeCheckboxItem showcoords = new NativeCheckboxItem("Show Coordinates", "Shows X, Y, Z and heading on screen", false);
         private static readonly NativeMenu MoneyMenu = new NativeMenu("Money Drop", "Money Drop", "");
         private static readonly NativeCheckboxItem money40k = new NativeCheckboxItem("Money Drop 40k", false);
         private static readonly NativeCheckboxItem money1milion = new NativeCheckboxItem("Money Drop 1Mil", false);
@@ -176,9 +248,9 @@ namespace EssentialMenu
         private static readonly NativeCheckboxItem expoweap = new NativeCheckboxItem("Explosive Ammo", "Description", false); // Enabled by Default with a Description
         private static readonly NativeCheckboxItem expomelee = new NativeCheckboxItem("Explosive Melee", "Description", false);
         private static readonly NativeCheckboxItem moneygunop = new NativeCheckboxItem("Money Gun", "Description", false);
-        private static readonly NativeCheckboxItem teleportgunop = new NativeCheckboxItem("Teleport Gun", "Ti teletrasporti dove spari", false);
-        private static readonly NativeCheckboxItem deletegunop = new NativeCheckboxItem("Delete Gun", "Elimina il ped o il veicolo che colpisci", false);
-        private static readonly NativeCheckboxItem gravitygunop = new NativeCheckboxItem("Gravity Gun", "Mira + click: afferra. Click: lancia. PagSu/PagGiu: distanza", false);
+        private static readonly NativeCheckboxItem teleportgunop = new NativeCheckboxItem("Teleport Gun", "Teleports you where you shoot", false);
+        private static readonly NativeCheckboxItem deletegunop = new NativeCheckboxItem("Delete Gun", "Deletes the ped or vehicle you hit", false);
+        private static readonly NativeCheckboxItem gravitygunop = new NativeCheckboxItem("Gravity Gun", "Aim + click: grab. Click: throw. PageUp/PageDown: distance", false);
 
         //VehicleMenu
 
@@ -187,14 +259,14 @@ namespace EssentialMenu
         private static readonly NativeCheckboxItem cardrivein = new NativeCheckboxItem("Car Autopilot","Autopilot", false);
         private static readonly NativeItem vehiclespawn = new NativeItem("Spawn Input Vehicle","Type a input name vehicle");
         private static readonly NativeItem vehiclepimp = new NativeItem("Max Car Stats");
-        private static readonly NativeMenu colorMenu = new NativeMenu("Colori Veicolo", "Scegli un colore");
+        private static readonly NativeMenu colorMenu = new NativeMenu("Vehicle Colors", "Choose a color");
         private static readonly NativeItem colorMenuItem = new NativeItem("Change Color");
         private static readonly NativeMenu upgradeMenu = new NativeMenu("Upgrades", "Vehicle Tuning");
         private static readonly NativeItem fullUpgradeItem = new NativeItem("🔧 Max Upgrade");
-        private static readonly NativeListItem<string> engineItem = new NativeListItem<string>("🔋 Motore", new[] { "Stock", "Level 1", "Level 2", "Level 3" });
-        private static readonly NativeListItem<string> brakesItem = new NativeListItem<string>("🛑 Freni", new[] { "Stock", "Street", "Sport", "Race" });
-        private static readonly NativeListItem<string> transmissionItem = new NativeListItem<string>("⚙️ Cambio", new[] { "Stock", "Street", "Sport", "Race" });
-        private static readonly NativeListItem<string> suspensionItem = new NativeListItem<string>("🌀 Sospensioni", new[] { "Stock", "Lowered", "Street", "Sport", "Competition" });
+        private static readonly NativeListItem<string> engineItem = new NativeListItem<string>("🔋 Engine", new[] { "Stock", "Level 1", "Level 2", "Level 3" });
+        private static readonly NativeListItem<string> brakesItem = new NativeListItem<string>("🛑 Brakes", new[] { "Stock", "Street", "Sport", "Race" });
+        private static readonly NativeListItem<string> transmissionItem = new NativeListItem<string>("⚙️ Transmission", new[] { "Stock", "Street", "Sport", "Race" });
+        private static readonly NativeListItem<string> suspensionItem = new NativeListItem<string>("🌀 Suspension", new[] { "Stock", "Lowered", "Street", "Sport", "Competition" });
         private static readonly NativeCheckboxItem turboItem = new NativeCheckboxItem("🚀 Turbo", false);
 
 
@@ -250,6 +322,15 @@ namespace EssentialMenu
         //Club House Teleport
         private static readonly NativeItem teltoclub1 = new NativeItem("Teleport to Club House 1");
         private static readonly NativeItem teltoclub2 = new NativeItem("Teleport to Club House 2");
+
+        //CASINO
+        private static readonly NativeMenu CasinoMenu = new NativeMenu("Casino Menu", "Diamond Casino");
+        private static readonly NativeItem teltocasinoentrance = new NativeItem("Teleport to Casino Entrance", "Outside entrance of the Diamond Casino");
+        private static readonly NativeItem teltocasinofloor = new NativeItem("Teleport to Casino Main Floor", "Main floor (loads the interior)");
+        private static readonly NativeItem teltocasinopenthouse = new NativeItem("Teleport to Casino Penthouse", "Penthouse above the casino (loads the interior)");
+        private static readonly NativeItem teltocasinogarage = new NativeItem("Teleport to Casino Garage", "Casino garage (loads the interior)");
+        private static readonly NativeItem teltocasinocarpark = new NativeItem("Teleport to Casino Car Park", "Casino car park (loads the interior)");
+        private static readonly NativeItem casinodiag = new NativeItem("Casino IPL Status", "Shows which casino IPLs are active");
         //End Club House Teleport
 
         //Stores Teleport
@@ -338,10 +419,10 @@ namespace EssentialMenu
         private static readonly NativeItem timeafternoon = new NativeItem("Afternoon (15:00)", "");
         private static readonly NativeItem timesunset = new NativeItem("Sunset (19:00)", "");
         private static readonly NativeItem timenight = new NativeItem("Night (22:00)", "");
-        private static readonly NativeItem timeplushour = new NativeItem("+1 Hour", "Avanza di un'ora");
-        private static readonly NativeItem timeminushour = new NativeItem("-1 Hour", "Torna indietro di un'ora");
-        private static readonly NativeCheckboxItem timefreeze = new NativeCheckboxItem("Freeze Time", "Ferma l'orologio di gioco", false);
-        private static readonly NativeSliderItem timeslider = new NativeSliderItem("Hour (0-23)", "Scegli l'ora con le frecce", 23, 12);
+        private static readonly NativeItem timeplushour = new NativeItem("+1 Hour", "Advances one hour");
+        private static readonly NativeItem timeminushour = new NativeItem("-1 Hour", "Goes back one hour");
+        private static readonly NativeCheckboxItem timefreeze = new NativeCheckboxItem("Freeze Time", "Stops the in-game clock", false);
+        private static readonly NativeSliderItem timeslider = new NativeSliderItem("Hour (0-23)", "Pick the hour with the arrows", 23, 12);
         bool timeSliderUpdating = false;
 
         //VisionMenu
@@ -351,7 +432,7 @@ namespace EssentialMenu
         private static readonly NativeCheckboxItem Ragevision = new NativeCheckboxItem("Rage Vision", "Description", false); // Enabled by Default with a Description
 
         //Vehicle Spawner Menu
-        private static readonly NativeMenu VehicleSpawnerMenu = new NativeMenu("Vehicle Spawner", "Spawn Veicoli");
+        private static readonly NativeMenu VehicleSpawnerMenu = new NativeMenu("Vehicle Spawner", "Spawn Vehicles");
         private Dictionary<string, List<string>> vehicleCategories = new Dictionary<string, List<string>>();
         private string iniPath = Path.Combine("scripts", "vehicles.ini");
 
@@ -368,9 +449,59 @@ namespace EssentialMenu
         private static readonly NativeCheckboxItem BodyGodMode = new NativeCheckboxItem("Bodygard Invincible", "Bodyguard GodMode", false);
         private List<Ped> bodyguards = new List<Ped>();
 
+        //BODYGUARD: ARMI, OPZIONI, AUTISTA
+        private static readonly string[] bodyWeaponNames =
+        {
+            "Pistol .50", "Pistol", "Combat Pistol", "Micro SMG", "SMG", "Assault SMG", "Assault Rifle", "Carbine Rifle",
+            "Advanced Rifle", "Special Carbine", "Pump Shotgun", "Assault Shotgun", "Combat MG", "Sniper Rifle",
+            "Heavy Sniper", "RPG", "Minigun", "Stun Gun", "All Weapons"
+        };
+        private static readonly WeaponHash[] bodyWeaponHashes =
+        {
+            WeaponHash.Pistol50, WeaponHash.Pistol, WeaponHash.CombatPistol, WeaponHash.MicroSMG, WeaponHash.SMG,
+            WeaponHash.AssaultSMG, WeaponHash.AssaultRifle, WeaponHash.CarbineRifle, WeaponHash.AdvancedRifle,
+            WeaponHash.SpecialCarbine, WeaponHash.PumpShotgun, WeaponHash.AssaultShotgun, WeaponHash.CombatMG,
+            WeaponHash.SniperRifle, WeaponHash.HeavySniper, WeaponHash.RPG, WeaponHash.Minigun, WeaponHash.StunGun
+        };
+        private static readonly int[] bodyAccuracyValues = { 30, 60, 90, 100 };
+        private static readonly float[] bodyFollowRanges = { 15f, 50f, 100f };
+        private static readonly string[] chauffeurCarNames = { "Baller", "Granger", "Schafter", "Kuruma (armored)", "Oracle", "Stretch", "Washington" };
+        private static readonly string[] chauffeurCarModels = { "baller2", "granger", "schafter2", "kuruma2", "oracle2", "stretch", "washington" };
+        private static readonly float[] chauffeurSpeeds = { 15f, 25f, 40f };
+        private static readonly int[] chauffeurStyles = { 786603, 786603, 1074528293 };
+
+        private static readonly NativeListItem<string> bodyweaponitem = new NativeListItem<string>("Bodyguard Weapon", "Weapon for bodyguards (existing ones too)", bodyWeaponNames);
+        private static readonly NativeListItem<string> bodyamountitem = new NativeListItem<string>("Spawn Amount", "How many bodyguards are created each time", new[] { "1", "2", "3", "4", "5" });
+        private static readonly NativeListItem<string> bodyaccitem = new NativeListItem<string>("Accuracy", "Shooting accuracy", new[] { "Low", "Normal", "High", "Perfect" });
+        private static readonly NativeListItem<string> bodydistitem = new NativeListItem<string>("Follow Distance", "How far they move away from you", new[] { "Close", "Normal", "Far" });
+        private static readonly NativeItem bodyhealitem = new NativeItem("Heal Bodyguards", "Full health and armor (revives the dead)");
+        private static readonly NativeItem bodytpitem = new NativeItem("Teleport Bodyguards To Me", "Brings them all next to you");
+        private static readonly NativeCheckboxItem bodyfleeitem = new NativeCheckboxItem("Never Flee", "Bodyguards always fight and never flee", false);
+        private static readonly NativeCheckboxItem bodyblipitem = new NativeCheckboxItem("Bodyguard Blips", "Shows the bodyguards on the map", false);
+
+        private static readonly NativeMenu BodyChauffeurMenu = new NativeMenu("Chauffeur", "Bodyguard Chauffeur");
+        private static readonly NativeItem chauffeurgoitem = new NativeItem("Drive To Waypoint", "A bodyguard drives, you sit in the passenger seat");
+        private static readonly NativeItem chauffeurstopitem = new NativeItem("Stop Driving", "Stops the chauffeur");
+        private static readonly NativeListItem<string> chauffeurcaritem = new NativeListItem<string>("Car Model", "Car used if you are not already in a vehicle", chauffeurCarNames);
+        private static readonly NativeListItem<string> chauffeurstyleitem = new NativeListItem<string>("Driving Style", "Driving speed and style", new[] { "Careful", "Normal", "Fast" });
+        private static readonly NativeCheckboxItem chauffeurmineitem = new NativeCheckboxItem("Use My Vehicle", "If you are in a vehicle, use that one", true);
+
+        int bodyWeaponIndex = 0;
+        int bodyAmount = 1;
+        int bodyAccuracy = 100;
+        bool bodyNeverFlee;
+        bool bodyBlips;
+        int chauffeurCarIdx = 0;
+        int chauffeurStyleIdx = 1;
+        bool chauffeurActive;
+        Ped chauffeurDriver;
+        Vehicle chauffeurVeh;
+        Vector3 chauffeurDest;
+        int chauffeurLastMoving;
+
         //Anonik Menu
 
-        // Font usato da Show Coordinates (ChaletComprimeCologne = ID 4 del gioco)
+        // Font used by Show Coordinates (ChaletComprimeCologne = game font ID 4)
         private static readonly Font MenuFont = (Font)4;
 
         public Basics()
@@ -391,7 +522,7 @@ namespace EssentialMenu
             // Aggiungi SkinChangerMenu al menu principale
             //DemoMenu.AddSubMenu(SkinChangerMenu);
 
-            // Configura la gerarchia dei menu per lo Skin Changer
+            // Set up the menu hierarchy for the Skin Changer
             SkinChangerMenu.AddSubMenu(ProtagonistMenu);
             SkinChangerMenu.AddSubMenu(GangMenu);
             SkinChangerMenu.AddSubMenu(CivMaleMenu);
@@ -402,9 +533,9 @@ namespace EssentialMenu
             SkinChangerMenu.AddSubMenu(AnimalMenu);
             SkinChangerMenu.AddSubMenu(StoryMenu);
 
-            // Configura lo stile per i nuovi menu
+            // Set up the style for the new menus
 
-            // Popola i menu con i modelli
+            // Fill the menus with the models
             SetupSkinChanger();
 
 
@@ -486,6 +617,7 @@ namespace EssentialMenu
             DemoPool.Add(Northmenu);//NorthMenu
             DemoPool.Add(MoneyMenu);//MoneyDropMenu
             DemoPool.Add(OnlineTeleportMenu);//Online Teleport Menu
+            DemoPool.Add(CasinoMenu);//Casino Menu
             DemoPool.Add(CayoMenu);//Cayo Perico Menu
             DemoPool.Add(OnlineHouseMenu);//House menu
             DemoPool.Add(ModernAppMenu);//Modern House
@@ -519,6 +651,13 @@ namespace EssentialMenu
             TeleportMenu.AddSubMenu(OnlineTeleportMenu);
             OnlineTeleportMenu.AddSubMenu(CayoMenu);
             OnlineTeleportMenu.AddSubMenu(OnlineHouseMenu);
+            OnlineTeleportMenu.AddSubMenu(CasinoMenu);
+            CasinoMenu.Add(teltocasinoentrance);
+            CasinoMenu.Add(teltocasinofloor);
+            CasinoMenu.Add(teltocasinopenthouse);
+            CasinoMenu.Add(teltocasinogarage);
+            CasinoMenu.Add(teltocasinocarpark);
+            CasinoMenu.Add(casinodiag);
             CayoMenu.Add(cayoloadmode);
             CayoMenu.Add(loadteltocayoperico);
             CayoMenu.Add(unloadteltocayoperico);
@@ -581,12 +720,24 @@ namespace EssentialMenu
             SelfMenu.Add(godmode1);
             SelfMenu.Add(maxhealth);
             SelfMenu.Add(neverwanted);
+            SelfMenu.Add(wantedlevelitem);
             SelfMenu.Add(giveallwep);
             SelfMenu.Add(givemaxammo);
             SelfMenu.Add(infiniteammo);
             SelfMenu.Add(superjump);
             SelfMenu.Add(invisible);
             SelfMenu.Add(fastrun);
+            SelfMenu.AddSubMenu(PlayerExtrasMenu);
+            DemoPool.Add(PlayerExtrasMenu);
+            PlayerExtrasMenu.Add(savedslotitem);
+            PlayerExtrasMenu.Add(savepositionitem);
+            PlayerExtrasMenu.Add(loadpositionitem);
+            PlayerExtrasMenu.Add(listpositionsitem);
+            PlayerExtrasMenu.Add(gamespeedslider);
+            PlayerExtrasMenu.Add(infstaminaitem);
+            PlayerExtrasMenu.Add(infbreathitem);
+            PlayerExtrasMenu.Add(ragdollnowitem);
+            PlayerExtrasMenu.Add(noragdollitem);
             SetupPedChanger();
             SelfMenu.AddSubMenu(MoneyMenu);
             MoneyMenu.Add(money40k);
@@ -597,6 +748,19 @@ namespace EssentialMenu
             MoneyMenu.Add(money100milion);
 
             //Weapon Menu
+            WeaponMenu.Add(removeallweapons);
+            WeaponMenu.Add(removecurrentweapon);
+            SetupWeaponSpawner();
+            WeaponMenu.AddSubMenu(WeaponCustomMenu);
+            DemoPool.Add(WeaponCustomMenu);
+            DemoPool.Add(WeaponComponentBrowserMenu);
+            WeaponCustomMenu.Add(wtintitem);
+            WeaponCustomMenu.Add(wmk2tintslider);
+            WeaponCustomMenu.Add(wtintcycleitem);
+            WeaponCustomMenu.Add(wcompbrowseritem);
+            WeaponCustomMenu.Add(wcompalladditem);
+            WeaponCustomMenu.Add(wcompremoveallitem);
+            WeaponMenu.Add(hashgunop);
             WeaponMenu.Add(expoweap);
             WeaponMenu.Add(expomelee);
             WeaponMenu.Add(moneygunop);
@@ -622,6 +786,25 @@ namespace EssentialMenu
             upgradeMenu.Add(turboItem);
             VehicleMenu.AddSubMenu(upgradeMenu);
             DemoPool.Add(upgradeMenu);
+            VehicleMenu.AddSubMenu(VehicleExtrasMenu);
+            DemoPool.Add(VehicleExtrasMenu);
+            VehicleExtrasMenu.Add(nitroitem);
+            VehicleExtrasMenu.Add(nitropoweritem);
+            VehicleExtrasMenu.Add(driftitem);
+            VehicleExtrasMenu.Add(glideitem);
+            VehicleExtrasMenu.Add(hoveritem);
+            VehicleExtrasMenu.Add(vehjumpitem);
+            VehicleExtrasMenu.Add(dooritem);
+            VehicleExtrasMenu.Add(dooropenitem);
+            VehicleExtrasMenu.Add(doorcloseitem);
+            VehicleExtrasMenu.Add(doorremoveitem);
+            VehicleExtrasMenu.Add(dooropenallitem);
+            VehicleExtrasMenu.Add(doorcloseallitem);
+            VehicleExtrasMenu.Add(neonitem);
+            VehicleExtrasMenu.Add(neoncoloritem);
+            VehicleExtrasMenu.Add(vehslotitem);
+            VehicleExtrasMenu.Add(vehsaveitem);
+            VehicleExtrasMenu.Add(vehloaditem);
 
             SetupVehicleSpawner();
             //VehicleMenu.Add(itemSpawnVehicle);
@@ -694,6 +877,21 @@ namespace EssentialMenu
             //Bodyguard Menu
             BodyGuardMenu.Add(BodyGodMode);
             BodyGuardMenu.Add(RemoveBody);
+            BodyGuardMenu.Add(bodyweaponitem);
+            BodyGuardMenu.Add(bodyamountitem);
+            BodyGuardMenu.Add(bodyaccitem);
+            BodyGuardMenu.Add(bodydistitem);
+            BodyGuardMenu.Add(bodyhealitem);
+            BodyGuardMenu.Add(bodytpitem);
+            BodyGuardMenu.Add(bodyfleeitem);
+            BodyGuardMenu.Add(bodyblipitem);
+            BodyGuardMenu.AddSubMenu(BodyChauffeurMenu);
+            DemoPool.Add(BodyChauffeurMenu);
+            BodyChauffeurMenu.Add(chauffeurgoitem);
+            BodyChauffeurMenu.Add(chauffeurstopitem);
+            BodyChauffeurMenu.Add(chauffeurcaritem);
+            BodyChauffeurMenu.Add(chauffeurstyleitem);
+            BodyChauffeurMenu.Add(chauffeurmineitem);
 
             //Anonik Menu
             AnonikMenu.Add(noclipmode);
@@ -734,6 +932,27 @@ namespace EssentialMenu
             godmode1.Activated += SetGodMode;
             maxhealth.Activated += SetMaxHealth;
             neverwanted.Activated += SetNeverWanted;
+            wantedlevelitem.ItemChanged += (s, e) => SetWantedLevel(e.Index);
+            savedslotitem.ItemChanged += (s, e) => savedSlot = e.Index;
+            savepositionitem.Activated += SetSavePosition;
+            loadpositionitem.Activated += SetLoadPosition;
+            listpositionsitem.Activated += SetListPositions;
+            gamespeedslider.ValueChanged += SetGameSpeed;
+            infstaminaitem.Activated += SetInfStamina;
+            infbreathitem.Activated += SetInfBreath;
+            ragdollnowitem.Activated += SetRagdollNow;
+            noragdollitem.Activated += SetNoRagdoll;
+            removeallweapons.Activated += SetRemoveAllWeapons;
+            removecurrentweapon.Activated += SetRemoveCurrentWeapon;
+            wsammoitem.SelectedIndex = 1;
+            wsammoitem.ItemChanged += (s, e) => wsAmmoIdx = e.Index;
+            wtintitem.ItemChanged += (s, e) => SetWeaponTint(e.Index);
+            wmk2tintslider.ValueChanged += (s, e) => SetWeaponTint(wmk2tintslider.Value);
+            wtintcycleitem.Activated += (s, e) => tintCycleOn = wtintcycleitem.Checked;
+            wcompbrowseritem.Activated += OpenComponentBrowser;
+            wcompalladditem.Activated += (s, e) => SetAllComponents(true);
+            wcompremoveallitem.Activated += (s, e) => SetAllComponents(false);
+            hashgunop.Activated += (s, e) => hashGunOn = hashgunop.Checked;
             giveallwep.Activated += SetGiveAllWep;
             givemaxammo.Activated += SetMaxAmmo;
             infiniteammo.Activated += SetInfAmmo;
@@ -756,6 +975,24 @@ namespace EssentialMenu
             cardrivein.Activated += SetCarDriveIn;
             vehiclespawn.Activated += SetCarSpawn;
             vehiclepimp.Activated += SetCarMax;
+            nitroitem.Activated += (s, e) => nitroOn = nitroitem.Checked;
+            nitropoweritem.SelectedIndex = 1;
+            nitropoweritem.ItemChanged += (s, e) => nitroIdx = e.Index;
+            driftitem.Activated += SetDriftMode;
+            glideitem.Activated += (s, e) => glideOn = glideitem.Checked;
+            hoveritem.Activated += SetHoverMode;
+            vehjumpitem.Activated += SetVehicleJump;
+            dooritem.ItemChanged += (s, e) => doorIdx = e.Index;
+            dooropenitem.Activated += (s, e) => SetDoor(doorIdx, 0);
+            doorcloseitem.Activated += (s, e) => SetDoor(doorIdx, 1);
+            doorremoveitem.Activated += (s, e) => SetDoor(doorIdx, 2);
+            dooropenallitem.Activated += (s, e) => { for (int d = 0; d < 6; d++) SetDoor(d, 0, true); };
+            doorcloseallitem.Activated += (s, e) => { for (int d = 0; d < 6; d++) SetDoor(d, 1, true); };
+            neonitem.Activated += SetNeon;
+            neoncoloritem.ItemChanged += (s, e) => { neonColorIdx = e.Index; ApplyNeon(); };
+            vehslotitem.ItemChanged += (s, e) => vehSlot = e.Index;
+            vehsaveitem.Activated += SetSaveVehicle;
+            vehloaditem.Activated += SetLoadVehicle;
             colorMenuItem.Activated += SetVehicleColor;
 
             fullUpgradeItem.Activated += (s, e) =>
@@ -763,15 +1000,15 @@ namespace EssentialMenu
                 ApplyVehicleMod(11, 3); // Motore
                 ApplyVehicleMod(12, 3); // Freni
                 ApplyVehicleMod(13, 3); // Trasmissione
-                ApplyVehicleMod(15, 4); // Sospensioni
+                ApplyVehicleMod(15, 4); // Suspension
                 SetTurbo(true);
-                Notification.Show("~g~Upgrade completo installato!");
+                Notification.Show("~g~Full upgrade installed!");
             };
 
             engineItem.ItemChanged += (s, e) => ApplyVehicleMod(11, e.Index); // Motore
             brakesItem.ItemChanged += (s, e) => ApplyVehicleMod(12, e.Index); // Freni
             transmissionItem.ItemChanged += (s, e) => ApplyVehicleMod(13, e.Index); // Cambio
-            suspensionItem.ItemChanged += (s, e) => ApplyVehicleMod(15, e.Index); // Sospensioni
+            suspensionItem.ItemChanged += (s, e) => ApplyVehicleMod(15, e.Index); // Suspension
             turboItem.CheckboxChanged += (s, e) => SetTurbo(turboItem.Checked);
 
 
@@ -860,6 +1097,12 @@ namespace EssentialMenu
             teltodocforgeryofficelab.Activated += SetForgeryOffice;
             teltoclub1.Activated += SetClubhouse1;
             teltoclub2.Activated += SetClubhouse2;
+            teltocasinoentrance.Activated += SetCasinoEntrance;
+            teltocasinofloor.Activated += SetCasinoFloor;
+            teltocasinopenthouse.Activated += SetCasinoPenthouse;
+            teltocasinogarage.Activated += SetCasinoGarage;
+            teltocasinocarpark.Activated += SetCasinoCarPark;
+            casinodiag.Activated += SetCasinoDiag;
 
             //Item Cayo Perico Menu
             cayoloadmode.Activated += SetCayoLoad;
@@ -894,6 +1137,21 @@ namespace EssentialMenu
             //Item Bodyguard Menu
             BodyGodMode.Activated += SetBodyGodMode;
             RemoveBody.Activated += SetRemoveBody;
+            bodyaccitem.SelectedIndex = 3;      // Perfect
+            bodydistitem.SelectedIndex = 1;     // Normal
+            chauffeurstyleitem.SelectedIndex = 1;
+            bodyweaponitem.ItemChanged += (s, e) => SetBodyWeapon(e.Index);
+            bodyamountitem.ItemChanged += (s, e) => bodyAmount = e.Index + 1;
+            bodyaccitem.ItemChanged += (s, e) => SetBodyAccuracy(e.Index);
+            bodydistitem.ItemChanged += (s, e) => SetBodyFollowRange(e.Index);
+            bodyhealitem.Activated += SetBodyHeal;
+            bodytpitem.Activated += SetBodyTeleport;
+            bodyfleeitem.Activated += SetBodyNeverFlee;
+            bodyblipitem.Activated += SetBodyBlips;
+            chauffeurgoitem.Activated += SetChauffeurGo;
+            chauffeurstopitem.Activated += SetChauffeurStop;
+            chauffeurcaritem.ItemChanged += (s, e) => chauffeurCarIdx = e.Index;
+            chauffeurstyleitem.ItemChanged += (s, e) => chauffeurStyleIdx = e.Index;
 
             //Item Anonik Menu
             showcoords.Activated += SetShowCoords;
@@ -904,7 +1162,7 @@ namespace EssentialMenu
 
             Tick += Basics_Tick;
             KeyDown += Basics_KeyDown; //line added to replace code in Basics_Tick
-            KeyDown += (s, ev) => noclipKeys.Add(ev.KeyCode);    // tasti per il No Clip
+            KeyDown += (s, ev) => noclipKeys.Add(ev.KeyCode);    // keys for No Clip
             KeyUp += (s, ev) => noclipKeys.Remove(ev.KeyCode);
 
 
@@ -920,7 +1178,7 @@ namespace EssentialMenu
         {
             if (!File.Exists(iniPath))
             {
-                Notification.Show("~r~vehicles.ini non trovato!");
+                Notification.Show("~r~vehicles.ini not found!");
                 return;
             }
 
@@ -969,7 +1227,7 @@ namespace EssentialMenu
 
             if (!model.IsInCdImage || !model.IsValid)
             {
-                Notification.Show($"~r~Modello non valido: ~w~{modelName}");
+                Notification.Show($"~r~Invalid model: ~w~{modelName}");
                 return;
             }
 
@@ -1009,7 +1267,7 @@ namespace EssentialMenu
         {
             if (!File.Exists(iniPPath))
             {
-                Notification.Show("~r~pedlist.ini non trovato!");
+                Notification.Show("~r~pedlist.ini not found!");
                 return;
             }
 
@@ -1079,7 +1337,7 @@ namespace EssentialMenu
 
              if (!model.IsInCdImage || !model.IsValid)
              {
-                 Notification.Show($"~r~Modello non valido: ~w~{modelName}");
+                 Notification.Show($"~r~Invalid model: ~w~{modelName}");
                  return;
              }
 
@@ -1088,7 +1346,7 @@ namespace EssentialMenu
 
              if (ped.IsDead)
              {
-                 Game.Player.ChangeModel(new Model("player_zero")); // Imposta il modello di default (o uno di base)
+                 Game.Player.ChangeModel(new Model("player_zero")); // Set the default model (or a basic one)
                  return;
              }
 
@@ -1115,23 +1373,23 @@ namespace EssentialMenu
 
             if (!model.IsInCdImage || !model.IsValid)
             {
-                Notification.Show($"~r~Modello non valido: ~w~{modelName}");
+                Notification.Show($"~r~Invalid model: ~w~{modelName}");
                 return;
             }
 
             model.Request(500);
             while (!model.IsLoaded) Script.Wait(100);
 
-            // Se il pedone è morto, eseguiamo il respawn e poi cambiamo il modello
+            // If the ped is dead, respawn it and then change the model
             if (ped.IsDead)
             {
-                // Forza il respawn del pedone
+                // Force the ped to respawn
                 RespawnPed();
 
-                // Attendi un po' di tempo per permettere al respawn di completarsi
-                Script.Wait(3000); // Prova con 3 secondi, ma regola questo valore se necessario
+                // Wait a bit to let the respawn complete
+                Script.Wait(3000); // Try 3 seconds, adjust this value if needed
 
-                // Cambia il modello solo dopo che il pedone è stato "resuscitato"
+                // Change the model only after the ped has been "resurrected"
                 Game.Player.ChangeModel(model);
                 Function.Call(Hash.SET_PED_DEFAULT_COMPONENT_VARIATION, Game.Player.Character);
                 Notification.Show($"~g~Changed: ~w~{modelName.ToUpper()}");
@@ -1140,7 +1398,7 @@ namespace EssentialMenu
             }
             else
             {
-                // Cambia il modello solo se il pedone non è morto
+                // Change the model only if the ped is not dead
                 if (ped.Model.Hash != model.Hash)
                 {
                     Game.Player.ChangeModel(model);
@@ -1154,19 +1412,19 @@ namespace EssentialMenu
             Script.Wait(500);
         }
 
-        // Funzione per forzare il respawn del pedone
+        // Function to force the ped to respawn
         private void RespawnPed()
         {
             Ped ped = Game.Player.Character;
 
-            // Rimuovi il pedone attuale (questo "resuscita" il pedone)
-            ped.Delete(); // Elimina il pedone morto
+            // Remove the current ped (this "resurrects" the ped)
+            ped.Delete(); // Delete the dead ped
 
-            // Attendi qualche frame per fare in modo che il pedone venga effettivamente rimosso
+            // Wait a few frames so the ped is actually removed
             Script.Wait(500);
 
-            // Ora respawna il pedone con il modello di base (modello di default)
-            Game.Player.ChangeModel(new Model("player_zero")); // Cambia con il modello che preferisci
+            // Now respawn the ped with the base (default) model
+            Game.Player.ChangeModel(new Model("player_zero")); // Change to the model you prefer
             Notification.Show("Respawn completato!");
         }
 
@@ -1179,7 +1437,7 @@ namespace EssentialMenu
         {
             if (!File.Exists(iniPPPath))
             {
-                Notification.Show("~r~bguard.ini non trovato!");
+                Notification.Show("~r~bguard.ini not found!");
                 return;
             }
 
@@ -1229,7 +1487,11 @@ namespace EssentialMenu
                     }
 
                     var item = new NativeItem(visibleName);
-                    item.Activated += (s, a) => SpawnBody(modelName);
+                    item.Activated += (s, a) =>
+                    {
+                        for (int n = 0; n < bodyAmount; n++)
+                            SpawnBody(modelName);
+                    };
                     cat2Menu.Add(item);
                 }
 
@@ -1250,29 +1512,30 @@ namespace EssentialMenu
 
             if (!model.IsInCdImage || !model.IsValid)
             {
-                Notification.Show($"~r~Modello non valido: ~w~{modelName}");
+                Notification.Show($"~r~Invalid model: ~w~{modelName}");
                 return;
             }
 
             model.Request(500);
             while (!model.IsLoaded) Script.Wait(100);
 
-            // Se il pedone è morto, eseguiamo il respawn e poi cambiamo il modello
+            // If the ped is dead, respawn it and then change the model
 
-                // Cambia il modello solo se il pedone non è morto
+                // Change the model only if the ped is not dead
                 if (ped.Model.Hash != model.Hash)
                 {
                 /*Game.Player.ChangeModel(model);
-                // Imposta il pedone come bodyguard
+                // Set the ped as a bodyguard
                 Function.Call(Hash.SET_PED_DEFAULT_COMPONENT_VARIATION, Game.Player.Character);*/
 
                 Ped player = Game.Player.Character;
 
-                Vector3 loc = player.Position + (player.ForwardVector * 5);
+                // bodyguards created together are lined up sideways so they don't overlap
+                Vector3 loc = player.Position + (player.ForwardVector * 5) + (player.RightVector * ((bodyguards.Count % 5 - 2) * 1.3f));
 
                 Ped bodyguard = World.CreatePed(model, loc);
 
-                bodyguard.Weapons.Give(WeaponHash.Pistol50, 9999, true, true);
+                GiveBodyguardWeapon(bodyguard);
 
                 bodyguard.Armor = 100;
 
@@ -1282,10 +1545,11 @@ namespace EssentialMenu
 
                 Function.Call(Hash.SET_PED_COMBAT_ABILITY, bodyguard, 100);
 
-                Function.Call(Hash.SET_PED_ACCURACY, bodyguard, 100);
+                Function.Call(Hash.SET_PED_ACCURACY, bodyguard, bodyAccuracy);
 
                 bodyguard.Task.FightAgainstHatedTargets(50000);
                 bodyguards.Add(bodyguard);
+                ApplyBodyguardOptions(bodyguard);
 
                 Notification.Show($"~g~Spawned: ~w~{modelName.ToUpper()}");
 
@@ -1294,6 +1558,377 @@ namespace EssentialMenu
 
 
             Script.Wait(500);
+        }
+
+        //==================== BODYGUARD: ARMI, OPZIONI, AUTISTA ====================
+        // Gives the bodyguards the weapon chosen in the menu ("All Weapons" = every weapon)
+        private void GiveBodyguardWeapon(Ped bg)
+        {
+            bg.Weapons.RemoveAll();
+
+            if (bodyWeaponIndex >= bodyWeaponHashes.Length)
+            {
+                foreach (WeaponHash w in Enum.GetValues(typeof(WeaponHash)))
+                    bg.Weapons.Give(w, 9999, false, true);
+                bg.Weapons.Select(WeaponHash.AssaultRifle, true);
+            }
+            else
+            {
+                bg.Weapons.Give(bodyWeaponHashes[bodyWeaponIndex], 9999, true, true);
+            }
+        }
+
+        private void SetBodyWeapon(int index)
+        {
+            bodyWeaponIndex = index;
+            foreach (Ped bg in bodyguards)
+            {
+                if (bg != null && bg.Exists() && bg.IsAlive)
+                    GiveBodyguardWeapon(bg);
+            }
+            Notification.Show("~g~Bodyguard weapon: ~w~" + bodyWeaponNames[index]);
+        }
+
+        private void SetBodyAccuracy(int index)
+        {
+            bodyAccuracy = bodyAccuracyValues[index];
+            foreach (Ped bg in bodyguards)
+            {
+                if (bg != null && bg.Exists())
+                    Function.Call(Hash.SET_PED_ACCURACY, bg, bodyAccuracy);
+            }
+        }
+
+        private void SetBodyFollowRange(int index)
+        {
+            PedGroup group = Game.Player.Character.PedGroup;
+            if (group != null)
+                Function.Call(Hash.SET_GROUP_SEPARATION_RANGE, group, bodyFollowRanges[index]);
+        }
+
+        private void SetBodyHeal(object sender, EventArgs e)
+        {
+            int n = 0;
+            foreach (Ped bg in bodyguards)
+            {
+                if (bg == null || !bg.Exists())
+                    continue;
+                if (bg.IsDead)
+                    bg.Resurrect();
+                bg.Health = bg.MaxHealth;
+                bg.Armor = 100;
+                n++;
+            }
+            Notification.Show(n > 0 ? "~g~Bodyguards healed: ~w~" + n : "~r~No bodyguards");
+        }
+
+        private void SetBodyTeleport(object sender, EventArgs e)
+        {
+            Ped player = Game.Player.Character;
+            int i = 0;
+            foreach (Ped bg in bodyguards)
+            {
+                if (bg == null || !bg.Exists() || bg.IsInVehicle())
+                    continue;
+
+                Vector3 pos = player.Position + (player.ForwardVector * 2f) + (player.RightVector * ((i % 5 - 2) * 1.2f));
+                Function.Call(Hash.SET_ENTITY_COORDS_NO_OFFSET, bg.Handle, pos.X, pos.Y, pos.Z, false, false, false);
+                i++;
+            }
+            Notification.Show(i > 0 ? "~g~Bodyguards teleported to you: ~w~" + i : "~r~No bodyguards");
+        }
+
+        private void ApplyNeverFlee(Ped bg, bool on)
+        {
+            Function.Call(Hash.SET_PED_COMBAT_ATTRIBUTES, bg, 46, on);        // always fights
+            Function.Call(Hash.SET_PED_FLEE_ATTRIBUTES, bg, on ? 0 : 512, false); // no fleeing
+        }
+
+        private void SetBodyNeverFlee(object sender, EventArgs e)
+        {
+            bodyNeverFlee = bodyfleeitem.Checked;
+            foreach (Ped bg in bodyguards)
+            {
+                if (bg != null && bg.Exists())
+                    ApplyNeverFlee(bg, bodyNeverFlee);
+            }
+        }
+
+        private void ApplyBodyBlip(Ped bg, bool on)
+        {
+            if (on)
+            {
+                if (bg.AttachedBlip == null)
+                {
+                    Blip blip = bg.AddBlip();
+                    blip.Color = BlipColor.Blue;
+                    blip.Name = "Bodyguard";
+                }
+            }
+            else
+            {
+                Blip blip = bg.AttachedBlip;
+                if (blip != null)
+                    blip.Delete();
+            }
+        }
+
+        private void SetBodyBlips(object sender, EventArgs e)
+        {
+            bodyBlips = bodyblipitem.Checked;
+            foreach (Ped bg in bodyguards)
+            {
+                if (bg != null && bg.Exists())
+                    ApplyBodyBlip(bg, bodyBlips);
+            }
+        }
+
+        // Makes the bodyguard an ally of the player: same relationship group, no friendly fire
+        private void MakeBodyguardLoyal(Ped bg)
+        {
+            Ped player = Game.Player.Character;
+            int grp = Function.Call<int>(Hash.GET_PED_RELATIONSHIP_GROUP_HASH, player);
+            Function.Call(Hash.SET_PED_RELATIONSHIP_GROUP_HASH, bg, grp);
+            Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, bg, false, false);
+            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED_BY_PLAYER, bg, Game.Player, false);
+            Function.Call(Hash.SET_PED_COMBAT_ATTRIBUTES, bg, 5, true);   // fights even armed enemies
+            Function.Call(Hash.SET_PED_COMBAT_ATTRIBUTES, bg, 0, true);   // can use cover
+            Function.Call(Hash.SET_PED_COMBAT_ATTRIBUTES, bg, 46, true);  // always fights
+            Function.Call(Hash.SET_PED_COMBAT_ATTRIBUTES, bg, 17, false); // never flees
+            Function.Call(Hash.SET_PED_COMBAT_ATTRIBUTES, bg, 58, true);  // does not disable combat
+            Function.Call(Hash.SET_PED_FLEE_ATTRIBUTES, bg, 0, false);    // no fleeing
+            Function.Call(Hash.SET_PED_COMBAT_MOVEMENT, bg, 2);           // offensive
+            Function.Call(Hash.SET_PED_COMBAT_RANGE, bg, 2);              // long range
+        }
+
+        private int bodyLoyaltyNext;
+
+        // Every 1.5 s checks that no bodyguard has turned against the player
+        private void DoBodyguardLoyaltyTick()
+        {
+            if (bodyguards.Count == 0 || Game.GameTime < bodyLoyaltyNext)
+                return;
+            bodyLoyaltyNext = Game.GameTime + 1500;
+
+            Ped player = Game.Player.Character;
+            int pg = Function.Call<int>(Hash.GET_PED_RELATIONSHIP_GROUP_HASH, player);
+
+            foreach (Ped bg in bodyguards)
+            {
+                if (bg == null || !bg.Exists() || bg.IsDead)
+                    continue;
+
+                if (Function.Call<int>(Hash.GET_PED_RELATIONSHIP_GROUP_HASH, bg) != pg)
+                    MakeBodyguardLoyal(bg);
+
+                if (Function.Call<bool>(Hash.IS_PED_IN_COMBAT, bg, player))
+                {
+                    bg.Task.ClearAll();
+                    MakeBodyguardLoyal(bg);
+                    if (bg != chauffeurDriver || !chauffeurActive)
+                    {
+                        PedGroup g = player.PedGroup;
+                        if (g != null)
+                            Function.Call(Hash.SET_PED_AS_GROUP_MEMBER, bg, g);
+                        bg.Task.FightAgainstHatedTargets(50000);
+                    }
+                }
+            }
+        }
+
+        // Current options applied to a newly created bodyguard
+        private void ApplyBodyguardOptions(Ped bg)
+        {
+            MakeBodyguardLoyal(bg);
+            if (bodyNeverFlee)
+                ApplyNeverFlee(bg, true);
+            if (bodyBlips)
+                ApplyBodyBlip(bg, true);
+            if (BodyGodMode.Checked)
+                bg.IsInvincible = true;
+        }
+
+        //---------- Chauffeur: a bodyguard drives to the waypoint, you are the passenger ----------
+        private Vehicle SpawnChauffeurCar(Ped player)
+        {
+            Model model = new Model(chauffeurCarModels[chauffeurCarIdx]);
+            if (!model.IsInCdImage || !model.IsValid)
+            {
+                Notification.Show("~r~Invalid car model");
+                return null;
+            }
+
+            model.Request(1000);
+            int waited = 0;
+            while (!model.IsLoaded && waited < 3000)
+            {
+                Script.Wait(50);
+                waited += 50;
+            }
+
+            Vehicle car = World.CreateVehicle(model, player.Position + (player.ForwardVector * 6f), player.Heading);
+            model.MarkAsNoLongerNeeded();
+
+            if (car == null)
+            {
+                Notification.Show("~r~Could not create the car");
+                return null;
+            }
+
+            car.PlaceOnGround();
+            return car;
+        }
+
+        private void StartChauffeurTask()
+        {
+            Function.Call(Hash.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS, chauffeurDriver, true);
+            Function.Call(Hash.SET_DRIVER_ABILITY, chauffeurDriver, 1.0f);
+            Function.Call(Hash.SET_DRIVER_AGGRESSIVENESS, chauffeurDriver, 0.2f);
+            Function.Call(Hash.TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE, chauffeurDriver, chauffeurVeh,
+                chauffeurDest.X, chauffeurDest.Y, chauffeurDest.Z,
+                chauffeurSpeeds[chauffeurStyleIdx], chauffeurStyles[chauffeurStyleIdx], 15f);
+            Function.Call(Hash.SET_PED_KEEP_TASK, chauffeurDriver, true);
+            chauffeurLastMoving = Game.GameTime;
+        }
+
+        private void SetChauffeurGo(object sender, EventArgs e)
+        {
+            if (!Function.Call<bool>(Hash.IS_WAYPOINT_ACTIVE))
+            {
+                Notification.Show("~r~Set a waypoint on the map first");
+                return;
+            }
+
+            Ped driver = null;
+            foreach (Ped bg in bodyguards)
+            {
+                if (bg != null && bg.Exists() && bg.IsAlive)
+                {
+                    driver = bg;
+                    break;
+                }
+            }
+
+            if (driver == null)
+            {
+                Notification.Show("~r~No bodyguards: spawn one from the menu");
+                return;
+            }
+
+            Ped player = Game.Player.Character;
+
+            Vehicle car = null;
+            if (chauffeurmineitem.Checked && player.IsInVehicle())
+                car = player.CurrentVehicle;
+            if (car == null)
+                car = SpawnChauffeurCar(player);
+            if (car == null)
+                return;
+
+            if (car.PassengerCapacity < 1)
+            {
+                Notification.Show("~r~This vehicle has no passenger seat");
+                return;
+            }
+
+            // first you move to the passenger seat, then the bodyguard takes the wheel
+            player.SetIntoVehicle(car, VehicleSeat.Passenger);
+            Function.Call(Hash.REMOVE_PED_FROM_GROUP, driver);
+            driver.SetIntoVehicle(car, VehicleSeat.Driver);
+
+            // the other bodyguards get in the back, if there is room
+            foreach (Ped bg in bodyguards)
+            {
+                if (bg == null || bg == driver || !bg.Exists() || bg.IsDead)
+                    continue;
+                if (car.IsSeatFree(VehicleSeat.Any))
+                    bg.SetIntoVehicle(car, VehicleSeat.Any);
+            }
+
+            // destination = waypoint, using the ground height if available
+            int blip = Function.Call<int>(Hash.GET_FIRST_BLIP_INFO_ID, 8);
+            Vector3 dest = Function.Call<Vector3>(Hash.GET_BLIP_INFO_ID_COORD, blip);
+            OutputArgument groundZ = new OutputArgument();
+            float z = Function.Call<bool>(Hash.GET_GROUND_Z_FOR_3D_COORD, dest.X, dest.Y, 1000f, groundZ, false, false)
+                ? groundZ.GetResult<float>() : 30f;
+
+            chauffeurDriver = driver;
+            chauffeurVeh = car;
+            chauffeurDest = new Vector3(dest.X, dest.Y, z);
+            chauffeurActive = true;
+            StartChauffeurTask();
+
+            Notification.Show("~g~Heading to the waypoint");
+        }
+
+        private void EndChauffeur(string message, bool arrived)
+        {
+            chauffeurActive = false;
+
+            if (chauffeurVeh != null && chauffeurVeh.Exists())
+                Function.Call(Hash.BRING_VEHICLE_TO_HALT, chauffeurVeh, 3f, 2500, false);
+
+            if (chauffeurDriver != null && chauffeurDriver.Exists())
+            {
+                chauffeurDriver.Task.ClearAll();
+                Function.Call(Hash.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS, chauffeurDriver, false);
+
+                // the chauffeur goes back to following you like the other bodyguards
+                PedGroup group = Game.Player.Character.PedGroup;
+                if (group != null && chauffeurDriver.IsAlive)
+                    Function.Call(Hash.SET_PED_AS_GROUP_MEMBER, chauffeurDriver, group);
+            }
+
+            // on arrival the bodyguards get out of the car
+            if (arrived && chauffeurVeh != null && chauffeurVeh.Exists())
+            {
+                foreach (Ped bg in bodyguards)
+                {
+                    if (bg != null && bg.Exists() && bg.IsInVehicle(chauffeurVeh))
+                        Function.Call(Hash.TASK_LEAVE_VEHICLE, bg, chauffeurVeh, 0);
+                }
+            }
+
+            Notification.Show(message);
+        }
+
+        private void SetChauffeurStop(object sender, EventArgs e)
+        {
+            if (!chauffeurActive)
+            {
+                Notification.Show("~r~No trip in progress");
+                return;
+            }
+            EndChauffeur("~y~Chauffeur stopped", false);
+        }
+
+        private void DoChauffeurTick()
+        {
+            if (!chauffeurActive)
+                return;
+
+            if (chauffeurDriver == null || !chauffeurDriver.Exists() || chauffeurDriver.IsDead
+                || chauffeurVeh == null || !chauffeurVeh.Exists() || chauffeurVeh.IsDead)
+            {
+                EndChauffeur("~r~Chauffeur or vehicle no longer available", false);
+                return;
+            }
+
+            float dx = chauffeurVeh.Position.X - chauffeurDest.X;
+            float dy = chauffeurVeh.Position.Y - chauffeurDest.Y;
+            float dist = (float)Math.Sqrt(dx * dx + dy * dy);
+
+            if (dist < 25f)
+            {
+                EndChauffeur("~g~Arrived at destination", true);
+                return;
+            }
+
+            // if the car stays still for more than 8 seconds (traffic, obstacles) re-issue the order
+            if (chauffeurVeh.Speed > 1.5f)
+                chauffeurLastMoving = Game.GameTime;
+            else if (Game.GameTime - chauffeurLastMoving > 8000)
+                StartChauffeurTask();
         }
 
         private void SetRemoveBody(object sender, EventArgs e)
@@ -1312,11 +1947,11 @@ namespace EssentialMenu
                 }
                 bodyguards.Clear();
 
-                Notification.Show("~g~Bodyguard rimosso!");
+                Notification.Show("~g~Bodyguard removed!");
             }
             else
             {
-                Notification.Show("~r~Nessun Bodyguard da rimuovere!");
+                Notification.Show("~r~No bodyguards to remove!");
             }
         }
 
@@ -1331,11 +1966,11 @@ namespace EssentialMenu
                 if (bodyguard.Exists())
                 {
                     bodyguard.IsInvincible = enable;
-                    Function.Call(Hash.SET_ENTITY_PROOFS, bodyguard, enable, enable, enable, enable, enable, enable, enable, enable); // opzionale per protezione completa
+                    Function.Call(Hash.SET_ENTITY_PROOFS, bodyguard, enable, enable, enable, enable, enable, enable, enable, enable); // optional, for full protection
                 }
             }
 
-            Notification.Show($"~g~God Mode Bodyguard: {(enable ? "ON" : "OFF")}");
+            Notification.Show($"~g~Bodyguard God Mode: {(enable ? "ON" : "OFF")}");
         }
 
 
@@ -1419,7 +2054,7 @@ namespace EssentialMenu
             AddModelToMenu(AnimalMenu, "Dog (Retriever)", PedHash.Retriever);
             AddModelToMenu(AnimalMenu, "Dog (Husky)", PedHash.Husky);
 
-            // Personaggi della storia
+            // Story characters
             //AddModelToMenu(StoryMenu, "Devon Weston", PedHash.Devon);
             AddModelToMenu(StoryMenu, "Solomon Richards", PedHash.Solomon);
             AddModelToMenu(StoryMenu, "Tao Cheng", PedHash.TaoCheng);
@@ -1451,8 +2086,8 @@ namespace EssentialMenu
                 try
                 {
 
-                    // Aggiungi effetto visivo prima del cambio modello
-                    // Esempio di effetto particellare
+                    // Add a visual effect before the model change
+                    // Particle effect example
 
                     // Effetto visivo pre-cambio
                     /*
@@ -1473,7 +2108,7 @@ namespace EssentialMenu
 
                     Notification.Show($"~g~Changed to: ~w~{name}");
 
-                    // Pulizia dopo 1 secondo
+                    // Cleanup after 1 second
                     Script.Wait(1000);
                     Function.Call((Hash)0x068E835A1D0DC0E3, "CamPushInNeutral"); // _STOP_SCREEN_EFFECT
                     Function.Call((Hash)0x068E835A1D0DC0E3, "DeathFailOut"); // _STOP_SCREEN_EFFECT
@@ -1490,7 +2125,7 @@ namespace EssentialMenu
 
         private void FunAnonik(object sender, EventArgs e)
         {
-            Notification.Show("Uffa funziono");
+            Notification.Show("It works!");
             Game.PlayerBlip.Sprite = BlipSprite.PoliceStation;
             Game.PlayerBlip.Color = BlipColor.Green;    
             Game.Player.ChangeModel(new Model("s_m_y_swat_01"));
@@ -1539,11 +2174,11 @@ namespace EssentialMenu
         {
             if (moongravmode.Checked == true)
             {
-                Function.Call(Hash.SET_GRAVITY_LEVEL, 2); // Imposta la gravità a livello 1 (gravità ridotta)
+                Function.Call(Hash.SET_GRAVITY_LEVEL, 2); // Set gravity to level 1 (reduced gravity)
             }
             if (moongravmode.Checked == false)
             {
-                Function.Call(Hash.SET_GRAVITY_LEVEL, 0); // Imposta la gravità a livello 0 (gravità originale)
+                Function.Call(Hash.SET_GRAVITY_LEVEL, 0); // Set gravity to level 0 (original gravity)
                 
             }
         }
@@ -1596,7 +2231,7 @@ namespace EssentialMenu
             if (myPed == null || !myPed.Exists())
                 return;
 
-            // Spawn di un nuovo meteorite
+            // Spawn a new meteor
             if (Game.GameTime > meteorTimer1)
             {
                 float radius = (float)(22.0 + meteorRnd.NextDouble() * (78.0 - 22.0));
@@ -1638,7 +2273,7 @@ namespace EssentialMenu
                 meteorTimer1 = Game.GameTime + 840;
             }
 
-            // Logica per ogni meteorite
+            // Logic for each meteor
             foreach (Prop r in rockArray)
             {
                 if (!r.Exists())
@@ -1727,33 +2362,33 @@ namespace EssentialMenu
                 Ped player = Game.Player.Character;
 
                 //foreach (Ped ped in World.GetAllPeds())
-                foreach (Ped ped in World.GetNearbyPeds(player, 500f)) // solo pedoni vicini
+                foreach (Ped ped in World.GetNearbyPeds(player, 500f)) // nearby peds only
                 {
                     if (ped == null || !ped.Exists() || ped.IsDead || ped == player)
                         continue;
 
-                    // Salta i poliziotti o pedoni già in combattimento
+                    // Skip cops and peds already in combat
                     if (ped.RelationshipGroup == Game.GenerateHash("COP") || ped.IsInCombat)
                         continue;
 
-                    // Imposta la relazione a ostile
+                    // Set the relationship to hostile
                     ped.RelationshipGroup = Game.GenerateHash("HATE_GROUP");
                     Function.Call(Hash.SET_RELATIONSHIP_BETWEEN_GROUPS, 5, Game.GenerateHash("HATE_GROUP"), Game.Player.Character.RelationshipGroup);
                     Function.Call(Hash.SET_RELATIONSHIP_BETWEEN_GROUPS, 5, Game.Player.Character.RelationshipGroup, Game.GenerateHash("HATE_GROUP"));
 
                     if (ped.IsInVehicle() && ped == ped.CurrentVehicle.GetPedOnSeat(VehicleSeat.Driver))
                     {
-                        // Il pedone è il guidatore di un veicolo
+                        // The ped is the driver of a vehicle
                         Function.Call(Hash.TASK_VEHICLE_DRIVE_TO_COORD,
                                 ped,
                                 ped.CurrentVehicle,
                                 player.Position.X,
                                 player.Position.Y,
                                 player.Position.Z,
-                                60f,  // velocità
+                                60f,  // speed
                                 1,    // driving mode
                                 ped.CurrentVehicle.Model.Hash,
-                                1074528293, //786603 driving style: aggressive //1074528293 follia
+                                1074528293, //786603 driving style: aggressive //1074528293 madness
                                 10f,  // stopping range
                                 5f    // straight line distance tolerance 
                           );
@@ -1763,34 +2398,34 @@ namespace EssentialMenu
                     ped.Weapons.Give(WeaponHash.AssaultRifle, 9999, true, true);
                     
 
-                    // Ordina al pedone di attaccare il giocatore
+                    // Order the ped to attack the player
                     ped.Task.FightAgainst(player);
                 }
 
                 /*Ped player = Game.Player.Character;
                 Vector3 playerPos = player.Position;
 
-                foreach (Ped ped in World.GetNearbyPeds(player, 100f)) // solo pedoni vicini
+                foreach (Ped ped in World.GetNearbyPeds(player, 100f)) // nearby peds only
                 {
                     if (ped == null || !ped.Exists() || ped.IsDead || ped == player || convertedPeds.Contains(ped))
                         continue;
 
-                    // Evita poliziotti e pedoni già in combattimento
+                    // Avoid cops and peds already in combat
                     if (ped.RelationshipGroup == Game.GenerateHash("COP") || ped.IsInCombat)
                         continue;
 
-                    // Imposta relazione ostile
+                    // Set the relationship to hostile
                     ped.RelationshipGroup = hostileGroupHash;
                     Function.Call(Hash.SET_RELATIONSHIP_BETWEEN_GROUPS, 5, hostileGroupHash, player.RelationshipGroup);
                     Function.Call(Hash.SET_RELATIONSHIP_BETWEEN_GROUPS, 5, player.RelationshipGroup, hostileGroupHash);
 
-                    // Dai un'arma se non ne ha
+                    // Give a weapon if it has none
                     if (!ped.IsArmed())
                     {
                         ped.Weapons.Give(WeaponHash.Pistol, 100, true, true);
                     }
 
-                    // Attacca il giocatore
+                    // Attack the player
                     ped.Task.FightAgainst(player);
                     convertedPeds.Add(ped);
                 }*/
@@ -1805,14 +2440,14 @@ namespace EssentialMenu
                     if (ped == null || !ped.Exists() || ped.IsDead || ped == player)
                         continue;
 
-                    // Ripristina il gruppo relazionale dei pedoni (puoi usare "CIVMALE" o "CIVFEMALE")
+                    // Restore the peds' relationship group (you can use "CIVMALE" or "CIVFEMALE")
                     ped.RelationshipGroup = Game.GenerateHash("CIVMALE");
 
                     // Ferma eventuali task aggressivi
                     ped.Task.ClearAll();
                 }
 
-                // Ripristina le relazioni tra i gruppi
+                // Restore the relationships between groups
                 Function.Call(Hash.SET_RELATIONSHIP_BETWEEN_GROUPS, 0, Game.GenerateHash("HATE_GROUP"), Game.Player.Character.RelationshipGroup);
                 Function.Call(Hash.SET_RELATIONSHIP_BETWEEN_GROUPS, 0, Game.Player.Character.RelationshipGroup, Game.GenerateHash("HATE_GROUP"));
             }
@@ -1853,6 +2488,641 @@ namespace EssentialMenu
         private void SetMaxHealth(object sender, EventArgs e)
         {
             Game.Player.Character.Health = 400;
+        }
+
+        //==================== WEAPON SPAWNER / CUSTOMIZER / HASH GUN ====================
+        // "CarbineRifleMk2" -> "Carbine Rifle Mk2"
+        private static string Prettify(string name)
+        {
+            return System.Text.RegularExpressions.Regex.Replace(name, "(?<=[a-z0-9])(?=[A-Z])", " ");
+        }
+
+        private void SetupWeaponSpawner()
+        {
+            WeaponMenu.AddSubMenu(WeaponSpawnerMenu);
+            DemoPool.Add(WeaponSpawnerMenu);
+            WeaponSpawnerMenu.Add(wsammoitem);
+
+            // weapon group hash -> category name (anything unknown goes to "Other")
+            string[] catNames = { "Handguns", "SMGs", "Assault Rifles", "Machine Guns", "Shotguns", "Sniper Rifles", "Heavy Weapons", "Throwables", "Melee", "Other" };
+            long[] catGroups = { 416676503L, 3337201093L, 970310034L, 1159398588L, 860033945L, 3082541095L, 2725924767L, 1548507267L, 2685387236L, -1L };
+
+            NativeMenu[] catMenus = new NativeMenu[catNames.Length];
+            int[] counts = new int[catNames.Length];
+            for (int i = 0; i < catNames.Length; i++)
+                catMenus[i] = new NativeMenu(catNames[i], catNames[i], "");
+
+            HashSet<uint> done = new HashSet<uint>();
+            foreach (WeaponHash w in Enum.GetValues(typeof(WeaponHash)))
+            {
+                uint hash = (uint)w;
+                if (hash == 0 || !done.Add(hash))
+                    continue;
+                if (!Function.Call<bool>(Hash.IS_WEAPON_VALID, hash))
+                    continue;
+
+                long group = (long)(uint)Function.Call<int>(Hash.GET_WEAPONTYPE_GROUP, hash);
+                int cat = catNames.Length - 1;
+                for (int i = 0; i < catGroups.Length - 1; i++)
+                {
+                    if (catGroups[i] == group)
+                    {
+                        cat = i;
+                        break;
+                    }
+                }
+
+                WeaponHash weapon = w;
+                NativeItem item = new NativeItem(Prettify(w.ToString()));
+                item.Activated += (s, e) => SpawnWeapon(weapon);
+                catMenus[cat].Add(item);
+                counts[cat]++;
+            }
+
+            for (int i = 0; i < catMenus.Length; i++)
+            {
+                if (counts[i] == 0)
+                    continue;
+                WeaponSpawnerMenu.AddSubMenu(catMenus[i]);
+                DemoPool.Add(catMenus[i]);
+            }
+        }
+
+        private void SpawnWeapon(WeaponHash weapon)
+        {
+            int[] ammo = { 250, 1000, 9999 };
+            Game.Player.Character.Weapons.Give(weapon, ammo[wsAmmoIdx], true, true);
+            Notification.Show("~g~Weapon given: ~w~" + Prettify(weapon.ToString()));
+        }
+
+        private bool GetCurrentWeapon(out Ped p, out uint hash)
+        {
+            p = Game.Player.Character;
+            hash = (uint)p.Weapons.Current.Hash;
+            if (p.Weapons.Current.Hash == WeaponHash.Unarmed)
+            {
+                Notification.Show("~r~Equip a weapon first");
+                return false;
+            }
+            return true;
+        }
+
+        private void SetWeaponTint(int tint)
+        {
+            Ped p;
+            uint hash;
+            if (!GetCurrentWeapon(out p, out hash))
+                return;
+            Function.Call(Hash.SET_PED_WEAPON_TINT_INDEX, p, hash, tint);
+        }
+
+        private void SetAllComponents(bool add)
+        {
+            Ped p;
+            uint hash;
+            if (!GetCurrentWeapon(out p, out hash))
+                return;
+
+            int n = 0;
+            foreach (WeaponComponentHash c in Enum.GetValues(typeof(WeaponComponentHash)).Cast<WeaponComponentHash>().Distinct())
+            {
+                uint ch = (uint)c;
+                if (ch == 0 || !Function.Call<bool>(Hash.DOES_WEAPON_TAKE_WEAPON_COMPONENT, hash, ch))
+                    continue;
+
+                if (add)
+                    Function.Call(Hash.GIVE_WEAPON_COMPONENT_TO_PED, p, hash, ch);
+                else
+                    Function.Call(Hash.REMOVE_WEAPON_COMPONENT_FROM_PED, p, hash, ch);
+                n++;
+            }
+            Notification.Show((add ? "~g~Components added: ~w~" : "~g~Components removed: ~w~") + n);
+        }
+
+        private void OpenComponentBrowser(object sender, EventArgs e)
+        {
+            Ped p;
+            uint hash;
+            if (!GetCurrentWeapon(out p, out hash))
+                return;
+
+            WeaponComponentBrowserMenu.Clear();
+
+            foreach (WeaponComponentHash c in Enum.GetValues(typeof(WeaponComponentHash)).Cast<WeaponComponentHash>().Distinct())
+            {
+                uint ch = (uint)c;
+                if (ch == 0 || !Function.Call<bool>(Hash.DOES_WEAPON_TAKE_WEAPON_COMPONENT, hash, ch))
+                    continue;
+
+                bool has = Function.Call<bool>(Hash.HAS_PED_GOT_WEAPON_COMPONENT, p, hash, ch);
+                NativeCheckboxItem item = new NativeCheckboxItem(Prettify(c.ToString()), has);
+                item.Activated += (s2, a2) =>
+                {
+                    Ped pl = Game.Player.Character;
+                    if (item.Checked)
+                        Function.Call(Hash.GIVE_WEAPON_COMPONENT_TO_PED, pl, hash, ch);
+                    else
+                        Function.Call(Hash.REMOVE_WEAPON_COMPONENT_FROM_PED, pl, hash, ch);
+                };
+                WeaponComponentBrowserMenu.Add(item);
+            }
+
+            NativeItem backItem = new NativeItem("Go Back");
+            backItem.Activated += (s2, a2) =>
+            {
+                WeaponComponentBrowserMenu.Visible = false;
+                WeaponCustomMenu.Visible = true;
+            };
+            WeaponComponentBrowserMenu.Add(backItem);
+
+            WeaponCustomMenu.Visible = false;
+            WeaponComponentBrowserMenu.Visible = true;
+        }
+
+        private void DoHashGunTick(Ped player)
+        {
+            if (Game.GameTime < hashGunCooldown)
+                return;
+            if (!Function.Call<bool>(Hash.IS_PED_SHOOTING, player.Handle))
+                return;
+
+            OutputArgument aimed = new OutputArgument();
+            if (!Function.Call<bool>(Hash.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT, Game.Player.Handle, aimed))
+                return;
+
+            int handle = aimed.GetResult<int>();
+            if (handle == 0)
+                return;
+
+            Entity target = Entity.FromHandle(handle);
+            if (target == null || !target.Exists())
+                return;
+
+            hashGunCooldown = Game.GameTime + 600;
+
+            var ci = System.Globalization.CultureInfo.InvariantCulture;
+            string type = target is Ped ? "Ped" : (target is Vehicle ? "Vehicle" : "Object");
+            string name = "";
+            if (target is Vehicle)
+                name = ((Vehicle)target).DisplayName;
+
+            string modelHex = "0x" + ((uint)target.Model.Hash).ToString("X8");
+            Vector3 pos = target.Position;
+
+            string text = "~b~" + type + (name.Length > 0 ? ": ~w~" + name : "")
+                + "~n~~b~Model: ~w~" + modelHex + " (" + (uint)target.Model.Hash + ")"
+                + "~n~~b~Health: ~w~" + target.Health + "/" + target.MaxHealth
+                + "~n~~b~Pos: ~w~" + pos.X.ToString("F1", ci) + ", " + pos.Y.ToString("F1", ci) + ", " + pos.Z.ToString("F1", ci);
+            Notification.Show(text);
+
+            try
+            {
+                File.AppendAllText(Path.Combine("scripts", "hashgun.log"),
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + " | " + type + (name.Length > 0 ? " " + name : "")
+                    + " | model " + modelHex + " | pos " + pos.X.ToString("F2", ci) + ", " + pos.Y.ToString("F2", ci) + ", " + pos.Z.ToString("F2", ci)
+                    + " | heading " + target.Heading.ToString("F1", ci) + Environment.NewLine);
+            }
+            catch (Exception)
+            {
+                // the log is optional: ignore write errors
+            }
+        }
+
+        private void DoWeaponExtrasTick()
+        {
+            Ped player = Game.Player.Character;
+            if (player == null || !player.Exists())
+                return;
+
+            if (hashGunOn)
+                DoHashGunTick(player);
+
+            if (tintCycleOn && Game.GameTime >= tintCycleNext)
+            {
+                tintCycleNext = Game.GameTime + 350;
+                tintCycleIdx = (tintCycleIdx + 1) % (player.Weapons.Current.Hash.ToString().Contains("Mk2") ? 32 : 8);
+                uint hash = (uint)player.Weapons.Current.Hash;
+                if (player.Weapons.Current.Hash != WeaponHash.Unarmed)
+                    Function.Call(Hash.SET_PED_WEAPON_TINT_INDEX, player, hash, tintCycleIdx);
+            }
+        }
+
+        //==================== VEHICLE EXTRAS ====================
+        private Vehicle GetPlayerVehicle(bool notify)
+        {
+            Ped p = Game.Player.Character;
+            if (p != null && p.Exists() && p.IsInVehicle())
+            {
+                Vehicle v = p.CurrentVehicle;
+                if (v != null && v.Exists())
+                    return v;
+            }
+            if (notify)
+                Notification.Show("~r~You are not in a vehicle");
+            return null;
+        }
+
+        private void SetDriftMode(object sender, EventArgs e)
+        {
+            driftOn = driftitem.Checked;
+            Vehicle v = GetPlayerVehicle(false);
+            if (v != null)
+                Function.Call(Hash.SET_VEHICLE_REDUCE_GRIP, v, driftOn);
+        }
+
+        private void SetHoverMode(object sender, EventArgs e)
+        {
+            hoverOn = hoveritem.Checked;
+            if (!hoverOn && hoverVeh != null && hoverVeh.Exists())
+            {
+                Function.Call(Hash.SET_ENTITY_HAS_GRAVITY, hoverVeh, true);
+                hoverVeh = null;
+            }
+        }
+
+        private void SetVehicleJump(object sender, EventArgs e)
+        {
+            Vehicle v = GetPlayerVehicle(true);
+            if (v == null)
+                return;
+            Vector3 vel = v.Velocity;
+            v.Velocity = new Vector3(vel.X, vel.Y, vel.Z + 9f);
+        }
+
+        // action: 0 = open, 1 = close, 2 = remove
+        private void SetDoor(int door, int action, bool silent = false)
+        {
+            Vehicle v = GetPlayerVehicle(!silent);
+            if (v == null)
+                return;
+
+            if (action == 0)
+                Function.Call(Hash.SET_VEHICLE_DOOR_OPEN, v, door, false, false);
+            else if (action == 1)
+                Function.Call(Hash.SET_VEHICLE_DOOR_SHUT, v, door, false);
+            else
+                Function.Call(Hash.SET_VEHICLE_DOOR_BROKEN, v, door, false);
+        }
+
+        private void ApplyNeon()
+        {
+            Vehicle v = GetPlayerVehicle(false);
+            if (v == null)
+                return;
+
+            v.Mods.NeonLightsColor = neonColors[neonColorIdx];
+            v.Mods.SetNeonLightsOn(VehicleNeonLight.Left, neonitem.Checked);
+            v.Mods.SetNeonLightsOn(VehicleNeonLight.Right, neonitem.Checked);
+            v.Mods.SetNeonLightsOn(VehicleNeonLight.Front, neonitem.Checked);
+            v.Mods.SetNeonLightsOn(VehicleNeonLight.Back, neonitem.Checked);
+        }
+
+        private void SetNeon(object sender, EventArgs e)
+        {
+            if (GetPlayerVehicle(true) == null)
+            {
+                neonitem.Checked = false;
+                return;
+            }
+            ApplyNeon();
+        }
+
+        // Saved vehicle line: "slot=model|c1|c2|pearl|wheelColor|wheelType|tint|livery|plate|mods(0-48)|toggles(17-22)|neonR,G,B"
+        private string[] ReadSavedVehicles()
+        {
+            string[] slots = new string[3];
+            if (!File.Exists(savedVehPath))
+                return slots;
+
+            foreach (string line in File.ReadAllLines(savedVehPath))
+            {
+                int eq = line.IndexOf('=');
+                int n;
+                if (eq > 0 && int.TryParse(line.Substring(0, eq), out n) && n >= 1 && n <= 3)
+                    slots[n - 1] = line.Substring(eq + 1);
+            }
+            return slots;
+        }
+
+        private void SetSaveVehicle(object sender, EventArgs e)
+        {
+            Vehicle v = GetPlayerVehicle(true);
+            if (v == null)
+                return;
+
+            OutputArgument c1 = new OutputArgument(), c2 = new OutputArgument();
+            OutputArgument pearl = new OutputArgument(), wheel = new OutputArgument();
+            Function.Call(Hash.GET_VEHICLE_COLOURS, v, c1, c2);
+            Function.Call(Hash.GET_VEHICLE_EXTRA_COLOURS, v, pearl, wheel);
+
+            List<string> mods = new List<string>();
+            for (int i = 0; i <= 48; i++)
+                mods.Add(Function.Call<int>(Hash.GET_VEHICLE_MOD, v, i).ToString());
+
+            List<string> toggles = new List<string>();
+            for (int i = 17; i <= 22; i++)
+                toggles.Add(Function.Call<bool>(Hash.IS_TOGGLE_MOD_ON, v, i) ? "1" : "0");
+
+            System.Drawing.Color neon = v.Mods.NeonLightsColor;
+            bool neonOn = v.Mods.IsNeonLightsOn(VehicleNeonLight.Left);
+
+            string data = v.Model.Hash + "|" + c1.GetResult<int>() + "|" + c2.GetResult<int>() + "|" + pearl.GetResult<int>() + "|" + wheel.GetResult<int>()
+                + "|" + Function.Call<int>(Hash.GET_VEHICLE_WHEEL_TYPE, v)
+                + "|" + Function.Call<int>(Hash.GET_VEHICLE_WINDOW_TINT, v)
+                + "|" + Function.Call<int>(Hash.GET_VEHICLE_LIVERY, v)
+                + "|" + v.Mods.LicensePlate.Replace("|", "").Replace("=", "")
+                + "|" + string.Join(",", mods.ToArray())
+                + "|" + string.Join(",", toggles.ToArray())
+                + "|" + neon.R + "," + neon.G + "," + neon.B + "," + (neonOn ? 1 : 0);
+
+            string[] slots = ReadSavedVehicles();
+            slots[vehSlot] = data;
+            List<string> lines = new List<string>();
+            for (int i = 0; i < 3; i++)
+            {
+                if (!string.IsNullOrEmpty(slots[i]))
+                    lines.Add((i + 1) + "=" + slots[i]);
+            }
+            File.WriteAllLines(savedVehPath, lines.ToArray());
+            Notification.Show("~g~Vehicle saved in slot " + (vehSlot + 1));
+        }
+
+        private void SetLoadVehicle(object sender, EventArgs e)
+        {
+            string data = ReadSavedVehicles()[vehSlot];
+            if (string.IsNullOrEmpty(data))
+            {
+                Notification.Show("~r~Slot " + (vehSlot + 1) + " is empty");
+                return;
+            }
+
+            string[] f = data.Split('|');
+            if (f.Length < 12)
+            {
+                Notification.Show("~r~Slot " + (vehSlot + 1) + " is corrupted");
+                return;
+            }
+
+            Model model = new Model(int.Parse(f[0]));
+            if (!model.IsInCdImage || !model.IsValid)
+            {
+                Notification.Show("~r~Saved model is not valid");
+                return;
+            }
+
+            model.Request(1000);
+            int waited = 0;
+            while (!model.IsLoaded && waited < 3000)
+            {
+                Script.Wait(50);
+                waited += 50;
+            }
+
+            Ped p = Game.Player.Character;
+            Vehicle v = World.CreateVehicle(model, p.Position + (p.ForwardVector * 5f), p.Heading);
+            model.MarkAsNoLongerNeeded();
+            if (v == null)
+            {
+                Notification.Show("~r~Could not create the vehicle");
+                return;
+            }
+
+            Function.Call(Hash.SET_VEHICLE_MOD_KIT, v, 0);
+            Function.Call(Hash.SET_VEHICLE_COLOURS, v, int.Parse(f[1]), int.Parse(f[2]));
+            Function.Call(Hash.SET_VEHICLE_EXTRA_COLOURS, v, int.Parse(f[3]), int.Parse(f[4]));
+            Function.Call(Hash.SET_VEHICLE_WHEEL_TYPE, v, int.Parse(f[5]));
+            Function.Call(Hash.SET_VEHICLE_WINDOW_TINT, v, int.Parse(f[6]));
+            int livery = int.Parse(f[7]);
+            if (livery >= 0)
+                Function.Call(Hash.SET_VEHICLE_LIVERY, v, livery);
+            v.Mods.LicensePlate = f[8];
+
+            string[] mods = f[9].Split(',');
+            for (int i = 0; i < mods.Length && i <= 48; i++)
+            {
+                int idx = int.Parse(mods[i]);
+                if (idx >= 0)
+                    Function.Call(Hash.SET_VEHICLE_MOD, v, i, idx, false);
+            }
+
+            string[] toggles = f[10].Split(',');
+            for (int i = 0; i < toggles.Length && i < 6; i++)
+                Function.Call(Hash.TOGGLE_VEHICLE_MOD, v, 17 + i, toggles[i] == "1");
+
+            string[] neon = f[11].Split(',');
+            if (neon.Length >= 4)
+            {
+                v.Mods.NeonLightsColor = System.Drawing.Color.FromArgb(int.Parse(neon[0]), int.Parse(neon[1]), int.Parse(neon[2]));
+                bool on = neon[3] == "1";
+                v.Mods.SetNeonLightsOn(VehicleNeonLight.Left, on);
+                v.Mods.SetNeonLightsOn(VehicleNeonLight.Right, on);
+                v.Mods.SetNeonLightsOn(VehicleNeonLight.Front, on);
+                v.Mods.SetNeonLightsOn(VehicleNeonLight.Back, on);
+            }
+
+            p.SetIntoVehicle(v, VehicleSeat.Driver);
+            Notification.Show("~g~Vehicle loaded from slot " + (vehSlot + 1));
+        }
+
+        private void DoVehicleExtrasTick()
+        {
+            if (!nitroOn && !driftOn && !glideOn && !hoverOn)
+                return;
+
+            Vehicle v = GetPlayerVehicle(false);
+            if (v == null)
+                return;
+
+            if (driftOn)
+                Function.Call(Hash.SET_VEHICLE_REDUCE_GRIP, v, true);
+
+            if (nitroOn && Game.IsKeyPressed(Keys.LShiftKey) && v.Driver == Game.Player.Character)
+                v.ForwardSpeed = Math.Min(Vector3.Dot(v.Velocity, v.ForwardVector) + (nitroPowers[nitroIdx] * Game.LastFrameTime), 90f);
+
+            if (glideOn && !hoverOn && v.IsInAir)
+            {
+                Vector3 vel = v.Velocity;
+                if (vel.Z < -3f)
+                    v.Velocity = new Vector3(vel.X, vel.Y, -3f);
+            }
+
+            if (hoverOn)
+            {
+                hoverVeh = v;
+                Function.Call(Hash.SET_ENTITY_HAS_GRAVITY, v, false);
+
+                Vector3 vel = v.Velocity;
+                float vz = vel.Z * 0.9f;
+                if (noclipKeys.Contains(Keys.Space)) vz = 12f;
+                if (noclipKeys.Contains(Keys.ControlKey) || noclipKeys.Contains(Keys.LControlKey)) vz = -12f;
+                v.Velocity = new Vector3(vel.X, vel.Y, vz);
+            }
+        }
+
+        //==================== PLAYER EXTRAS ====================
+        // Reads the saved slots: file lines look like "1=x;y;z;heading"
+        private string[] ReadSavedPositions()
+        {
+            string[] slots = new string[5];
+            if (!File.Exists(savedPosPath))
+                return slots;
+
+            foreach (string line in File.ReadAllLines(savedPosPath))
+            {
+                int eq = line.IndexOf('=');
+                int n;
+                if (eq > 0 && int.TryParse(line.Substring(0, eq), out n) && n >= 1 && n <= 5)
+                    slots[n - 1] = line.Substring(eq + 1);
+            }
+            return slots;
+        }
+
+        private void SetSavePosition(object sender, EventArgs e)
+        {
+            Ped p = Game.Player.Character;
+            var ci = System.Globalization.CultureInfo.InvariantCulture;
+            string[] slots = ReadSavedPositions();
+            Vector3 pos = p.Position;
+            slots[savedSlot] = pos.X.ToString("F3", ci) + ";" + pos.Y.ToString("F3", ci) + ";" + pos.Z.ToString("F3", ci) + ";" + p.Heading.ToString("F1", ci);
+
+            List<string> lines = new List<string>();
+            for (int i = 0; i < 5; i++)
+            {
+                if (!string.IsNullOrEmpty(slots[i]))
+                    lines.Add((i + 1) + "=" + slots[i]);
+            }
+            File.WriteAllLines(savedPosPath, lines.ToArray());
+            Notification.Show("~g~Position saved in slot " + (savedSlot + 1));
+        }
+
+        private void SetLoadPosition(object sender, EventArgs e)
+        {
+            string data = ReadSavedPositions()[savedSlot];
+            if (string.IsNullOrEmpty(data))
+            {
+                Notification.Show("~r~Slot " + (savedSlot + 1) + " is empty");
+                return;
+            }
+
+            var ci = System.Globalization.CultureInfo.InvariantCulture;
+            string[] parts = data.Split(';');
+            float x, y, z, h;
+            if (parts.Length < 4
+                || !float.TryParse(parts[0], System.Globalization.NumberStyles.Float, ci, out x)
+                || !float.TryParse(parts[1], System.Globalization.NumberStyles.Float, ci, out y)
+                || !float.TryParse(parts[2], System.Globalization.NumberStyles.Float, ci, out z)
+                || !float.TryParse(parts[3], System.Globalization.NumberStyles.Float, ci, out h))
+            {
+                Notification.Show("~r~Slot " + (savedSlot + 1) + " is corrupted");
+                return;
+            }
+
+            Ped p = Game.Player.Character;
+            Entity target = p.IsInVehicle() ? (Entity)p.CurrentVehicle : p;
+            Function.Call(Hash.REQUEST_COLLISION_AT_COORD, x, y, z);
+            Function.Call(Hash.SET_ENTITY_COORDS_NO_OFFSET, target.Handle, x, y, z, false, false, false);
+            target.Heading = h;
+            Notification.Show("~g~Teleported to slot " + (savedSlot + 1));
+        }
+
+        private void SetListPositions(object sender, EventArgs e)
+        {
+            string[] slots = ReadSavedPositions();
+            string report = "Saved positions";
+            for (int i = 0; i < 5; i++)
+                report += "~n~Slot " + (i + 1) + ": " + (string.IsNullOrEmpty(slots[i]) ? "~r~empty~s~" : "~g~saved~s~");
+            Notification.Show(report);
+        }
+
+        private void SetGameSpeed(object sender, EventArgs e)
+        {
+            if (gameSpeedUpdating)
+                return;
+
+            int v = Math.Max(1, gamespeedslider.Value);
+            Function.Call(Hash.SET_TIME_SCALE, v / 10f);
+        }
+
+        private void SetInfStamina(object sender, EventArgs e)
+        {
+            infStamina = infstaminaitem.Checked;
+        }
+
+        private void SetInfBreath(object sender, EventArgs e)
+        {
+            infBreath = infbreathitem.Checked;
+            if (!infBreath)
+                Function.Call(Hash.SET_PED_MAX_TIME_UNDERWATER, Game.Player.Character, 10f);
+        }
+
+        private void SetRagdollNow(object sender, EventArgs e)
+        {
+            Ped p = Game.Player.Character;
+            if (p.IsInVehicle())
+            {
+                Notification.Show("~r~Exit the vehicle first");
+                return;
+            }
+            Function.Call(Hash.SET_PED_TO_RAGDOLL, p, 3000, 3000, 0, false, false, false);
+        }
+
+        private void SetNoRagdoll(object sender, EventArgs e)
+        {
+            noRagdoll = noragdollitem.Checked;
+            if (!noRagdoll)
+                Function.Call(Hash.SET_PED_CAN_RAGDOLL, Game.Player.Character, true);
+        }
+
+        private void DoPlayerExtrasTick()
+        {
+            Ped p = Game.Player.Character;
+            if (p == null || !p.Exists())
+                return;
+
+            if (infStamina)
+                Function.Call(Hash.RESTORE_PLAYER_STAMINA, Game.Player, 1.0f);
+
+            if (infBreath)
+                Function.Call(Hash.SET_PED_MAX_TIME_UNDERWATER, p, 10000f);
+
+            if (noRagdoll)
+            {
+                Function.Call(Hash.SET_PED_CAN_RAGDOLL, p, false);
+                Function.Call(Hash.SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT, p, false);
+            }
+        }
+
+        private void SetWantedLevel(int stars)
+        {
+            if (neverwanted.Checked)
+            {
+                Notification.Show("~r~Disable Never Wanted first");
+                return;
+            }
+
+            Game.MaxWantedLevel = 5;
+            Game.Player.WantedLevel = stars;
+            Function.Call(Hash.SET_PLAYER_WANTED_LEVEL_NOW, Game.Player, false);
+            Notification.Show(stars == 0 ? "~g~Wanted level cleared" : "~y~Wanted level: ~w~" + stars + " star(s)");
+        }
+
+        private void SetRemoveAllWeapons(object sender, EventArgs e)
+        {
+            Game.Player.Character.Weapons.RemoveAll();
+            Notification.Show("~g~All weapons removed");
+        }
+
+        private void SetRemoveCurrentWeapon(object sender, EventArgs e)
+        {
+            Ped player = Game.Player.Character;
+            WeaponHash current = player.Weapons.Current.Hash;
+            if (current == WeaponHash.Unarmed)
+            {
+                Notification.Show("~r~No weapon in hand");
+                return;
+            }
+            player.Weapons.Remove(current);
+            Notification.Show("~g~Current weapon removed");
         }
 
         private void SetNeverWanted(object sender, EventArgs e)
@@ -2041,7 +3311,7 @@ namespace EssentialMenu
             if (expoweap.Checked == false)
             {
                 expowpon = false;
-                //aggiungi codice per disabilitare munizioni esplosive
+                //add code to disable explosive ammo
             }
         }
 
@@ -2054,7 +3324,7 @@ namespace EssentialMenu
             if (expomelee.Checked == false)
             {
                 expoml = false;
-                //aggiungi codice per disabilitare munizioni esplosive
+                //add code to disable explosive ammo
             }
         }
 
@@ -2068,7 +3338,7 @@ namespace EssentialMenu
             if (moneygunop.Checked == false)
             {
                 moneygun = false;
-                //aggiungi codice per disabilitare munizioni esplosive
+                //add code to disable explosive ammo
             }
         }
 
@@ -2102,7 +3372,7 @@ namespace EssentialMenu
             if (ped == null || !ped.Exists())
                 return;
 
-            // In auto muovo il veicolo, a piedi il personaggio
+            // In a car I move the vehicle, on foot the character
             Entity target = ped.IsInVehicle() ? (Entity)ped.CurrentVehicle : (Entity)ped;
 
             if (noclipEntity != target)
@@ -2114,7 +3384,7 @@ namespace EssentialMenu
             Function.Call(Hash.SET_ENTITY_COLLISION, target.Handle, false, false);
             target.IsPositionFrozen = true;
 
-            // Direzione dalla camera (yaw = Rotation.Z, pitch = Rotation.X, in gradi)
+            // Direction from the camera (yaw = Rotation.Z, pitch = Rotation.X, in degrees)
             Vector3 camRot = GameplayCamera.Rotation;
             float yaw = camRot.Z * (float)Math.PI / 180f;
             float pitch = camRot.X * (float)Math.PI / 180f;
@@ -2178,7 +3448,7 @@ namespace EssentialMenu
                     else
                         ped.Position = dest;
 
-                    teleportGunCooldown = Game.GameTime + 400; // evita teleport multipli con il fuoco automatico
+                    teleportGunCooldown = Game.GameTime + 400; // avoids multiple teleports with automatic fire
                 }
             }
         }
@@ -2204,7 +3474,7 @@ namespace EssentialMenu
             if (!Function.Call<bool>(Hash.IS_PED_SHOOTING, player.Handle))
                 return;
 
-            // Entita' verso cui il giocatore sta mirando (ped, veicolo o oggetto)
+            // Entity the player is aiming at (ped, vehicle or object)
             OutputArgument aimed = new OutputArgument();
             if (!Function.Call<bool>(Hash.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT, Game.Player.Handle, aimed))
                 return;
@@ -2217,13 +3487,13 @@ namespace EssentialMenu
             if (target == null || !target.Exists())
                 return;
 
-            // Non eliminare se stessi ne' il proprio veicolo
+            // Do not delete yourself or your own vehicle
             if (target.Handle == player.Handle)
                 return;
             if (player.IsInVehicle() && target.Handle == player.CurrentVehicle.Handle)
                 return;
 
-            // Serve per poter cancellare anche le entita' create dal gioco
+            // Needed to also delete entities created by the game
             Function.Call(Hash.SET_ENTITY_AS_MISSION_ENTITY, target.Handle, true, true);
             target.Delete();
 
@@ -2246,7 +3516,7 @@ namespace EssentialMenu
                 return;
 
             Vector3 pos = p.Position;
-            var ci = System.Globalization.CultureInfo.InvariantCulture; // punto decimale, comodo da copiare nel codice
+            var ci = System.Globalization.CultureInfo.InvariantCulture; // decimal point, handy to copy into code
 
             string caption = "X: " + pos.X.ToString("F2", ci)
                 + "   Y: " + pos.Y.ToString("F2", ci)
@@ -2265,7 +3535,7 @@ namespace EssentialMenu
                 GravityRelease(false);
         }
 
-        // Direzione in cui guarda la camera (yaw = Rotation.Z, pitch = Rotation.X, in gradi)
+        // Direction the camera is looking (yaw = Rotation.Z, pitch = Rotation.X, in degrees)
         private static Vector3 GetCameraForward()
         {
             Vector3 rot = GameplayCamera.Rotation;
@@ -2277,7 +3547,7 @@ namespace EssentialMenu
                 (float)Math.Sin(pitch));
         }
 
-        // Lascia l'entita' (throwIt = true la lancia in avanti)
+        // Releases the entity (throwIt = true throws it forward)
         private void GravityRelease(bool throwIt)
         {
             if (gravHeld != null && gravHeld.Exists())
@@ -2289,7 +3559,7 @@ namespace EssentialMenu
             }
 
             gravHeld = null;
-            gravCooldown = Game.GameTime + 300; // evita di riafferrare subito
+            gravCooldown = Game.GameTime + 300; // avoids grabbing it again right away
         }
 
         private void DoGravityGunTick()
@@ -2303,7 +3573,7 @@ namespace EssentialMenu
 
             bool aiming = Function.Call<bool>(Hash.IS_PLAYER_FREE_AIMING, Game.Player.Handle);
 
-            // Mentre miri il click serve alla gravity gun, non a sparare
+            // While aiming, the click is used by the gravity gun, not to shoot
             if (aiming)
                 Function.Call(Hash.DISABLE_CONTROL_ACTION, 0, 24, true);
             bool click = Function.Call<bool>(Hash.IS_DISABLED_CONTROL_JUST_PRESSED, 0, 24);
@@ -2314,7 +3584,7 @@ namespace EssentialMenu
             Vector3 camPos = GameplayCamera.Position;
             Vector3 forward = GetCameraForward();
 
-            // --- Nessun oggetto in mano: click per afferrare quello che stai mirando ---
+            // --- No object in hand: click to grab what you are aiming at ---
             if (gravHeld == null)
             {
                 if (!aiming || !click || Game.GameTime < gravCooldown)
@@ -2332,7 +3602,7 @@ namespace EssentialMenu
                 if (target == null || !target.Exists() || target.Handle == player.Handle)
                     return;
 
-                // Se miri il guidatore o un passeggero (per esempio dal parabrezza) afferri tutto il veicolo
+                // If you aim at the driver or a passenger (e.g. through the windshield) you grab the whole vehicle
                 Ped aimedPed = target as Ped;
                 if (aimedPed != null && aimedPed.IsInVehicle())
                     target = aimedPed.CurrentVehicle;
@@ -2351,7 +3621,7 @@ namespace EssentialMenu
             // --- Oggetto in mano ---
             if (!aiming)
             {
-                GravityRelease(false); // hai smesso di mirare: lo lasci cadere
+                GravityRelease(false); // you stopped aiming: it is dropped
                 return;
             }
 
@@ -2361,16 +3631,16 @@ namespace EssentialMenu
                 return;
             }
 
-            // PagSu / PagGiu cambiano la distanza (i tasti arrivano dagli eventi KeyDown/KeyUp dello script)
+            // PageUp / PageDown change the distance (keys come from the script's KeyDown/KeyUp events)
             if (noclipKeys.Contains(Keys.PageUp))
                 gravDist = Math.Min(60f, gravDist + 15f * Game.LastFrameTime);
             if (noclipKeys.Contains(Keys.PageDown))
                 gravDist = Math.Max(3f, gravDist - 15f * Game.LastFrameTime);
 
-            // L'oggetto viene "tirato" verso il punto davanti alla camera
+            // The object is "pulled" toward the point in front of the camera
             Vector3 desired = camPos + forward * gravDist;
 
-            // I veicoli fermi sono "addormentati" per la fisica: va risvegliata prima di dargli velocita'
+            // Stationary vehicles are "asleep" for physics: wake them before giving them speed
             if (gravHeld is Vehicle)
                 Function.Call(Hash.ACTIVATE_PHYSICS, gravHeld.Handle);
 
@@ -2460,7 +3730,7 @@ namespace EssentialMenu
         {
             if (!Game.Player.Character.IsInVehicle())
             {
-                Notification.Show("~r~Non sei in un veicolo.");
+                Notification.Show("~r~You are not in a vehicle.");
                 return;
             }
 
@@ -2483,12 +3753,12 @@ namespace EssentialMenu
                 {
                     Function.Call(Hash.SET_VEHICLE_MOD_KIT, veh, 0);
                     Function.Call(Hash.SET_VEHICLE_COLOURS, veh, (int)kv.Value, (int)kv.Value);
-                    Notification.Show($"~g~Colore impostato: ~w~{kv.Key}");
+                    Notification.Show($"~g~Color set: ~w~{kv.Key}");
                 };
                 colorMenu.Add(item);
             }
 
-            // Aggiunge il pulsante Indietro
+            // Adds the Back button
             NativeItem backItem = new NativeItem("Go Back");
             backItem.Activated += (s2, a2) =>
             {
@@ -2916,7 +4186,7 @@ namespace EssentialMenu
 
             if (cayoOn && !cayoMpLoaded)
             {
-                Function.Call((Hash)0x888C3502DBBEEF5); // ON_ENTER_MP, una sola volta
+                Function.Call((Hash)0x888C3502DBBEEF5); // ON_ENTER_MP, only once
                 cayoMpLoaded = true;
             }
 
@@ -2959,7 +4229,7 @@ namespace EssentialMenu
         {
             if (!cayoOn)
             {
-                Notification.Show("~r~Attiva prima 'Load Cayo Perico'");
+                Notification.Show("~r~Enable 'Load Cayo Perico' first");
                 return;
             }
 
@@ -2986,7 +4256,7 @@ namespace EssentialMenu
             cayoOn = false;
             Function.Call((Hash)0x9A9D1BA639675CF1, "HeistIsland", false); // SET_ISLAND_HOPPER_ENABLED
             Function.Call((Hash)0x5E1460624D194A38, false);                // minimappa isola
-            Function.Call((Hash)0xF74B1FFA4A15FBEA, false);                // nodi AI isola (a memoria, la meno sicura)
+            Function.Call((Hash)0xF74B1FFA4A15FBEA, false);                // island AI nodes (from memory, the least certain)
             Function.Call(Hash.SET_AUDIO_FLAG, "PlayerOnDLCHeist4Island", false);
             Function.Call((Hash)0x9BAE5AD2508DF078, false);                // SET_INSTANCE_PRIORITY_MODE(1)
             Function.Call((Hash)0x0888C3502DBBEEF5, false);                      // ON_ENTER_MP
@@ -3001,7 +4271,7 @@ namespace EssentialMenu
 
         private void SetMethFarm(object sender, EventArgs e)
         {
-            // Carica i dati MP, come per Cayo (una sola volta)
+            // Loads the MP data, as for Cayo (only once)
             if (!cayoMpLoaded)
             {
                 Function.Call((Hash)0x888C3502DBBEEF5); // ON_ENTER_MP
@@ -3009,7 +4279,7 @@ namespace EssentialMenu
                 Script.Wait(1000);
             }
 
-            // Nomi a memoria: non so quale dei ware0X sia il meth, quindi li chiedo tutti
+            // Names from memory: I don't know which ware0X is the meth lab, so I request them all
             string[] bikerIpls =
             {
                  "bkr_biker_interior_placement_interior_1_biker_dlc_int_ware01_milo", //Meth Lab
@@ -3032,7 +4302,7 @@ namespace EssentialMenu
 
             if (interior == 0)
             {
-                Notification.Show("~r~Interno non trovato, teleport annullato");
+                Notification.Show("~r~Interior not found, teleport cancelled");
                 return;
             }
 
@@ -3047,7 +4317,7 @@ namespace EssentialMenu
                 waited += 100;
             }
 
-            // Entity set del meth lab (nomi a memoria)
+            // Meth lab entity sets (names from memory)
             string[] methSets =
             {
                  //"meth_lab_basic",
@@ -3109,7 +4379,7 @@ namespace EssentialMenu
 
             if (interior == 0)
             {
-                Notification.Show("~r~Interno non trovato, teleport annullato");
+                Notification.Show("~r~Interior not found, teleport cancelled");
                 return;
             }
 
@@ -3143,6 +4413,134 @@ namespace EssentialMenu
                 player.Character.Position = pos;
             else
                 player.Character.CurrentVehicle.Position = pos;
+        }
+
+        //==================== CASINO ====================
+        // Diamond Casino IPLs (names from public lists: if one doesn't exist REQUEST_IPL ignores it)
+        private static readonly string[] casinoIpls =
+        {
+            "vw_casino_main", "vw_casino_garage", "vw_casino_carpark", "vw_casino_penthouse",
+            "hei_dlc_windows_casino", "hei_dlc_windows_casino_lod",
+            "hei_dlc_casino_door", "hei_dlc_casino_door_lod",
+            "hei_dlc_casino_aircon", "hei_dlc_casino_aircon_lod",
+            "vw_dlc_casino_door", "vw_casino_billboard"
+        };
+
+        // Loads the online data (only once, as for Cayo and the bases) and requests the casino IPLs
+        private void LoadCasinoIpls()
+        {
+            if (!cayoMpLoaded)
+            {
+                Function.Call((Hash)0x888C3502DBBEEF5); // ON_ENTER_MP
+                cayoMpLoaded = true;
+                Script.Wait(1000);
+            }
+
+            foreach (string ipl in casinoIpls)
+                Function.Call(Hash.REQUEST_IPL, ipl);
+
+            Script.Wait(1500);
+        }
+
+        private int CountActiveCasinoIpls()
+        {
+            int n = 0;
+            foreach (string ipl in casinoIpls)
+            {
+                if (Function.Call<bool>(Hash.IS_IPL_ACTIVE, ipl))
+                    n++;
+            }
+            return n;
+        }
+
+        private void TeleportPlayerTo(Vector3 pos)
+        {
+            Function.Call(Hash.REQUEST_COLLISION_AT_COORD, pos.X, pos.Y, pos.Z);
+            Script.Wait(500);
+
+            Ped ped = Game.Player.Character;
+            Entity e = ped.IsInVehicle() ? (Entity)ped.CurrentVehicle : (Entity)ped;
+            Function.Call(Hash.SET_ENTITY_COORDS_NO_OFFSET, e.Handle, pos.X, pos.Y, pos.Z, false, false, false);
+        }
+
+        // probe = point inside the interior to find it again, dest = where you are moved, sets = entity sets to activate
+        private void TeleportToCasinoInterior(Vector3 probe, Vector3 dest, string[] sets, string tintSet, int tintIndex)
+        {
+            LoadCasinoIpls();
+
+            int interior = Function.Call<int>(Hash.GET_INTERIOR_AT_COORDS, probe.X, probe.Y, probe.Z);
+            if (interior == 0)
+            {
+                Notification.Show("~r~Casino interior not found (active IPLs: " + CountActiveCasinoIpls() + "/" + casinoIpls.Length
+                    + "). Try \"Casino IPL Status\"");
+                return;
+            }
+
+            Function.Call(Hash.PIN_INTERIOR_IN_MEMORY, interior);
+            Function.Call(Hash.DISABLE_INTERIOR, interior, false);
+            Function.Call(Hash.CAP_INTERIOR, interior, false);
+
+            int waited = 0;
+            while (!Function.Call<bool>(Hash.IS_INTERIOR_READY, interior) && waited < 5000)
+            {
+                Script.Wait(100);
+                waited += 100;
+            }
+
+            foreach (string set in sets)
+                Function.Call(Hash.ACTIVATE_INTERIOR_ENTITY_SET, interior, set);
+
+            if (!string.IsNullOrEmpty(tintSet))
+                Function.Call(Hash.SET_INTERIOR_ENTITY_SET_TINT_INDEX, interior, tintSet, tintIndex);
+
+            Function.Call(Hash.REFRESH_INTERIOR, interior);
+            Script.Wait(1000);
+
+            TeleportPlayerTo(dest);
+        }
+
+        private void SetCasinoEntrance(object sender, EventArgs e)
+        {
+            LoadCasinoIpls();
+            TeleportPlayerTo(new Vector3(924.0f, 46.0f, 81.1f));
+        }
+
+        private void SetCasinoFloor(object sender, EventArgs e)
+        {
+            TeleportToCasinoInterior(new Vector3(1100.0f, 220.0f, -50.0f), new Vector3(1089.7f, 206.2f, -48.99f),
+                new string[0], null, 0);
+        }
+
+        private void SetCasinoPenthouse(object sender, EventArgs e)
+        {
+            TeleportToCasinoInterior(new Vector3(976.636f, 70.295f, 115.164f), new Vector3(976.636f, 70.295f, 115.164f),
+                new string[]
+                {
+                    "Set_Pent_Tint_Shell", "Set_Pent_Pattern_01", "Set_Pent_Spa_Bar_Closed", "Set_Pent_Media_Bar_Open",
+                    "Set_Pent_Dealer", "Set_Pent_Arcade_Retro", "Set_Pent_Bar_Clutter", "Set_Pent_Clutter_01",
+                    "set_pent_bar_light_01", "set_pent_bar_party_0"
+                }, "Set_Pent_Tint_Shell", 3);
+        }
+
+        private void SetCasinoGarage(object sender, EventArgs e)
+        {
+            // coordinates taken from public lists: if it puts you in the void or outside the interior, report it
+            TeleportToCasinoInterior(new Vector3(1295.0f, 217.0f, -50.0f), new Vector3(1295.0f, 217.0f, -48.5f),
+                new string[0], null, 0);
+        }
+
+        private void SetCasinoCarPark(object sender, EventArgs e)
+        {
+            TeleportToCasinoInterior(new Vector3(1380.0f, 200.0f, -50.0f), new Vector3(1380.0f, 200.0f, -48.5f),
+                new string[0], null, 0);
+        }
+
+        private void SetCasinoDiag(object sender, EventArgs e)
+        {
+            string report = "Casino IPL (after ON_ENTER_MP: " + (cayoMpLoaded ? "yes" : "no") + ")";
+            foreach (string ipl in casinoIpls)
+                report += "~n~" + ipl + ": " + (Function.Call<bool>(Hash.IS_IPL_ACTIVE, ipl) ? "~g~YES~s~" : "~r~NO~s~");
+            Notification.Show(report);
         }
 
         private void SetWeedLab(object sender, EventArgs e)
@@ -3335,7 +4733,7 @@ namespace EssentialMenu
                 Script.Wait(1000);
             }
 
-            // Toglie gli altri stili, per non avere due arredamenti sovrapposti
+            // Removes the other styles, so two furnishings don't overlap
             foreach (string other in apartmentIpls)
             {
                 if (other != ipl)
@@ -3345,7 +4743,7 @@ namespace EssentialMenu
             Function.Call(Hash.REQUEST_IPL, ipl);
             Script.Wait(1500);
 
-            Notification.Show(ipl + " attivo: " + Function.Call<bool>(Hash.IS_IPL_ACTIVE, ipl));
+            Notification.Show(ipl + " active: " + Function.Call<bool>(Hash.IS_IPL_ACTIVE, ipl));
 
             int interior = Function.Call<int>(Hash.GET_INTERIOR_AT_COORDS, pos.X, pos.Y, pos.Z);
             if (interior != 0)
@@ -3414,7 +4812,7 @@ namespace EssentialMenu
                 Script.Wait(1000);
             }
 
-            // Solo gli uffici sono stili alternativi: garage e mod shop sono indipendenti
+            // Only the offices are alternative styles: garages and mod shop are independent
             if (isOffice)
             {
                 foreach (string other in arcadiusOfficeIpls)
@@ -3427,7 +4825,7 @@ namespace EssentialMenu
             Function.Call(Hash.REQUEST_IPL, ipl);
             Script.Wait(1500);
 
-            Notification.Show(ipl + " attivo: " + Function.Call<bool>(Hash.IS_IPL_ACTIVE, ipl));
+            Notification.Show(ipl + " active: " + Function.Call<bool>(Hash.IS_IPL_ACTIVE, ipl));
 
             int interior = Function.Call<int>(Hash.GET_INTERIOR_AT_COORDS, pos.X, pos.Y, pos.Z);
             if (interior != 0)
@@ -3564,7 +4962,7 @@ namespace EssentialMenu
                 Function.Call(Hash.REQUEST_IPL, "prologuerdb");
                 Function.Call(Hash.REQUEST_IPL, "prologuerd_lod");
         {
-            // Carica IPL di North Yankton
+            // Load North Yankton IPLs
             /*Function.Call(Hash.REQUEST_IPL, "prologue01");
             Function.Call(Hash.REQUEST_IPL, "prologue01_lod");
             Function.Call(Hash.REQUEST_IPL, "prologue01c");
@@ -3679,10 +5077,10 @@ namespace EssentialMenu
         {
             Function.Call(Hash.SET_CLOCK_TIME, hour, 0, 0);
             SyncTimeSlider(hour);
-            Notification.Show("Ora impostata: " + hour.ToString("00") + ":00");
+            Notification.Show("Time set: " + hour.ToString("00") + ":00");
         }
 
-        // Aggiorna lo slider senza far scattare di nuovo il suo evento
+        // Updates the slider without triggering its event again
         private void SyncTimeSlider(int hour)
         {
             timeSliderUpdating = true;
@@ -3855,7 +5253,7 @@ namespace EssentialMenu
             {
                 Function.Call(Hash.PLAY_SOUND_FRONTEND, -1, "FocusIn", "HintCamSounds", true);
                 Function.Call(Hash.SET_TIME_SCALE, 0.3f);
-                Notification.Show("~b~Matrix Mode ~g~Attivata");
+                Notification.Show("~b~Matrix Mode ~g~Enabled");
             }
 
             if (MatrixVision.Checked == false)
@@ -3907,6 +5305,11 @@ namespace EssentialMenu
             DoDeleteGunTick();
             DoGravityGunTick();
             DoShowCoordsTick();
+            DoChauffeurTick();
+            DoBodyguardLoyaltyTick();
+            DoPlayerExtrasTick();
+            DoVehicleExtrasTick();
+            DoWeaponExtrasTick();
 
             if (Game.Player.Character.IsDead)
             {
@@ -4058,9 +5461,9 @@ namespace EssentialMenu
                 //DemoMenu.Visible = true;
 
                 //GTA.UI.Notification.Show("Welcome",true);
-                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.Call911,"Anonik","Welcome","Essential Menu 1.336 BETA", true,true);
+                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.Call911,"Anonik","Welcome","Essential Menu 1.338 BETA", true,true);
                 //ShowMissionPassedMessage("ESSENTIAL MENU", "Versione BETA");
-                // Crea e mostra un messaggio grande stile "Mission Passed" con titolo e sottotitolo
+                // Creates and shows a big "Mission Passed" style message with title and subtitle
                 //bigMessage = new BigMessage("ESSENTIAL MENU", "VERSIONE BETA", MessageType.MissionPassedOldGen);
                // bigMessageTimer = Environment.TickCount;
 
